@@ -4,7 +4,7 @@
  * @LastEditTime: 2021-01-10 01:00:18
  */
 import React from 'react';
-import {View} from 'react-native';
+import {View, StyleSheet, Dimensions} from 'react-native';
 import TabNavigator from 'react-native-tab-navigator';
 import SVG from 'react-native-svg-uri';
 import {
@@ -60,7 +60,7 @@ export default class TabBar extends React.Component {
     const {selectedTab, pages} = this.state;
     return (
       <View style={{flex: 1}}>
-        <TabNavigator>
+        <TabNavigator style={styles.content}>
           {pages.map((v, i) => (
             <TabNavigator.Item
               key={i}
@@ -78,3 +78,14 @@ export default class TabBar extends React.Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  content: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  },
+});
