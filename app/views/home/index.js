@@ -15,8 +15,9 @@ export default class Home extends React.Component {
     super(props);
     this.state = {
       isLoading: true,
+      isNewBook: false,
       baseUrl: 'http://www.xbiquge.la',
-      thisUrl: '/26/26765/19402615.html',
+      thisUrl: '/9/9673/4266254.html',
       prevUrl: '',
       nextUrl: '',
       bookHtml: '',
@@ -100,23 +101,26 @@ export default class Home extends React.Component {
 
   // 初始加载
   componentDidMount() {
-    storage
-    .load({
-      key: 'klfn',
-    })
-    .then(ret => {
-      this.setState({
-        isLoading: true,
-        thisUrl: ret.thisUrl,
+    if (this.state.isNewBook) {
+      this._loadHtml();
+    } else {
+      storage
+      .load({
+        key: 'klfn',
+      })
+      .then(ret => {
+        this.setState({
+          isLoading: true,
+          thisUrl: ret.thisUrl,
+        });
+        this._loadHtml();
+      })
+      .catch(err => {
+        console.warn(err.message);
+        alert(err.message);
+        this._loadHtml();
       });
-      this._loadHtml();
-    })
-    .catch(err => {
-      console.warn(err.message);
-      alert(err.message);
-      this._loadHtml();
-    });
-      // this._loadHtml();
+    }
   }
 
   render() {
