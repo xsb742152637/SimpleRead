@@ -4,7 +4,13 @@
  * @Date: 2021-05-02
  */
 import React from 'react';
-import {Text, StyleSheet, TouchableOpacity, View, Dimensions} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
 
 export default class BookCity extends React.Component {
   constructor(props) {
@@ -16,7 +22,7 @@ export default class BookCity extends React.Component {
       <View>
         <Text>书城</Text>
       </View>
-    )
+    );
   }
 }
 

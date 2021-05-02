@@ -1,9 +1,8 @@
 import React from 'react';
 //StackNavigator导航
 import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
 import TabBar from './tabbar';
 
@@ -13,7 +12,7 @@ import BookRead from './views/bookread/index';
 import Me from './views/me/index';
 import Search from './views/search/index';
 // 设置react-native路由导航
-const Stack  = createStackNavigator();
+const Stack = createStackNavigator();
 
 export default () => {
   return (

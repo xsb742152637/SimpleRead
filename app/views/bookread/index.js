@@ -4,10 +4,18 @@
  * @Date: 2021-05-02
  */
 import React from 'react';
-import {Text, StyleSheet, View, Dimensions, FlatList, TouchableOpacity, ScrollView, Button} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  Dimensions,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+  Button,
+} from 'react-native';
 import cheerio from 'cheerio';
 import storage from '../../config/storage';
-
 
 export default class BookRead extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -22,13 +30,11 @@ export default class BookRead extends React.Component {
       nextUrl: '',
       bookHtml: '',
       bookTitle: '',
-    }
+    };
   }
 
   // render渲染前触发，仅调用一次
-  componentwillMount() {
-
-  }
+  componentwillMount() {}
 
   // 组装请求路径
   _getUrl(url) {
@@ -44,18 +50,21 @@ export default class BookRead extends React.Component {
       thisUrl = this.state.nextUrl;
     }
 
-    this.setState({
-      isLoading: true,
-      thisUrl: thisUrl,
-      prevUrl: '',
-      nextUrl: '',
-    }, () => {
-      this._loadHtml();
-    });
+    this.setState(
+      {
+        isLoading: true,
+        thisUrl: thisUrl,
+        prevUrl: '',
+        nextUrl: '',
+      },
+      () => {
+        this._loadHtml();
+      },
+    );
   }
 
   _getContent(str) {
-    let strs = str.replace(/&nbsp;/g,'').split('<br>');
+    let strs = str.replace(/&nbsp;/g, '').split('<br>');
     let strNew = '';
     for (let i = 0; i < strs.length; i++) {
       let s = strs[i].toString().trim();
@@ -67,17 +76,15 @@ export default class BookRead extends React.Component {
   }
   // 请求html内容，并缓存
   _loadHtml() {
-    fetch(
-      this._getUrl()
-    )
-      .then((response) => {
+    fetch(this._getUrl())
+      .then(response => {
         if (response.status >= 200 && response.status < 300) {
           return response.text();
         }
       })
-      .then((responseJson) => {
+      .then(responseJson => {
         // alert(responseJson);
-        let $ = cheerio.load(responseJson,{decodeEntities:false});
+        let $ = cheerio.load(responseJson, {decodeEntities: false});
 
         this.setState({
           isLoading: false,
@@ -89,12 +96,12 @@ export default class BookRead extends React.Component {
         storage.save({
           key: 'klfn',
           data: {
-            thisUrl: this.state.thisUrl
+            thisUrl: this.state.thisUrl,
           },
         });
         // return responseJson.movies;
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error);
       });
   }
@@ -105,27 +112,27 @@ export default class BookRead extends React.Component {
       this._loadHtml();
     } else {
       storage
-      .load({
-        key: 'klfn',
-      })
-      .then(ret => {
-        this.setState({
-          isLoading: true,
-          thisUrl: ret.thisUrl,
+        .load({
+          key: 'klfn',
+        })
+        .then(ret => {
+          this.setState({
+            isLoading: true,
+            thisUrl: ret.thisUrl,
+          });
+          this._loadHtml();
+        })
+        .catch(err => {
+          console.warn(err.message);
+          alert(err.message);
+          this._loadHtml();
         });
-        this._loadHtml();
-      })
-      .catch(err => {
-        console.warn(err.message);
-        alert(err.message);
-        this._loadHtml();
-      });
     }
   }
 
   render() {
     if (this.state.isLoading) {
-      return (<Text>正在加载……</Text>);
+      return <Text>正在加载……</Text>;
     }
     return (
       <View style={styles.myView}>
@@ -135,18 +142,22 @@ export default class BookRead extends React.Component {
             accessibilityLabel="accessibility title"
             disabled={false}
             testID={'buttonTag'}
-            onPress={() => {this._clickButton(true)}}
-        />
-        <Text style={styles.bookTitle}>{this.state.bookTitle}</Text>
-        <Text style={styles.bookContent}>{this.state.bookHtml}</Text>
-        <Button
-          title={'下一章'}
-          style={styles.myButton}
-          accessibilityLabel="accessibility title"
-          disabled={false}
-          testID={'buttonTag'}
-          onPress={() => {this._clickButton(false)}}
-        />
+            onPress={() => {
+              this._clickButton(true);
+            }}
+          />
+          <Text style={styles.bookTitle}>{this.state.bookTitle}</Text>
+          <Text style={styles.bookContent}>{this.state.bookHtml}</Text>
+          <Button
+            title={'下一章'}
+            style={styles.myButton}
+            accessibilityLabel="accessibility title"
+            disabled={false}
+            testID={'buttonTag'}
+            onPress={() => {
+              this._clickButton(false);
+            }}
+          />
         </ScrollView>
       </View>
     );
@@ -166,7 +177,6 @@ const styles = StyleSheet.create({
   myView: {
     padding: 6,
     backgroundColor: '#CCE8CF',
-
   },
   myButton: {
     backgroundColor: '#FAF9DE',
@@ -178,11 +188,10 @@ const styles = StyleSheet.create({
     color: '#000',
     marginTop: 20,
     marginBottom: 10,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   bookContent: {
     fontSize: 16,
     color: '#555',
   },
 });
-

@@ -4,7 +4,16 @@
  * @Date: 2021-05-02
  */
 import React from 'react';
-import {Text, StyleSheet, View, Dimensions, FlatList, TouchableOpacity, ScrollView, Button} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  Dimensions,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+  Button,
+} from 'react-native';
 import cheerio from 'cheerio';
 import storage from '../../config/storage';
 
@@ -15,18 +24,14 @@ export default class BookList extends React.Component {
     this.state = {
       isLoading: true,
       isNewBook: false,
-    }
+    };
   }
 
   // render渲染前触发，仅调用一次
-  componentwillMount() {
-
-  }
+  componentwillMount() {}
 
   // 初始加载
-  componentDidMount() {
-
-  }
+  componentDidMount() {}
 
   render() {
     return (
@@ -52,7 +57,6 @@ const styles = StyleSheet.create({
   myView: {
     padding: 6,
     backgroundColor: '#CCE8CF',
-
   },
   myButton: {
     backgroundColor: '#FAF9DE',
@@ -64,11 +68,10 @@ const styles = StyleSheet.create({
     color: '#000',
     marginTop: 20,
     marginBottom: 10,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   bookContent: {
     fontSize: 16,
     color: '#555',
   },
 });
-
