@@ -1,91 +1,80 @@
 /*
- * @Author: zhangyu
- * @Date: 2021-01-09 23:50:02
- * @LastEditTime: 2021-01-10 01:00:18
+ * 底部导航
+ * @Author: xie
+ * @Date: 2021-05-02
  */
 import React from 'react';
-import {View, StyleSheet, Dimensions} from 'react-native';
-import TabNavigator from 'react-native-tab-navigator';
-import SVG from 'react-native-svg-uri';
-import {
-  home,
-  selectedHome,
-  message,
-  selectedMessage,
-  me,
-  selectedMe,
-} from './resources/svg/svg';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import Home from './views/home/index';
-import Message from './views/message/index';
+import MyIcon from './config/myIcon';
+import AppStyles from './utils/style'
+import Icon from 'react-native-vector-icons/dist/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+import BookList from './views/booklist/index';
+import BookCity from './views/bookcity/index';
 import Me from './views/me/index';
 
+const Tab = createBottomTabNavigator();
+
+const tabbarConfig = [
+  {
+    icon: 'shujia',
+    selectedIcon: 'shujia',
+    title: 'BookList',
+  },
+  {
+    icon: 'fenlei',
+    selectedIcon: 'fenlei',
+    title: 'BookCity',
+  },
+  {
+    icon: 'gerenzhongxin',
+    selectedIcon: 'gerenzhongxin',
+    title: 'Me',
+  },
+];
+
 export default class TabBar extends React.Component {
-  state = {
-    selectedTab: 'home',
-    pages: [
-      {
-        selected: 'home',
-        title: '首页',
-        renderIcon: () => <SVG width="20" height="20" svgXmlData={home} />,
-        renderSelectedIcon: () => (
-          <SVG width="20" height="20" svgXmlData={selectedHome} />
-        ),
-        onPress: () => this.setState({selectedTab: 'home'}),
-        component: <Home />,
-      },
-      {
-        selected: 'message',
-        title: '消息',
-        renderIcon: () => <SVG width="20" height="20" svgXmlData={message} />,
-        renderSelectedIcon: () => (
-          <SVG width="20" height="20" svgXmlData={selectedMessage} />
-        ),
-        onPress: () => this.setState({selectedTab: 'message'}),
-        component: <Message />,
-      },
-      {
-        selected: 'me',
-        title: '我的',
-        renderIcon: () => <SVG width="20" height="20" svgXmlData={me} />,
-        renderSelectedIcon: () => (
-          <SVG width="20" height="20" svgXmlData={selectedMe} />
-        ),
-        onPress: () => this.setState({selectedTab: 'me'}),
-        component: <Me />,
-      },
-    ],
-  };
+
   render() {
-    const {selectedTab, pages} = this.state;
     return (
-      <View style={{flex: 1}}>
-        <TabNavigator style={styles.content}>
-          {pages.map((v, i) => (
-            <TabNavigator.Item
-              key={i}
-              selected={selectedTab === v.selected}
-              title={v.title}
-              renderIcon={v.renderIcon}
-              renderSelectedIcon={v.renderSelectedIcon}
-              onPress={v.onPress}
-              selectedTitleStyle={{color: '#333333'}}>
-              {v.component}
-            </TabNavigator.Item>
-          ))}
-        </TabNavigator>
-      </View>
+      <Tab.Navigator
+        initialRouteName="BookList"
+        screenOptions={({route}) => ({
+          tabBarIcon: ({focused, color, size}) => {
+            let icon = '';
+            let iconColor = focused ? AppStyles.color.iconActive : AppStyles.color.icon;
+            let iconSize = focused ? AppStyles.fontSize.iconActive : AppStyles.fontSize.icon;
+            tabbarConfig &&
+            tabbarConfig.forEach(tabbar => {
+              if (route.name === tabbar.title) {
+                icon = focused ? tabbar.selectedIcon : tabbar.icon;
+              }
+            });
+            return (
+              <MyIcon name={icon} size={iconSize} color={iconColor}/>
+            );
+          },
+        })}
+        tabBarOptions={{
+          inactiveTintColor: AppStyles.color.icon, // 设置TabBar非选中状态下的标签和图标的颜色；
+          activeTintColor: AppStyles.color.iconActive, // 设置TabBar选中状态下的标签和图标的颜色
+          style: { // 整个底部导航栏样式
+            fontSize: AppStyles.fontSize.icon
+          },
+          labelStyle: { // 标签样式
+            fontSize: AppStyles.fontSize.label,
+          },
+          iconStyle: { // 图标样式
+
+          }
+
+        }}>
+        <Tab.Screen name="BookList" options={{title:'书架'}} component={BookList} />
+        <Tab.Screen name="BookCity" options={{title:'书城'}} component={BookCity} />
+        <Tab.Screen name="Me" options={{title:'我'}} component={Me} />
+      </Tab.Navigator>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  content: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-});

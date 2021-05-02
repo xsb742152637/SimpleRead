@@ -1,7 +1,7 @@
 /*
- * @Author: zhangyu
- * @Date: 2021-01-05 20:43:15
- * @LastEditTime: 2021-01-09 23:22:19
+ * 阅读
+ * @Author: xie
+ * @Date: 2021-05-02
  */
 import React from 'react';
 import {Text, StyleSheet, View, Dimensions, FlatList, TouchableOpacity, ScrollView, Button} from 'react-native';
@@ -9,7 +9,7 @@ import cheerio from 'cheerio';
 import storage from '../../config/storage';
 
 
-export default class Home extends React.Component {
+export default class BookRead extends React.Component {
   // 构造函数，可以在里面初始化props和state
   constructor(props) {
     super(props);

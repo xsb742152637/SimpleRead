@@ -1,18 +1,22 @@
 /*
- * @Author: zhangyu
- * @Date: 2021-01-05 20:42:53
- * @LastEditTime: 2021-01-09 23:22:42
+ * 书城
+ * @Author: xie
+ * @Date: 2021-05-02
  */
 import React from 'react';
-import {Text, StyleSheet, View, Dimensions} from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, View, Dimensions} from 'react-native';
 
-export default class Message extends React.Component {
+export default class BookCity extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
-      <View style={styles.content}>
-        <Text>消息</Text>
+      <View>
+        <Text>书城</Text>
       </View>
-    );
+    )
   }
 }
 

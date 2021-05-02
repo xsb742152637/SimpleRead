@@ -1,23 +1,28 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+//StackNavigator导航
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
 
 import TabBar from './tabbar';
-import Home from './views/home/index';
-import Message from './views/message/index';
+
+import BookCity from './views/bookcity/index';
+import BookList from './views/booklist/index';
+import BookRead from './views/bookread/index';
 import Me from './views/me/index';
+import Search from './views/search/index';
 // 设置react-native路由导航
-const AppStack = createStackNavigator();
+const Stack  = createStackNavigator();
 
 export default () => {
   return (
     <NavigationContainer>
-      <AppStack.Navigator headerMode="none" initialRouteName="TabBar">
-        <AppStack.Screen name="TabBar" component={TabBar} />
-        <AppStack.Screen name="Home" component={Home} />
-        <AppStack.Screen name="Message" component={Message} />
-        <AppStack.Screen name="Me" component={Me} />
-      </AppStack.Navigator>
+      <Stack.Navigator headerMode="none" initialRouteName="TabBar">
+        <Stack.Screen name="TabBar" component={TabBar} />
+        <Stack.Screen name="BookRead" component={BookRead} />
+        <Stack.Screen name="Search" component={Search} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
