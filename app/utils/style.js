@@ -3,14 +3,15 @@
  */
 export default AppStyles = {
   color: {
-    icon: '#999',
-    iconActive: '#500',
+    baseBackground: '#f7f7f7',
+    icon: '#a6a6a6',
+    iconActive: '#393939',
   },
   fontSize: {
     base: 18,
-    icon: 20, // 图标
-    iconActive: 24, // 图标
+    icon: 18, // 图标
+    iconActive: 20, // 图标
 
-    label: 14, // 标签文字
+    label: 13, // 标签文字
   },
 };

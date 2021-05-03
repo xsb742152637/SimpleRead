@@ -14,8 +14,7 @@ import {
   ScrollView,
   Button,
 } from 'react-native';
-import cheerio from 'cheerio';
-import storage from '../../config/storage';
+import AppStyles from '../../utils/style';
 
 export default class BookList extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -35,7 +34,7 @@ export default class BookList extends React.Component {
 
   render() {
     return (
-      <View style={styles.myView}>
+      <View style={styles.content}>
         <ScrollView style={styles.myScrollView}>
           <Text>{'这里是列表'}</Text>
         </ScrollView>
@@ -52,11 +51,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-    backgroundColor: '#CCE8CF',
-  },
-  myView: {
-    padding: 6,
-    backgroundColor: '#CCE8CF',
+    backgroundColor: AppStyles.color.baseBackground,
   },
   myButton: {
     backgroundColor: '#FAF9DE',
