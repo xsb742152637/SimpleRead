@@ -1,6 +1,8 @@
 /**
  * 全局样式变量
  */
+import {Dimensions} from 'react-native';
+let AppStyles;
 export default AppStyles = {
   color: {
     baseBackground: '#f7f7f7',
@@ -14,4 +16,9 @@ export default AppStyles = {
 
     label: 13, // 标签文字
   },
+  padding: {
+    baseTop: 10,
+    baseLeft: 14,
+  },
+  radius: 12,
 };

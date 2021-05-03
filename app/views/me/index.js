@@ -19,7 +19,7 @@ export default class Me extends React.Component {
 
   _back() {
     // alert('You tapped the next button2');
-    this.props.navigation.navigate('BookList');
+    this.props.navigation.navigate('BookRead');
     //返回
     // this.props.navigation.goBack()
     // 返回到第一层

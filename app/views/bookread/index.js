@@ -15,7 +15,7 @@ import {
   Button,
 } from 'react-native';
 import cheerio from 'cheerio';
-import storage from '../../config/storage';
+import storage from '@config/storage';
 
 export default class BookRead extends React.Component {
   // 构造函数，可以在里面初始化props和state

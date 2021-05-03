@@ -14,7 +14,8 @@ import {
   ScrollView,
   Button,
 } from 'react-native';
-import AppStyles from '../../utils/style';
+import MyIcon from '@config/myIcon';
+import AppStyles from '@utils/style';
 
 export default class BookList extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -23,6 +24,7 @@ export default class BookList extends React.Component {
     this.state = {
       isLoading: true,
       isNewBook: false,
+      bookList: [],
     };
   }
 
@@ -30,14 +32,48 @@ export default class BookList extends React.Component {
   componentwillMount() {}
 
   // 初始加载
-  componentDidMount() {}
+  componentDidMount() {
+    let data = [];
+    for (let i = 0; i < 100; i++) {
+      data.push({
+        index: i,
+        name: '我是：' + i,
+      });
+    }
+    this.setState({bookList: data});
+  }
 
+  _goSearch() {
+    this.props.navigation.navigate('Search');
+  }
+  _goReadHistory() {
+    this.props.navigation.navigate('ReadHistory');
+  }
+  _getItem(item) {
+    return (
+      <TouchableOpacity>
+        <Text style={styles.itemName}>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  }
   render() {
     return (
       <View style={styles.content}>
-        <ScrollView style={styles.myScrollView}>
-          <Text>{'这里是列表'}</Text>
-        </ScrollView>
+        <View style={styles.viewHeader}>
+          <TouchableOpacity
+            style={styles.myButton}
+            onPress={() => this._goReadHistory()}>
+            <MyIcon name={'yuedujilu'} size={AppStyles.fontSize.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this._goSearch()}>
+            <MyIcon name={'sousuo'} size={AppStyles.fontSize.icon} />
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          data={this.state.bookList}
+          keyExtractor={item => item.index}
+          renderItem={({item}) => this._getItem(item)}
+        />
       </View>
     );
   }
@@ -45,18 +81,23 @@ export default class BookList extends React.Component {
 
 const styles = StyleSheet.create({
   content: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingRight: AppStyles.padding.baseLeft,
+    paddingLeft: AppStyles.padding.baseLeft,
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
     backgroundColor: AppStyles.color.baseBackground,
+    flex: 1,
+  },
+  viewHeader: {
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
+    textAlign: 'right',
+    paddingTop: AppStyles.padding.baseTop,
+    paddingBottom: AppStyles.padding.baseTop,
   },
   myButton: {
-    backgroundColor: '#FAF9DE',
-    color: '#000',
-    borderRadius: 10,
+    paddingLeft: AppStyles.padding.baseLeft,
   },
   bookTitle: {
     fontSize: 30,

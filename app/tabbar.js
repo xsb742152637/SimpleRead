@@ -6,14 +6,14 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import MyIcon from './config/myIcon';
-import AppStyles from './utils/style';
+import MyIcon from '@config/myIcon';
+import AppStyles from '@utils/style';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import BookList from './views/booklist/index';
-import BookCity from './views/bookcity/index';
-import Me from './views/me/index';
+import BookList from '@views/booklist/index';
+import BookCity from '@views/bookcity/index';
+import Me from '@views/me/index';
 
 const Tab = createBottomTabNavigator();
 
