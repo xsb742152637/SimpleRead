@@ -11,6 +11,8 @@ import {
   View,
   Dimensions,
 } from 'react-native';
+import AppStyles from '@utils/style';
+import StyleConfig from '@config/styleConfig';
 
 export default class Me extends React.Component {
   constructor(props) {
@@ -28,7 +30,7 @@ export default class Me extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={AppStyles.content}>
         <Text>11</Text>
         <Text>22</Text>
         <TouchableOpacity onPress={() => this._back()}>
@@ -39,13 +41,4 @@ export default class Me extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  content: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-});
+const styles = StyleSheet.create({});

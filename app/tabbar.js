@@ -8,6 +8,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import MyIcon from '@config/myIcon';
 import AppStyles from '@utils/style';
+import StyleConfig from '@config/styleConfig';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -44,11 +45,11 @@ export default class TabBar extends React.Component {
           tabBarIcon: ({focused, color, size}) => {
             let icon = '';
             let iconColor = focused
-              ? AppStyles.color.iconActive
-              : AppStyles.color.icon;
+              ? StyleConfig.color.iconActive
+              : StyleConfig.color.icon;
             let iconSize = focused
-              ? AppStyles.fontSize.iconActive
-              : AppStyles.fontSize.icon;
+              ? StyleConfig.fontSize.iconActive
+              : StyleConfig.fontSize.icon;
             tabbarConfig &&
               tabbarConfig.forEach(tabbar => {
                 if (route.name === tabbar.title) {
@@ -59,15 +60,15 @@ export default class TabBar extends React.Component {
           },
         })}
         tabBarOptions={{
-          inactiveTintColor: AppStyles.color.icon, // 设置TabBar非选中状态下的标签和图标的颜色；
-          activeTintColor: AppStyles.color.iconActive, // 设置TabBar选中状态下的标签和图标的颜色
+          inactiveTintColor: StyleConfig.color.icon, // 设置TabBar非选中状态下的标签和图标的颜色；
+          activeTintColor: StyleConfig.color.iconActive, // 设置TabBar选中状态下的标签和图标的颜色
           style: {
             // 整个底部导航栏样式
-            fontSize: AppStyles.fontSize.icon,
+            fontSize: StyleConfig.fontSize.icon,
           },
           labelStyle: {
             // 标签样式
-            fontSize: AppStyles.fontSize.label,
+            fontSize: StyleConfig.fontSize.label,
           },
           iconStyle: {
             // 图标样式

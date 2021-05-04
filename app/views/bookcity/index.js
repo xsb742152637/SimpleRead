@@ -11,6 +11,8 @@ import {
   View,
   Dimensions,
 } from 'react-native';
+import AppStyles from '@utils/style';
+import StyleConfig from '@config/styleConfig';
 
 export default class BookCity extends React.Component {
   constructor(props) {
@@ -19,20 +21,11 @@ export default class BookCity extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={AppStyles.content}>
         <Text>书城</Text>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  content: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-});
+const styles = StyleSheet.create({});

@@ -1,24 +1,52 @@
 /**
  * 全局样式变量
  */
-import {Dimensions} from 'react-native';
-let AppStyles;
-export default AppStyles = {
-  color: {
-    baseBackground: '#f7f7f7',
-    icon: '#a6a6a6',
-    iconActive: '#393939',
-  },
-  fontSize: {
-    base: 18,
-    icon: 18, // 图标
-    iconActive: 20, // 图标
+'use strict';
 
-    label: 13, // 标签文字
+import React from 'react';
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Dimensions,
+  TextInput,
+  FlatList,
+  Image,
+  Keyboard,
+} from 'react-native';
+import StyleConfig from '@config/styleConfig';
+
+module.exports = StyleSheet.create({
+  content: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    backgroundColor: StyleConfig.color.baseBackground,
+  },
+  main: {
+    paddingRight: StyleConfig.padding.baseLeft,
+    paddingLeft: StyleConfig.padding.baseLeft,
+    paddingBottom: StyleConfig.padding.baseTop,
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: StyleConfig.color.header,
+    height: StyleConfig.headerHeight,
+    paddingRight: StyleConfig.padding.baseLeft,
+    paddingLeft: StyleConfig.padding.baseLeft,
+    borderBottomWidth: 1,
+    borderBottomColor: StyleConfig.color.border,
+    borderStyle: 'solid',
+    // borderWidth: 1,
+    // borderColor: 'red',
+    // borderStyle: 'solid',
   },
   padding: {
-    baseTop: 10,
-    baseLeft: 14,
+    paddingRight: StyleConfig.padding.baseLeft,
+    paddingLeft: StyleConfig.padding.baseLeft,
+    paddingTop: StyleConfig.padding.baseTop,
+    paddingBottom: StyleConfig.padding.baseTop,
   },
-  radius: 12,
-};
+});

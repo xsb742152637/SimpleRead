@@ -9,6 +9,7 @@ let persistConfig = {
   storage: AsyncStorage,
   stateReconciler: hardSet,
 };
+// eslint-disable-next-line no-undef
 const persistedReducer = persistReducer(persistConfig, reducer);
 export default function configureStore() {
   const store = createStore(persistedReducer);
