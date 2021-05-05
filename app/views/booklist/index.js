@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import {cloneObj} from '@/utils/function';
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
 import MyIcon from '@/config/myIcon';
@@ -30,29 +31,17 @@ export default class BookList extends React.Component {
 
   // 初始加载
   componentDidMount() {
-    let bookList = global.realm.objects('BookList').sorted('saveTime');
-    this.setState({bookList: bookList});
-
-    // this._goSearch();
-
-    // let item = {
-    //   author: '木三千',
-    //   bookId: '4B2B8B90-E9D3-411A-A5BF-F3470EFCE352',
-    //   bookName: '动物三国',
-    //   bookUrl: 'http://book.zongheng.com/book/967835.html',
-    //   chapterUrl: '',
-    //   imgUrl:
-    //     'http://static.zongheng.com/upload/cover/fb/80/fb805124ae3d16f9d33664f47ec8dcda.jpeg',
-    //   intro:
-    //     '这里是你闻所未闻的三国，它对你来说很陌生，却又很亲切。这里龙、猫、狗三足鼎力，它们又会擦出怎样的火花呢?',
-    //   isEnd: 1,
-    //   len: '2515字',
-    //   state: '连载',
-    //   type: '历史军事',
-    // };
-    // this.props.navigation.navigate('SearchDetail', item);
+    this._loadBookList();
   }
 
+  _loadBookList() {
+    let bookList = global.realm.objects('BookList').sorted('saveTime', true);
+    this.setState({bookList: cloneObj(bookList)});
+  }
+
+  _refresh() {
+    this._loadBookList();
+  }
   _goSearch() {
     this.props.navigation.navigate('Search');
   }
@@ -79,7 +68,9 @@ export default class BookList extends React.Component {
           <View style={styles.itemContent}>
             <Text style={styles.itemName}>{item.bookName}</Text>
             <Text numberOfLines={1} style={styles.itemAuthor}>
-              {'还未读过'}
+              {item.historyChapterTitle == ''
+                ? '还未读过'
+                : item.historyChapterTitle}
             </Text>
             <Text numberOfLines={1} style={styles.itemNewChapter}>
               {'最新章节：' + item.lastChapterTitle}
@@ -103,6 +94,11 @@ export default class BookList extends React.Component {
           <View style={styles.tools}>
             <TouchableOpacity
               style={styles.myButton}
+              onPress={() => this._refresh()}>
+              <Text>{'刷新'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.myButton}
               onPress={() => this._goReadHistory()}>
               <MyIcon name={'yuedujilu'} size={StyleConfig.fontSize.icon} />
             </TouchableOpacity>
@@ -119,7 +115,7 @@ export default class BookList extends React.Component {
           </View>
         ) : (
           <FlatList
-            style={styles.main}
+            style={global.appStyles.main}
             data={this.state.bookList}
             keyExtractor={item => item.bookId}
             renderItem={({item}) => this._getItem(item)}
@@ -131,12 +127,6 @@ export default class BookList extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  main: {
-    paddingTop: StyleConfig.padding.baseTop,
-    // borderWidth: 1,
-    // borderColor: 'red',
-    // borderStyle: 'solid',
-  },
   tools: {
     flex: 1,
     display: 'flex',
@@ -171,11 +161,13 @@ const styles = StyleSheet.create({
   itemView: {
     display: 'flex',
     flexDirection: 'row',
+    marginTop: StyleConfig.padding.baseTop,
     paddingTop: StyleConfig.padding.baseTop,
     paddingBottom: StyleConfig.padding.baseTop,
     paddingRight: StyleConfig.padding.baseLeft,
     paddingLeft: StyleConfig.padding.baseLeft,
     backgroundColor: '#fff',
+    borderRadius: StyleConfig.radius.base,
   },
   itemContent: {
     paddingLeft: StyleConfig.padding.baseLeft,

@@ -117,6 +117,7 @@ export default class BookRead extends React.Component {
           saveTime: new Date(),
           historyChapterTitle: that.state.title,
           detailId: that.state.detailId,
+          lastChapterUrl: that.state.lastChapterUrl,
           historyChapterPage: that.state.page,
         },
         true,

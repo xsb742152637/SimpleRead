@@ -6,6 +6,19 @@ export let getWidth = ratio => {
   return Dimensions.get('window').width * ratio;
 };
 
+export let cloneObj = obj => {
+  console.log(obj.length);
+  if (obj.length != undefined) {
+    let a = new Array();
+    for (let i = 0; i < obj.length; i++) {
+      a.push(JSON.parse(JSON.stringify(obj[i])));
+    }
+    return a;
+  } else {
+    return JSON.parse(JSON.stringify(obj));
+  }
+};
+
 // 自动生成uuid
 export let getId = () => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'

@@ -12,7 +12,7 @@ import {
   Dimensions,
   Image,
 } from 'react-native';
-import {getWidth} from '@/utils/function';
+import {getWidth, cloneObj} from '@/utils/function';
 import Back from '@/components/back';
 import MyIcon from '@/config/myIcon';
 import StyleConfig from '@/config/styleConfig';
@@ -47,10 +47,7 @@ export default class SearchDetail extends React.Component {
         console.error(error);
       });
   }
-  _readBook() {
-    global.toast.add('开始阅读吧……');
-  }
-  _addBookList() {
+  _addBookList(type) {
     let that = this;
     let BookChapterDetail = global.realm.objects('BookList');
     // 判断是否已存在
@@ -66,27 +63,10 @@ export default class SearchDetail extends React.Component {
       global.toast.add('书架已存在这本书，别点了哦……');
     } else {
       let d = that.state.bookInfo;
-      // console.log({
-      //   bookId: d.bookId,
-      //   bookName: d.bookName,
-      //   author: d.author,
-      //   bookUrl: d.bookUrl,
-      //   chapterUrl: d.chapterUrl,
-      //   imgUrl: d.imgUrl,
-      //   lastChapterUrl: d.lastChapterUrl,
-      //   lastChapterTitle: d.lastChapterTitle,
-      //   lastChapterTime: d.lastChapterTime,
-      //   hasNewChapter: 0,
-      //   isEnd: d.isEnd,
-      //   bookState: 1,
-      //   sourceKey: '',
-      //   saveTime: new Date(),
-      // });
-      // global.toast.add('成功加入书架，快去阅读吧……');
-      global.realm.write(() => {
-        global.realm.create(
-          'BookList',
-          {
+
+      new Promise((resolve, reject) => {
+        global.realm.write(() => {
+          let item = {
             bookId: d.bookId,
             bookName: d.bookName,
             author: d.author,
@@ -101,10 +81,16 @@ export default class SearchDetail extends React.Component {
             bookState: 1,
             sourceKey: '',
             saveTime: new Date(),
-          },
-          true,
-        );
-        global.toast.add('成功加入书架，快去阅读吧……');
+          };
+          global.realm.create('BookList', item, true);
+          resolve(cloneObj(item));
+        });
+      }).then(item => {
+        if (type) {
+          that.props.navigation.navigate('BookRead', item);
+        } else {
+          global.toast.add('成功加入书架，快去阅读吧……');
+        }
       });
     }
   }
@@ -124,7 +110,7 @@ export default class SearchDetail extends React.Component {
               <View style={styles.row}>
                 <Image
                   source={{uri: item.imgUrl}}
-                  style={{width: 180, height: 260}}
+                  style={{width: 170, height: 260}}
                 />
               </View>
               <View style={[styles.row, styles.bookName]}>
@@ -138,7 +124,7 @@ export default class SearchDetail extends React.Component {
               <View style={[styles.row, styles.buttonRow]}>
                 <TouchableOpacity
                   activeOpacity={StyleConfig.activeOpacity}
-                  onPress={() => this._readBook()}>
+                  onPress={() => this._addBookList(true)}>
                   <View
                     style={[
                       global.appStyles.padding,
@@ -150,7 +136,7 @@ export default class SearchDetail extends React.Component {
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={StyleConfig.activeOpacity}
-                  onPress={() => this._addBookList()}>
+                  onPress={() => this._addBookList(false)}>
                   <View style={[global.appStyles.padding, styles.myButton]}>
                     <Text>加入书架</Text>
                   </View>
@@ -171,7 +157,7 @@ export default class SearchDetail extends React.Component {
 const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
-    paddingBottom: StyleConfig.padding.baseTop,
+    paddingTop: StyleConfig.padding.baseTop,
   },
   bookName: {
     fontSize: 25,
@@ -181,10 +167,12 @@ const styles = StyleSheet.create({
     color: StyleConfig.color.detailText,
   },
   introP: {
+    marginTop: StyleConfig.padding.baseTop,
     borderWidth: 1,
     borderColor: StyleConfig.color.border,
     borderStyle: 'solid',
     minHeight: 200,
+    borderRadius: StyleConfig.radius.base,
   },
   title: {
     fontSize: 20,
@@ -204,7 +192,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#bcc1ad',
     borderStyle: 'solid',
-    borderRadius: StyleConfig.radius,
+    borderRadius: StyleConfig.radius.button,
   },
   myButton1: {
     backgroundColor: '#ced3bf',

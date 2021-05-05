@@ -23,7 +23,10 @@ export default StyleConfig = {
     baseTop: 10,
     baseLeft: 14,
   },
+  radius: {
+    base: 6,
+    button: 12,
+  },
   headerHeight: 50, // 页面头部高度
-  radius: 12,
   activeOpacity: 0.6,
 };
