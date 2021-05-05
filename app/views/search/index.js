@@ -35,9 +35,9 @@ export default class Search extends React.Component {
 
   componentDidMount() {
     // this._searchBook();
-    setTimeout(() => {
-      this._initBook();
-    }, 1000);
+    // setTimeout(() => {
+    //   this._initBook();
+    // }, 1000);
     // Loading.hide();
   }
   // 开始搜索
