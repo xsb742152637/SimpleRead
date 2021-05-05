@@ -15,7 +15,7 @@ import {
   Image,
   Keyboard,
 } from 'react-native';
-import StyleConfig from '@config/styleConfig';
+import StyleConfig from '@/config/styleConfig';
 
 module.exports = StyleSheet.create({
   content: {

@@ -16,11 +16,8 @@ import {
   Keyboard,
 } from 'react-native';
 import Back from '@/components/back';
-import MyIcon from '@config/myIcon';
-import StyleConfig from '@config/styleConfig';
-import AppStyles from '@utils/style';
-import AppApi from '@utils/api';
-import Loading from '@utils/load/loading';
+import MyIcon from '@/config/myIcon';
+import StyleConfig from '@/config/styleConfig';
 
 export default class Search extends React.Component {
   constructor(props) {
@@ -38,7 +35,7 @@ export default class Search extends React.Component {
     // setTimeout(() => {
     //   this._initBook();
     // }, 1000);
-    // Loading.hide();
+    // global.loading.hide();
   }
   // 开始搜索
   _searchBook() {
@@ -48,9 +45,10 @@ export default class Search extends React.Component {
       that.inputRef.current.blur();
       // 收起键盘
       Keyboard.dismiss();
-      Loading.show();
+      global.loading.show();
       console.log(this.state.searchText);
-      AppApi.getSearchList(that.state.searchText)
+      global.appApi
+        .getSearchList(that.state.searchText)
         .then(res => {
           console.log(res);
           that.setState(
@@ -59,12 +57,12 @@ export default class Search extends React.Component {
               bookList: res,
             },
             () => {
-              Loading.hide();
+              global.loading.hide();
             },
           );
         })
         .catch(error => {
-          Loading.hide();
+          global.loading.hide();
           console.error(error);
         });
     }
@@ -76,7 +74,8 @@ export default class Search extends React.Component {
       let data = that.state.searchList[index + i];
       console.log(index + i);
       // console.log(data);
-      AppApi.getBookInfo(data)
+      global.appApi
+        .getBookInfo(data)
         .then(book => {
           let bookList = that.state.bookList;
           bookList.push(book);
@@ -376,7 +375,7 @@ export default class Search extends React.Component {
             />
           </View>
           <View style={styles.itemContent}>
-            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemName}>{item.bookName}</Text>
             <Text numberOfLines={1} style={styles.itemAuthor}>
               {item.author}
             </Text>
@@ -393,8 +392,8 @@ export default class Search extends React.Component {
   }
   render() {
     return (
-      <View style={AppStyles.content}>
-        <View style={AppStyles.header}>
+      <View style={global.appStyles.content}>
+        <View style={global.appStyles.header}>
           <Back navigation={this.props.navigation} />
           <View style={styles.searchInputParent}>
             <TextInput
@@ -414,10 +413,10 @@ export default class Search extends React.Component {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={AppStyles.main}>
+        <View style={global.appStyles.main}>
           <FlatList
             data={this.state.bookList}
-            keyExtractor={item => item.key}
+            keyExtractor={item => item.bookId}
             renderItem={({item}) => this._getItem(item)}
           />
         </View>

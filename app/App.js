@@ -5,12 +5,15 @@ import './utils/load/rootview';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import TabBar from 'tabbar';
-
+// 底部导航栏
+import TabBar from './components/tabbar';
+// 各功能页面
 import BookRead from './views/bookread/index';
 import Search from './views/search/index';
 import SearchDetail from './views/search/detail';
 import ReadHistory from './views/readhistory/index';
+
+// 数据库
 
 // 设置react-native路由导航
 const Stack = createStackNavigator();

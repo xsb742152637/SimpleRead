@@ -1,6 +1,6 @@
 /*
 
-import Popup from '@utils/load/popup';
+import Popup from '@/utils/load/popup';
 Popup.show(
         {
           title: '请选择',
@@ -14,13 +14,13 @@ Popup.show(
       );
 
 
-import Toast from '@utils/load/toast';
+import Toast from '@/utils/load/toast';
 
 Toast.add('测试,我是Toast 顺序：111');
 
 
 
-import Loading from '@utils/load/loading';
+import Loading from '@/utils/load/loading';
 
 Loading.show();
 Loading.hide();

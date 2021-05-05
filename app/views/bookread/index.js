@@ -14,13 +14,8 @@ import {
   ScrollView,
   Button,
 } from 'react-native';
-import {goBack} from '@utils/function';
 import cheerio from 'cheerio';
-import storage from '@config/storage';
-import StyleConfig from '@config/styleConfig';
-import AppApi from '@utils/api';
-import Toast from '@utils/load/toast';
-import Loading from '@utils/load/loading';
+import StyleConfig from '@/config/styleConfig';
 
 export default class BookRead extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -32,8 +27,10 @@ export default class BookRead extends React.Component {
     this.scrollViewRef = null;
     this.state = {
       bookInfo: bookInfo,
-      key: bookInfo.name,
-      thisUrl: bookInfo.thisUrl,
+      key: bookInfo.bookName,
+      detailId: '',
+      page: 1,
+      lastChapterUrl: bookInfo.lastChapterUrl,
       prevUrl: '',
       nextUrl: '',
       listUrl: '',
@@ -47,24 +44,24 @@ export default class BookRead extends React.Component {
 
   // 上一章/下一章
   _clickButton(type) {
-    let thisUrl;
+    let lastChapterUrl;
     if (type) {
       if (this.state.prevUrl == '') {
-        Toast.add('已经是第一章了……');
+        global.toast.add('已经是第一章了……');
         return;
       }
-      thisUrl = this.state.prevUrl;
+      lastChapterUrl = this.state.prevUrl;
     } else {
       if (this.state.nextUrl == '') {
-        Toast.add('已经是最后一章了……');
+        global.toast.add('已经是最后一章了……');
         return;
       }
-      thisUrl = this.state.nextUrl;
+      lastChapterUrl = this.state.nextUrl;
     }
 
     this.setState(
       {
-        thisUrl: thisUrl,
+        lastChapterUrl: lastChapterUrl,
         prevUrl: '',
         nextUrl: '',
       },
@@ -77,9 +74,10 @@ export default class BookRead extends React.Component {
   // 请求html内容，并缓存
   _loadHtml() {
     let that = this;
-    Loading.show();
-    // console.log(this.state.thisUrl);
-    AppApi.getChapter(this.state.thisUrl)
+    global.loading.show();
+    // console.log(this.state.lastChapterUrl);
+    global.appApi
+      .getChapter(this.state.lastChapterUrl)
       .then(res => {
         // console.log(res);
         console.log(res.prevUrl);
@@ -92,41 +90,44 @@ export default class BookRead extends React.Component {
             nextUrl: res.nextUrl,
           },
           () => {
-            Loading.hide();
+            that._saveBook();
+            global.loading.hide();
           },
         );
-        storage.save({
-          key: this.state.key,
-          data: {
-            title: res.title,
-            thisUrl: this.state.thisUrl,
-          },
-        });
         if (that.scrollViewRef != null) {
           that.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
         }
       })
       .catch(error => {
-        Loading.hide();
+        global.loading.hide();
         console.error(error);
       });
   }
 
+  _saveBook() {
+    let that = this;
+    let bookId = this.state.bookInfo.bookId;
+    let books = global.realm.objects('BookList');
+    let book = global.realm.objectForPrimaryKey('BookList', bookId);
+    global.realm.write(() => {
+      global.realm.create(
+        'BookList',
+        {
+          bookId: bookId,
+          saveTime: new Date(),
+          historyChapterTitle: that.state.title,
+          detailId: that.state.detailId,
+          historyChapterPage: that.state.page,
+        },
+        true,
+      );
+
+      global.toast.add('记录成功……');
+    });
+  }
   // 初始加载
   componentDidMount() {
-    storage
-      .load({
-        key: this.state.key,
-      })
-      .then(ret => {
-        this.setState({
-          thisUrl: ret.thisUrl,
-        });
-        this._loadHtml();
-      })
-      .catch(err => {
-        this._loadHtml();
-      });
+    this._loadHtml();
   }
 
   render() {

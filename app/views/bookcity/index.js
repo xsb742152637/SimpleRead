@@ -11,8 +11,7 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import AppStyles from '@utils/style';
-import StyleConfig from '@config/styleConfig';
+import StyleConfig from '@/config/styleConfig';
 
 export default class BookCity extends React.Component {
   constructor(props) {
@@ -21,7 +20,7 @@ export default class BookCity extends React.Component {
 
   render() {
     return (
-      <View style={AppStyles.content}>
+      <View style={global.appStyles.content}>
         <Text>书城</Text>
       </View>
     );

@@ -12,15 +12,10 @@ import {
   Dimensions,
   Image,
 } from 'react-native';
-import {getWidth} from '@utils/function';
+import {getWidth} from '@/utils/function';
 import Back from '@/components/back';
-import MyIcon from '@config/myIcon';
-import AppStyles from '@utils/style';
-import StyleConfig from '@config/styleConfig';
-import AppApi from '@utils/api';
-import Toast from '@utils/load/toast';
-import Loading from '@utils/load/loading';
-import storage from '@config/storage';
+import MyIcon from '@/config/myIcon';
+import StyleConfig from '@/config/styleConfig';
 
 export default class SearchDetail extends React.Component {
   constructor(props) {
@@ -34,74 +29,94 @@ export default class SearchDetail extends React.Component {
   componentDidMount() {
     let that = this;
     // console.log(this.props.navigation.state.params);
-    Loading.show();
-    AppApi.getBookInfo(this.state.data)
+    global.loading.show();
+    global.appApi
+      .getBookInfo(this.state.data)
       .then(res => {
         that.setState(
           {
             bookInfo: res,
           },
           () => {
-            Loading.hide();
+            global.loading.hide();
           },
         );
       })
       .catch(error => {
-        Loading.hide();
+        global.loading.hide();
         console.error(error);
       });
   }
   _readBook() {
-    Toast.add('开始阅读吧……');
+    global.toast.add('开始阅读吧……');
   }
   _addBookList() {
     let that = this;
-    storage
-      .load({
-        key: 'bookList',
-      })
-      .then(ret => {
-        // 判断是否已存在
-        let isHave = false;
-        let url = that.state.bookInfo.url;
-        ret.forEach(e => {
-          if (e.url === url) {
-            isHave = true;
-            return false;
-          }
-        });
-        if (isHave) {
-          Toast.add('书架已存在这本书，别点了哦……');
-        } else {
-          ret.push(that.state.bookInfo);
-          storage.save({
-            key: 'bookList',
-            data: ret,
-          });
-
-          console.log(ret);
-          Toast.add('成功加入书架，快去阅读吧……');
-        }
-      })
-      .catch(err => {
-        let bookList = [];
-        bookList.push(that.state.bookInfo);
-        storage.save({
-          key: 'bookList',
-          data: bookList,
-        });
-        Toast.add('成功加入书架，快去阅读吧……');
+    let BookChapterDetail = global.realm.objects('BookList');
+    // 判断是否已存在
+    let isHave = false;
+    let bookUrl = that.state.bookInfo.bookUrl;
+    BookChapterDetail.forEach(e => {
+      if (e.bookUrl === bookUrl) {
+        isHave = true;
+        return false;
+      }
+    });
+    if (isHave) {
+      global.toast.add('书架已存在这本书，别点了哦……');
+    } else {
+      let d = that.state.bookInfo;
+      // console.log({
+      //   bookId: d.bookId,
+      //   bookName: d.bookName,
+      //   author: d.author,
+      //   bookUrl: d.bookUrl,
+      //   chapterUrl: d.chapterUrl,
+      //   imgUrl: d.imgUrl,
+      //   lastChapterUrl: d.lastChapterUrl,
+      //   lastChapterTitle: d.lastChapterTitle,
+      //   lastChapterTime: d.lastChapterTime,
+      //   hasNewChapter: 0,
+      //   isEnd: d.isEnd,
+      //   bookState: 1,
+      //   sourceKey: '',
+      //   saveTime: new Date(),
+      // });
+      // global.toast.add('成功加入书架，快去阅读吧……');
+      global.realm.write(() => {
+        global.realm.create(
+          'BookList',
+          {
+            bookId: d.bookId,
+            bookName: d.bookName,
+            author: d.author,
+            bookUrl: d.bookUrl,
+            chapterUrl: d.chapterUrl,
+            imgUrl: d.imgUrl,
+            lastChapterUrl: d.lastChapterUrl,
+            lastChapterTitle: d.lastChapterTitle,
+            lastChapterTime: d.lastChapterTime,
+            hasNewChapter: 0,
+            isEnd: d.isEnd,
+            bookState: 1,
+            sourceKey: '',
+            saveTime: new Date(),
+          },
+          true,
+        );
+        global.toast.add('成功加入书架，快去阅读吧……');
       });
+    }
   }
 
   render() {
     let item = this.state.bookInfo;
     return (
-      <View style={AppStyles.content}>
-        <View style={AppStyles.header}>
+      <View style={global.appStyles.content}>
+        <View style={global.appStyles.header}>
           <Back navigation={this.props.navigation} />
         </View>
-        <View style={AppStyles.main}>
+        <View style={global.appStyles.main}>
           {item == null ? (
             <Text style={styles.emptyText}>正在加载……</Text>
           ) : (
@@ -113,7 +128,7 @@ export default class SearchDetail extends React.Component {
                 />
               </View>
               <View style={[styles.row, styles.bookName]}>
-                <Text style={styles.bookName}>{item.name}</Text>
+                <Text style={styles.bookName}>{item.bookName}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.other}>
@@ -126,7 +141,7 @@ export default class SearchDetail extends React.Component {
                   onPress={() => this._readBook()}>
                   <View
                     style={[
-                      AppStyles.padding,
+                      global.appStyles.padding,
                       styles.myButton1,
                       styles.myButton,
                     ]}>
@@ -136,12 +151,12 @@ export default class SearchDetail extends React.Component {
                 <TouchableOpacity
                   activeOpacity={StyleConfig.activeOpacity}
                   onPress={() => this._addBookList()}>
-                  <View style={[AppStyles.padding, styles.myButton]}>
+                  <View style={[global.appStyles.padding, styles.myButton]}>
                     <Text>加入书架</Text>
                   </View>
                 </TouchableOpacity>
               </View>
-              <View style={[AppStyles.padding, styles.introP]}>
+              <View style={[global.appStyles.padding, styles.introP]}>
                 <Text style={styles.title}>简介</Text>
                 <Text style={styles.intro}>{item.intro}</Text>
               </View>

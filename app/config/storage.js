@@ -9,8 +9,8 @@ const storage = new Storage({
   // If storageBackend is not set, data will be lost after reload.
   storageBackend: AsyncStorage, // for web: window.localStorage
 
-  // 有效期：一年
-  defaultExpires: 1000 * 3600 * 24 * 365,
+  // 有效期：默认一整天（1000 * 3600 * 24 毫秒），设为null则永不过期
+  defaultExpires: null,
 
   // cache data in the memory. default is true.
   enableCache: true,

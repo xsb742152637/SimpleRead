@@ -11,10 +11,10 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import {goBack} from '@utils/function';
-import MyIcon from '@config/myIcon';
-import AppStyles from '@utils/style';
-import StyleConfig from '@config/styleConfig';
+import {goBack} from '@/utils/function';
+import MyIcon from '@/config/myIcon';
+import AppStyles from '@/utils/style';
+import StyleConfig from '@/config/styleConfig';
 
 export default class Back extends React.Component {
   constructor(props) {

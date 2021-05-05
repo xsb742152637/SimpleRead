@@ -12,12 +12,9 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import MyIcon from '@config/myIcon';
-import AppStyles from '@utils/style';
-import StyleConfig from '@config/styleConfig';
-import Loading from '@utils/load/loading';
-import Toast from '@utils/load/toast';
-import storage from '@config/storage';
+// 公共样式参数
+import StyleConfig from '@/config/styleConfig';
+import MyIcon from '@/config/myIcon';
 
 export default class BookList extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -33,33 +30,25 @@ export default class BookList extends React.Component {
 
   // 初始加载
   componentDidMount() {
-    Loading.show();
-    storage
-      .load({
-        key: 'bookList',
-      })
-      .then(ret => {
-        this.setState({bookList: ret});
-        Loading.hide();
-      })
-      .catch(err => {
-        Loading.hide();
-      });
+    let bookList = global.realm.objects('BookList').sorted('saveTime');
+    this.setState({bookList: bookList});
 
     // this._goSearch();
 
     // let item = {
-    //   author: '景家二少爷',
+    //   author: '木三千',
+    //   bookId: '4B2B8B90-E9D3-411A-A5BF-F3470EFCE352',
+    //   bookName: '动物三国',
+    //   bookUrl: 'http://book.zongheng.com/book/967835.html',
+    //   chapterUrl: '',
     //   imgUrl:
-    //     'http://static.zongheng.com/upload/cover/e4/6d/e46d4870e69ec5da264216f030139efe.jpeg',
+    //     'http://static.zongheng.com/upload/cover/fb/80/fb805124ae3d16f9d33664f47ec8dcda.jpeg',
     //   intro:
-    //     '这是‘历朝皆以弱灭，独汉以强亡’的汉末三国，这是充满了铁血、杀戮，又不失温情与信义的时代；是赋予万千中国人民族名称的时代；是吊打四方蛮夷一骑当五胡的的时代。',
-    //   key: 1,
-    //   len: '375661字',
-    //   name: '稗史三国',
+    //     '这里是你闻所未闻的三国，它对你来说很陌生，却又很亲切。这里龙、猫、狗三足鼎力，它们又会擦出怎样的火花呢?',
+    //   isEnd: 1,
+    //   len: '2515字',
     //   state: '连载',
     //   type: '历史军事',
-    //   url: 'http://book.zongheng.com/book/846142.html',
     // };
     // this.props.navigation.navigate('SearchDetail', item);
   }
@@ -72,18 +61,6 @@ export default class BookList extends React.Component {
   }
   _goBookRead(item) {
     this.props.navigation.navigate('BookRead', item);
-  }
-  _getContent(str) {
-    let strs = str.replace(/&nbsp;/g, '').split('\n');
-    let strNew = '';
-    for (let i = 0; i < strs.length; i++) {
-      let s = strs[i].toString().trim().replace('· ', '');
-      console.log(s);
-      if (s != '') {
-        strNew += s + ' ';
-      }
-    }
-    return strNew;
   }
   _getItem(item) {
     return (
@@ -100,15 +77,15 @@ export default class BookList extends React.Component {
             />
           </View>
           <View style={styles.itemContent}>
-            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemName}>{item.bookName}</Text>
             <Text numberOfLines={1} style={styles.itemAuthor}>
               {'还未读过'}
             </Text>
             <Text numberOfLines={1} style={styles.itemNewChapter}>
-              {'最新章节：' + item.newChapter}
+              {'最新章节：' + item.lastChapterTitle}
             </Text>
             <Text numberOfLines={1} style={styles.itemNewChapter}>
-              {'更新情况：' + this._getContent(item.time)}
+              {'更新情况：' + item.lastChapterTime}
             </Text>
           </View>
         </View>
@@ -118,8 +95,8 @@ export default class BookList extends React.Component {
   render() {
     let isEmpty = this.state.bookList.length == 0;
     return (
-      <View style={AppStyles.content}>
-        <View style={AppStyles.header}>
+      <View style={global.appStyles.content}>
+        <View style={global.appStyles.header}>
           <View>
             <Text>简 阅</Text>
           </View>
@@ -144,7 +121,7 @@ export default class BookList extends React.Component {
           <FlatList
             style={styles.main}
             data={this.state.bookList}
-            keyExtractor={item => item.key}
+            keyExtractor={item => item.bookId}
             renderItem={({item}) => this._getItem(item)}
           />
         )}

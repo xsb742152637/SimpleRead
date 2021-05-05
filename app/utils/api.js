@@ -2,7 +2,8 @@
  * 全局样式变量
  */
 import cheerio from 'cheerio';
-import request from '@utils/ajax';
+import request from '@/utils/ajax';
+import {getId} from '@/utils/function';
 
 let AppApi;
 export default AppApi = {
@@ -18,6 +19,18 @@ export default AppApi = {
       let s = strs[i].toString().trim();
       if (s != '') {
         strNew += '\t\t' + s + '\n\n';
+      }
+    }
+    return strNew;
+  },
+  _getContent2(str) {
+    let strs = str.replace(/&nbsp;/g, '').split('\n');
+    let strNew = '';
+    for (let i = 0; i < strs.length; i++) {
+      let s = strs[i].toString().trim().replace('· ', '');
+      console.log(s);
+      if (s != '') {
+        strNew += s + ' ';
       }
     }
     return strNew;
@@ -68,21 +81,25 @@ export default AppApi = {
     // 注意：这里params里面的key为全小写
     return new Promise((resolve, reject) => {
       request
-        .fetchHtml(data.url)
+        .fetchHtml(data.bookUrl)
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
           let main = $('.book-main');
           let imgUrl = $(main).find('.book-img img').attr('src');
           let intro = that._getContent($(main).find('.book-dec>p').text());
-          let newChapter = $(main).find('.book-new-chapter>.tit>a').text();
-          let time = $(main).find('.book-new-chapter>.time').text();
-          let thisUrl = $(main).find('.read-btn').attr('href');
+          let lastChapterTitle = $(main)
+            .find('.book-new-chapter>.tit>a')
+            .text();
+          let lastChapterTime = $(main).find('.book-new-chapter>.time').text();
+          let lastChapterUrl = $(main).find('.read-btn').attr('href');
+          let chapterUrl = $(main).find('.all-catalog').attr('href');
 
           data.imgUrl = imgUrl;
           data.intro = intro;
-          data.newChapter = newChapter;
-          data.time = time;
-          data.thisUrl = thisUrl;
+          data.lastChapterTitle = lastChapterTitle;
+          data.lastChapterTime = that._getContent2(lastChapterTime);
+          data.lastChapterUrl = lastChapterUrl;
+          data.chapterUrl = chapterUrl;
           resolve(data);
         })
         .catch(error => {
@@ -116,14 +133,16 @@ export default AppApi = {
               return;
             }
             data.push({
-              key: i,
-              url: url,
-              name: name,
+              bookId: getId(),
+              bookName: name,
               author: author,
+              bookUrl: url,
+              chapterUrl: '',
               imgUrl: imgUrl,
               intro: intro,
               type: type,
               state: state,
+              isEnd: state.indexOf('连载') >= 0 ? 1 : 0,
               len: len,
             });
           });
