@@ -123,7 +123,7 @@ export default class SearchDetail extends React.Component {
               </View>
               <View style={[styles.row, styles.buttonRow]}>
                 <TouchableOpacity
-                  activeOpacity={StyleConfig.activeOpacity}
+                  activeOpacity={StyleConfig.opacity.active}
                   onPress={() => this._addBookList(true)}>
                   <View
                     style={[
@@ -135,7 +135,7 @@ export default class SearchDetail extends React.Component {
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  activeOpacity={StyleConfig.activeOpacity}
+                  activeOpacity={StyleConfig.opacity.active}
                   onPress={() => this._addBookList(false)}>
                   <View style={[global.appStyles.padding, styles.myButton]}>
                     <Text>加入书架</Text>
@@ -190,15 +190,15 @@ const styles = StyleSheet.create({
     width: getWidth(0.4),
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#bcc1ad',
+    borderColor: StyleConfig.color.button,
     borderStyle: 'solid',
     borderRadius: StyleConfig.radius.button,
   },
   myButton1: {
-    backgroundColor: '#ced3bf',
+    backgroundColor: StyleConfig.color.button,
   },
   buttonText: {
-    color: '#fff',
+    color: StyleConfig.color.titleText,
   },
   emptyText: {
     textAlign: 'center',

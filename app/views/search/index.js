@@ -97,11 +97,11 @@ export default class Search extends React.Component {
   _getItem(item) {
     return (
       <TouchableOpacity
-        activeOpacity={StyleConfig.activeOpacity}
+        activeOpacity={StyleConfig.opacity.active}
         onPress={() => {
           this._goDetail(item);
         }}>
-        <View style={styles.itemView}>
+        <View style={global.appStyles.card}>
           <View>
             <Image
               source={{uri: item.imgUrl}}
@@ -135,15 +135,15 @@ export default class Search extends React.Component {
               autoFocus={true}
               clearButtonMode="while-editing"
               placeholder={'请输入关键字：书名/作者'}
-              style={styles.searchInput}
+              style={[global.appStyles.border, styles.searchInput]}
               onChangeText={text => this._setSearchText(text)}
             />
           </View>
           <View>
             <TouchableOpacity
-              activeOpacity={StyleConfig.activeOpacity}
+              activeOpacity={StyleConfig.opacity.active}
               onPress={() => this._searchBook()}>
-              <Text>搜索</Text>
+              <Text style={global.appStyles.headerText}>搜索</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -168,48 +168,36 @@ const styles = StyleSheet.create({
   searchInput: {
     paddingRight: StyleConfig.padding.baseLeft,
     paddingLeft: StyleConfig.padding.baseLeft,
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingTop: StyleConfig.padding.text,
+    paddingBottom: StyleConfig.padding.text,
     borderRadius: StyleConfig.radius.button,
     backgroundColor: '#efefef',
-  },
-  itemView: {
-    display: 'flex',
-    flexDirection: 'row',
-    // alignItems: 'center',
-    marginTop: StyleConfig.padding.baseTop,
-    paddingTop: StyleConfig.padding.baseTop,
-    paddingBottom: StyleConfig.padding.baseTop,
-    paddingRight: StyleConfig.padding.baseLeft,
-    paddingLeft: StyleConfig.padding.baseLeft,
-    backgroundColor: '#fff',
-    borderRadius: StyleConfig.radius.base,
   },
   itemContent: {
     paddingLeft: StyleConfig.padding.baseLeft,
     flex: 1,
   },
   itemName: {
-    color: '#000',
-    fontSize: 15,
+    color: StyleConfig.color.titleText,
+    fontSize: StyleConfig.fontSize.titleText,
     // fontWeight: 'bold',
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingTop: StyleConfig.padding.text,
+    paddingBottom: StyleConfig.padding.text,
   },
   itemAuthor: {
     color: StyleConfig.color.text,
-    fontSize: 12,
-    paddingBottom: 5,
+    fontSize: StyleConfig.fontSize.detailText,
+    paddingBottom: StyleConfig.padding.text,
   },
   itemIntro: {
     color: StyleConfig.color.detailText,
-    fontSize: 12,
+    fontSize: StyleConfig.fontSize.detailText,
   },
   itemNewChapter: {
     color: StyleConfig.color.detailText,
-    paddingTop: 5,
-    paddingBottom: 5,
-    fontSize: 12,
+    paddingTop: StyleConfig.padding.text,
+    paddingBottom: StyleConfig.padding.text,
+    fontSize: StyleConfig.fontSize.detailText,
     // borderWidth: 1,
     // borderColor: 'red',
     // borderStyle: 'solid',

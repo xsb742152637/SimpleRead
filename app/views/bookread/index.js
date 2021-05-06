@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Button,
+  BackHandler,
 } from 'react-native';
 import cheerio from 'cheerio';
 import StyleConfig from '@/config/styleConfig';
@@ -37,10 +38,27 @@ export default class BookRead extends React.Component {
       content: '',
       title: '',
     };
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+  }
+  componentWillMount() {
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
   }
 
-  // render渲染前触发，仅调用一次
-  componentwillMount() {}
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  handleBackButtonClick() {
+    alert('退回');
+    this.props.navigation.goBack(null);
+    return true;
+  }
 
   // 上一章/下一章
   _clickButton(type) {

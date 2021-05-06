@@ -29,6 +29,7 @@ export default class Back extends React.Component {
         <TouchableOpacity onPress={() => this._goBack()}>
           <MyIcon
             name={'fanhuishangyizhang'}
+            style={global.appStyles.headerIcon}
             size={StyleConfig.fontSize.icon}
           />
         </TouchableOpacity>

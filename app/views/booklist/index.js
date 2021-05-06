@@ -54,11 +54,11 @@ export default class BookList extends React.Component {
   _getItem(item) {
     return (
       <TouchableOpacity
-        activeOpacity={StyleConfig.activeOpacity}
+        activeOpacity={StyleConfig.opacity.active}
         onPress={() => {
           this._goBookRead(item);
         }}>
-        <View style={styles.itemView}>
+        <View style={global.appStyles.card}>
           <View>
             <Image
               source={{uri: item.imgUrl}}
@@ -89,21 +89,29 @@ export default class BookList extends React.Component {
       <View style={global.appStyles.content}>
         <View style={global.appStyles.header}>
           <View>
-            <Text>简 阅</Text>
+            <Text style={global.appStyles.headerText}>简 阅</Text>
           </View>
           <View style={styles.tools}>
             <TouchableOpacity
               style={styles.myButton}
               onPress={() => this._refresh()}>
-              <Text>{'刷新'}</Text>
+              <Text style={global.appStyles.headerText}>{'刷新'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.myButton}
               onPress={() => this._goReadHistory()}>
-              <MyIcon name={'yuedujilu'} size={StyleConfig.fontSize.icon} />
+              <MyIcon
+                name={'yuedujilu'}
+                style={global.appStyles.headerIcon}
+                size={StyleConfig.fontSize.icon}
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this._goSearch()}>
-              <MyIcon name={'sousuo'} size={StyleConfig.fontSize.icon} />
+              <MyIcon
+                name={'sousuo'}
+                style={global.appStyles.headerIcon}
+                size={StyleConfig.fontSize.icon}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -158,41 +166,30 @@ const styles = StyleSheet.create({
     paddingTop: StyleConfig.padding.baseTop,
   },
 
-  itemView: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginTop: StyleConfig.padding.baseTop,
-    paddingTop: StyleConfig.padding.baseTop,
-    paddingBottom: StyleConfig.padding.baseTop,
-    paddingRight: StyleConfig.padding.baseLeft,
-    paddingLeft: StyleConfig.padding.baseLeft,
-    backgroundColor: '#fff',
-    borderRadius: StyleConfig.radius.base,
-  },
   itemContent: {
     paddingLeft: StyleConfig.padding.baseLeft,
     flex: 1,
   },
   itemName: {
-    color: '#000',
-    fontSize: 15,
+    color: StyleConfig.color.titleText,
+    fontSize: StyleConfig.fontSize.titleText,
     // fontWeight: 'bold',
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingTop: StyleConfig.padding.text,
+    paddingBottom: StyleConfig.padding.text,
   },
   itemAuthor: {
     color: StyleConfig.color.text,
-    fontSize: 12,
-    paddingBottom: 5,
+    fontSize: StyleConfig.fontSize.detailText,
+    paddingBottom: StyleConfig.padding.text,
   },
   itemIntro: {
     color: StyleConfig.color.detailText,
-    fontSize: 12,
+    fontSize: StyleConfig.fontSize.detailText,
   },
   itemNewChapter: {
     color: StyleConfig.color.detailText,
-    paddingTop: 5,
-    paddingBottom: 5,
-    fontSize: 12,
+    paddingTop: StyleConfig.padding.text,
+    paddingBottom: StyleConfig.padding.text,
+    fontSize: StyleConfig.fontSize.detailText,
   },
 });
