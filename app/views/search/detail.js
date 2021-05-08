@@ -12,7 +12,7 @@ import {
   Dimensions,
   Image,
 } from 'react-native';
-import {getWidth, cloneObj} from '@/utils/function';
+import {getWidth} from '@/utils/function';
 import Back from '@/components/back';
 import MyIcon from '@/config/myIcon';
 import StyleConfig from '@/config/styleConfig';
@@ -49,45 +49,46 @@ export default class SearchDetail extends React.Component {
   }
   _addBookList(type) {
     let that = this;
-    let BookChapterDetail = global.realm.objects('BookList');
+    let d = that.state.bookInfo;
+    let rows = global.realm.queryBookList();
     // 判断是否已存在
     let isHave = false;
+    let bookId = d.bookId;
     let bookUrl = that.state.bookInfo.bookUrl;
-    BookChapterDetail.forEach(e => {
+    rows.forEach(e => {
       if (e.bookUrl === bookUrl) {
-        isHave = true;
-        return false;
+        // 直接阅读的数据，在书架是不显示，可以再次添加
+        if (e.bookState == 0) {
+          bookId = e.bookId;
+        } else {
+          isHave = true;
+          return false;
+        }
       }
     });
     if (isHave) {
       global.toast.add('书架已存在这本书，别点了哦……');
     } else {
-      let d = that.state.bookInfo;
+      let item = {
+        bookId: bookId,
+        bookName: d.bookName,
+        author: d.author,
+        bookUrl: d.bookUrl,
+        chapterUrl: d.chapterUrl,
+        imgUrl: d.imgUrl,
+        lastChapterUrl: d.lastChapterUrl,
+        lastChapterTitle: d.lastChapterTitle,
+        lastChapterTime: d.lastChapterTime,
+        hasNewChapter: 0,
+        isEnd: d.isEnd,
+        bookState: type ? 0 : 1, // 直接阅读的小说状态为不显示
+        sourceKey: '',
+        saveTime: new Date(),
+      };
 
-      new Promise((resolve, reject) => {
-        global.realm.write(() => {
-          let item = {
-            bookId: d.bookId,
-            bookName: d.bookName,
-            author: d.author,
-            bookUrl: d.bookUrl,
-            chapterUrl: d.chapterUrl,
-            imgUrl: d.imgUrl,
-            lastChapterUrl: d.lastChapterUrl,
-            lastChapterTitle: d.lastChapterTitle,
-            lastChapterTime: d.lastChapterTime,
-            hasNewChapter: 0,
-            isEnd: d.isEnd,
-            bookState: 1,
-            sourceKey: '',
-            saveTime: new Date(),
-          };
-          global.realm.create('BookList', item, true);
-          resolve(cloneObj(item));
-        });
-      }).then(item => {
+      global.realm.saveBook(item).then(row => {
         if (type) {
-          that.props.navigation.navigate('BookRead', item);
+          that.props.navigation.navigate('BookRead', row);
         } else {
           global.toast.add('成功加入书架，快去阅读吧……');
         }

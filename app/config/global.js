@@ -1,7 +1,5 @@
-// 数据库
-import Realm from 'realm';
-// 数据库建表文件
-import schemaArray from '@/config/modelSchema';
+// 数据库建表 与 增删改查方法
+import realm from '@/config/modelSchema';
 // 本次存储
 import storage from '@/config/storage';
 // 公共样式
@@ -16,7 +14,7 @@ import Popup from '@/utils/load/popup';
 
 import AppApi from '@/utils/api';
 
-global.realm = new Realm({schema: schemaArray, schemaVersion: 3});
+global.realm = realm;
 global.storage = storage;
 global.appStyles = AppStyles;
 global.loading = Loading;

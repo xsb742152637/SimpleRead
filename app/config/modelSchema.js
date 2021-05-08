@@ -3,6 +3,8 @@
  * @Author: xie
  * @Date: 2021-05-05
  */
+import Realm from 'realm';
+import {cloneObj} from '@/utils/function';
 
 // 书架
 const BookListSchema = {
@@ -23,7 +25,7 @@ const BookListSchema = {
     detailId: {type: 'string', default: ''}, //最后一次阅读的章节序号
     historyChapterPage: {type: 'int', default: 0}, //最后一次阅读的章节页数
     isEnd: {type: 'int', default: 0}, // 是否完结：0(不知道)、1(连载中)、2(完结)
-    bookState: {type: 'int', default: 1}, // 状态：0(养肥)、1(正常显示)、2(置顶)
+    bookState: {type: 'int', default: 1}, // 状态：0(不显示)、1(正常显示)、2(置顶)、3(养肥)
     sourceKey: {type: 'string', default: ''}, //选中的当前源
     saveTime: 'date', // 最后保存时间
     orderNum: {type: 'int', default: 0}, // 序号
@@ -108,4 +110,103 @@ const schemaArray = [
   ReaderConfigSchema,
 ];
 
-module.exports = schemaArray;
+let realm = new Realm({schema: schemaArray, schemaVersion: 3});
+
+// 最底层的查询方法，传入表名和需要查询的主键
+let _findOne = (tableName, primaryKey) => {
+  try {
+    return cloneObj(realm.objectForPrimaryKey(tableName, primaryKey));
+  } catch (e) {
+    console.log('查询一条数据失败：', tableName, primaryKey);
+    console.log(e);
+  }
+  return null;
+};
+// 最底层的保存方法，传入表名和需要更新的数据对象
+let _saveRow = (tableName, row) => {
+  return new Promise((resolve, reject) => {
+    try {
+      realm.write(() => {
+        realm.create(tableName, row, true);
+        resolve(cloneObj(row));
+      });
+    } catch (e) {
+      console.log('数据更新失败：', tableName, row);
+      reject(e);
+    }
+  });
+};
+
+// 最底层的删除方法，传入需要删除的数组对象或单个对象
+let deleteRow = row => {
+  try {
+    realm.write(() => {
+      realm.delete(row);
+    });
+  } catch (e) {
+    console.log('数据删除失败：', row);
+  }
+};
+
+// 书架 查询正常显示的全部小说，并按照修改时间倒序排列
+const queryBookList = bookState => {
+  if (!bookState) {
+    bookState = [0, 1, 2];
+  }
+  console.log(bookState);
+  try {
+    let filter = [];
+    if (bookState.length) {
+      bookState.forEach(k => {
+        filter.push(' bookState == ' + k);
+      });
+    } else {
+      filter.push(' bookState == ' + bookState);
+    }
+    filter = filter.join(' or ');
+    console.log(filter);
+    return cloneObj(
+      realm.objects('BookList').filtered(filter).sorted('saveTime', true),
+    );
+  } catch (e) {
+    console.log('书架查询失败！');
+    console.log(e);
+  }
+  return [];
+};
+
+// 根据主键查询一本小说
+const findBook = primaryKey => {
+  return _findOne('BookList', primaryKey);
+};
+// 保存一本小说
+const saveBook = row => {
+  return _saveRow('BookList', row);
+};
+
+const queryChapter = () => {
+  try {
+    console.log('书架查询失败！');
+  } catch (e) {
+    console.log('书架查询失败！');
+  }
+  return [];
+};
+const findChapter = primaryKey => {
+  return _findOne('BookChapterList', primaryKey);
+};
+const saveChapter = row => {
+  return _saveRow('BookChapterList', row);
+};
+
+module.exports = {
+  deleteRow,
+
+  queryBookList,
+  findBook,
+  saveBook,
+
+  queryChapter,
+  findChapter,
+  saveChapter,
+};

@@ -45,11 +45,11 @@ export default class Search extends React.Component {
       // 收起键盘
       Keyboard.dismiss();
       global.loading.show();
-      console.log(this.state.searchText);
+      // console.log(this.state.searchText);
       global.appApi
         .getSearchList(that.state.searchText)
         .then(res => {
-          console.log(res);
+          // console.log(res);
           that.setState(
             {
               isChange: false,
@@ -71,7 +71,7 @@ export default class Search extends React.Component {
     let index = (that.state.pages - 1) * that.state.rows;
     for (let i = 0; i < that.state.rows; i++) {
       let data = that.state.searchList[index + i];
-      console.log(index + i);
+      // console.log(index + i);
       // console.log(data);
       global.appApi
         .getBookInfo(data)

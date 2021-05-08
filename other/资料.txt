@@ -3,3 +3,22 @@ http://www.uugai.com/logoa/index.php
 
 自动生成各种尺寸app图标
 https://icon.wuruihong.com/
+
+新的小说源
+http://www.qishusk.com/
+
+
+/*
+数据库：realm
+文档：https://docs.mongodb.com/realm-legacy/docs/javascript/latest/
+支持下列基本类型
+  bool属性映射到JavaScriptboolean值
+  int，float和double属性映射到JavaScriptnumber值。内部“ int”和“ double”存储为64位，而float内部存储为32位。
+  string 属性映射到 string
+  data 属性映射到 ArrayBuffer
+  date 属性映射到 Date
+
+ string? 或 {type: 'string', optional: true} 表示非必填
+ double?[] 表示存double的数组
+ indexed: true 表示该列支持索引，支持的字段：int，string，bool，和date
+*/

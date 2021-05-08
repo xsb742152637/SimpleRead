@@ -12,10 +12,10 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {cloneObj} from '@/utils/function';
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
 import MyIcon from '@/config/myIcon';
+import {getId, textFormat} from '@/utils/function';
 
 export default class BookList extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -35,13 +35,13 @@ export default class BookList extends React.Component {
   }
 
   _loadBookList() {
-    let bookList = global.realm.objects('BookList').sorted('saveTime', true);
-    this.setState({bookList: cloneObj(bookList)});
+    let a =
+      '这是&lsquo;历朝皆以弱灭，独汉以强亡&rsquo;的汉末三国，这是充满了铁血、杀戮，又不失温情与信义的时代；是赋予万千中国人民族名称的时代；是吊打四方蛮夷一骑当五胡的的时代。可这也是中华历史中最黑暗的时代，诸侯混战使人口减少了十之七八，直接导致了之后的诸胡入侵，炎黄子孙竟沦落为两脚之羊，被当做粮食使用，华夏文明几近断绝。也许，一个意外出现的人，能煽动他的那双蝴蝶翅膀，给予这个时代不用的历史命运';
+    console.log(textFormat(a));
+
+    this.setState({bookList: global.realm.queryBookList(1)});
   }
 
-  _refresh() {
-    this._loadBookList();
-  }
   _goSearch() {
     this.props.navigation.navigate('Search');
   }
@@ -94,7 +94,7 @@ export default class BookList extends React.Component {
           <View style={styles.tools}>
             <TouchableOpacity
               style={styles.myButton}
-              onPress={() => this._refresh()}>
+              onPress={() => this._loadBookList()}>
               <Text style={global.appStyles.headerText}>{'刷新'}</Text>
             </TouchableOpacity>
             <TouchableOpacity

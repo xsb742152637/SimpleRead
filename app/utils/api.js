@@ -3,7 +3,7 @@
  */
 import cheerio from 'cheerio';
 import request from '@/utils/ajax';
-import {getId} from '@/utils/function';
+import {getId, textFormat} from '@/utils/function';
 
 let AppApi;
 export default AppApi = {
@@ -28,7 +28,7 @@ export default AppApi = {
     let strNew = '';
     for (let i = 0; i < strs.length; i++) {
       let s = strs[i].toString().trim().replace('· ', '');
-      console.log(s);
+      // console.log(s);
       if (s != '') {
         strNew += s + ' ';
       }
@@ -95,9 +95,15 @@ export default AppApi = {
           let chapterUrl = $(main).find('.all-catalog').attr('href');
 
           data.imgUrl = imgUrl;
-          data.intro = intro;
+          data.intro = textFormat(intro);
+          console.log(intro);
+          console.log('-------------------------');
+          console.log(data.intro);
           data.lastChapterTitle = lastChapterTitle;
-          data.lastChapterTime = that._getContent2(lastChapterTime);
+          data.lastChapterTime = textFormat(lastChapterTime).replace(
+            /((\s| )*\r?\n)+/g,
+            '',
+          );
           data.lastChapterUrl = lastChapterUrl;
           data.chapterUrl = chapterUrl;
           resolve(data);

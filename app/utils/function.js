@@ -6,6 +6,7 @@ export let getWidth = ratio => {
   return Dimensions.get('window').width * ratio;
 };
 
+// 对象克隆
 export let cloneObj = obj => {
   console.log(obj.length);
   if (obj.length != undefined) {
@@ -28,4 +29,64 @@ export let getId = () => {
       return v.toString(16);
     })
     .toUpperCase();
+};
+
+// 将从html得到的文本格式化
+export let textFormat = str => {
+  str = removeHtmlTab(str);
+  str = escape2Html(str);
+  str = trimBr(str);
+  return str;
+};
+// 删除html标签
+export let removeHtmlTab = str => {
+  return str.replace(/<[^<>]+?>/g, '');
+};
+//转意符换成普通字符
+export let escape2Html = str => {
+  let arrEntities = {
+    lt: '<',
+    gt: '>',
+    nbsp: ' ',
+    amp: '&',
+    quot: '"',
+    copy: '©',
+    oelig: 'œ',
+    scaron: 'š',
+    Yuml: 'Ÿ',
+    circ: 'ˆ',
+    tilde: '˜',
+    ndash: '–',
+    mdash: '—',
+    lsquo: '‘',
+    rsquo: '’',
+    sbquo: '‚',
+    ldquo: '“',
+    rdquo: '”',
+    bdquo: '„',
+    dagger: '†',
+    permil: '‰',
+    lsaquo: '‹',
+    rsaquo: '›',
+    euro: '€',
+  };
+  return str.replace(
+    /&(lt|gt|nbsp|amp|quot|copy|oelig|scaron|Yuml|circ|tilde|ndash|mdash|lsquo|rsquo|sbquo|ldquo|rdquo|bdquo|dagger|permil|lsaquo|rsaquo|euro);/gi,
+    function (all, t) {
+      return arrEntities[t];
+    },
+  );
+};
+
+//去除开头结尾换行,并将连续3次以上换行转换成2次换行
+export let trimBr = str => {
+  str = str.replace(/((\s| )*\r?\n){3,}/g, '\r\n\r\n'); //限制最多2次换行
+  str = str.replace(/^((\s| )*\r?\n)+/g, ''); //清除开头换行
+  str = str.replace(/((\s| )*\r?\n)+$/g, ''); //清除结尾换行
+  return str;
+};
+// 将多个连续空格合并成一个空格
+export let mergeSpace = str => {
+  str = str.replace(/(\s| )+/g, ' ');
+  return str;
 };

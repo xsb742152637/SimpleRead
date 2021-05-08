@@ -125,24 +125,16 @@ export default class BookRead extends React.Component {
   _saveBook() {
     let that = this;
     let bookId = this.state.bookInfo.bookId;
-    let books = global.realm.objects('BookList');
-    let book = global.realm.objectForPrimaryKey('BookList', bookId);
-    global.realm.write(() => {
-      global.realm.create(
-        'BookList',
-        {
-          bookId: bookId,
-          saveTime: new Date(),
-          historyChapterTitle: that.state.title,
-          detailId: that.state.detailId,
-          lastChapterUrl: that.state.lastChapterUrl,
-          historyChapterPage: that.state.page,
-        },
-        true,
-      );
 
-      global.toast.add('记录成功……');
-    });
+    let book = {
+      bookId: bookId,
+      saveTime: new Date(),
+      historyChapterTitle: that.state.title,
+      detailId: that.state.detailId,
+      lastChapterUrl: that.state.lastChapterUrl,
+      historyChapterPage: that.state.page,
+    };
+    global.realm.saveBook(book);
   }
   // 初始加载
   componentDidMount() {
