@@ -123,28 +123,40 @@ let _findOne = (tableName, primaryKey) => {
   return null;
 };
 // 最底层的保存方法，传入表名和需要更新的数据对象
-let _saveRow = (tableName, row) => {
+let _saveRow = (tableName, rows) => {
   return new Promise((resolve, reject) => {
     try {
       realm.write(() => {
-        realm.create(tableName, row, true);
-        resolve(cloneObj(row));
+        if (rows.length) {
+          rows.forEach(row => {
+            realm.create(tableName, row, true);
+          });
+        } else {
+          realm.create(tableName, rows, true);
+        }
+        resolve(cloneObj(rows));
       });
     } catch (e) {
-      console.log('数据更新失败：', tableName, row);
+      console.log('数据更新失败：', tableName, rows);
       reject(e);
     }
   });
 };
 
 // 最底层的删除方法，传入需要删除的数组对象或单个对象
-let deleteRow = row => {
+let deleteRow = rows => {
   try {
     realm.write(() => {
-      realm.delete(row);
+      if (rows.length) {
+        rows.forEach(row => {
+          realm.delete(row);
+        });
+      } else {
+        realm.delete(rows);
+      }
     });
   } catch (e) {
-    console.log('数据删除失败：', row);
+    console.log('数据删除失败：', rows);
   }
 };
 
@@ -180,23 +192,44 @@ const findBook = primaryKey => {
   return _findOne('BookList', primaryKey);
 };
 // 保存一本小说
-const saveBook = row => {
-  return _saveRow('BookList', row);
+const saveBook = rows => {
+  return _saveRow('BookList', rows);
 };
 
-const queryChapter = () => {
+const queryChapter = bookId => {
   try {
-    console.log('书架查询失败！');
+    return cloneObj(
+      realm
+        .objects('BookChapterList')
+        .filtered('bookId == $0', bookId)
+        .sorted('orderNum'),
+    );
   } catch (e) {
-    console.log('书架查询失败！');
+    console.log('查询失败！');
+    console.log(e);
   }
   return [];
+};
+// 查询最大章节序号
+const getMaxChapterOrderNum = bookId => {
+  try {
+    let orderNum = realm
+      .objects('BookChapterList')
+      .filtered('bookId == $0', bookId)
+      .map('orderNum');
+    console.log(orderNum);
+  } catch (e) {
+    console.log('查询失败！');
+    console.log(e);
+  }
+  return 0;
 };
 const findChapter = primaryKey => {
   return _findOne('BookChapterList', primaryKey);
 };
-const saveChapter = row => {
-  return _saveRow('BookChapterList', row);
+
+const saveChapter = rows => {
+  return _saveRow('BookChapterList', rows);
 };
 
 module.exports = {
@@ -207,6 +240,7 @@ module.exports = {
   saveBook,
 
   queryChapter,
+  getMaxChapterOrderNum,
   findChapter,
   saveChapter,
 };

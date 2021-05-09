@@ -15,8 +15,8 @@ import {
   Button,
   BackHandler,
 } from 'react-native';
-import cheerio from 'cheerio';
 import StyleConfig from '@/config/styleConfig';
+import {getId, textFormat} from '@/utils/function';
 
 export default class BookRead extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -25,7 +25,7 @@ export default class BookRead extends React.Component {
     let bookInfo = this.props.route.params;
 
     // console.log(bookInfo);
-    this.scrollViewRef = null;
+    this.scrollRef = null;
     this.state = {
       bookInfo: bookInfo,
       key: bookInfo.bookName,
@@ -55,7 +55,7 @@ export default class BookRead extends React.Component {
   }
 
   handleBackButtonClick() {
-    alert('退回');
+    // alert('退回');
     this.props.navigation.goBack(null);
     return true;
   }
@@ -109,12 +109,12 @@ export default class BookRead extends React.Component {
           },
           () => {
             that._saveBook();
+            if (that.scrollRef != null) {
+              that.scrollRef.scrollTo({x: 0, y: 0, animated: true});
+            }
             global.loading.hide();
           },
         );
-        if (that.scrollViewRef != null) {
-          that.scrollViewRef.scrollTo({x: 0, y: 0, animated: true});
-        }
       })
       .catch(error => {
         global.loading.hide();
@@ -126,6 +126,7 @@ export default class BookRead extends React.Component {
     let that = this;
     let bookId = this.state.bookInfo.bookId;
 
+    // 保存阅读进度
     let book = {
       bookId: bookId,
       saveTime: new Date(),
@@ -136,6 +137,23 @@ export default class BookRead extends React.Component {
     };
     global.realm.saveBook(book);
   }
+
+  _saveChapter() {
+    let that = this;
+    let bookId = this.state.bookInfo.bookId;
+
+    let orderNum = global.realm.getMaxChapterOrderNum(bookId);
+    // 保存阅读进度
+    let chapter = {
+      chapterId: getId(),
+      bookId: bookId,
+      chapterUrl: that.state.lastChapterUrl,
+      title: that.state.title,
+      num: 0,
+      orderNum: orderNum,
+    };
+    global.realm.saveChapter(chapter);
+  }
   // 初始加载
   componentDidMount() {
     this._loadHtml();
@@ -144,9 +162,7 @@ export default class BookRead extends React.Component {
   render() {
     return (
       <View style={styles.myView}>
-        <ScrollView
-          ref={c => (this.scrollViewRef = c)}
-          style={styles.myScrollView}>
+        <ScrollView ref={c => (this.scrollRef = c)} style={styles.myScrollView}>
           <Button
             title={'上一章'}
             accessibilityLabel="accessibility title"

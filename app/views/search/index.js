@@ -23,6 +23,7 @@ export default class Search extends React.Component {
   constructor(props) {
     super(props);
     this.inputRef = React.createRef();
+    this.scrollRef = null;
     this.state = {
       isChange: false,
       searchText: '',
@@ -50,6 +51,9 @@ export default class Search extends React.Component {
         .getSearchList(that.state.searchText)
         .then(res => {
           // console.log(res);
+          if (that.scrollRef != null) {
+            that.scrollRef.scrollTo({x: 0, y: 0, animated: true});
+          }
           that.setState(
             {
               isChange: false,
@@ -149,6 +153,7 @@ export default class Search extends React.Component {
         </View>
         <View style={global.appStyles.main}>
           <FlatList
+            ref={c => (this.scrollRef = c)}
             data={this.state.bookList}
             keyExtractor={item => item.bookId}
             renderItem={({item}) => this._getItem(item)}
