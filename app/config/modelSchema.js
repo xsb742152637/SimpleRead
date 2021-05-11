@@ -13,20 +13,19 @@ const BookListSchema = {
   properties: {
     bookId: 'string', // 主键
     bookName: 'string', // 书名
-    author: {type: 'string', default: ''}, //作者
+    author: 'string?', //作者
     bookUrl: 'string', // 小说主页
     chapterUrl: 'string', // 小说目录
     imgUrl: 'string', // 封面图
-    lastChapterUrl: 'string', // 最新一章路径
-    lastChapterTitle: 'string', // 最新一章标题
-    lastChapterTime: 'string', // 最新更新时间
+    lastChapterTitle: 'string?', // 最新一章标题
+    lastChapterTime: 'string?', // 最新更新时间
     hasNewChapter: {type: 'int', default: 0}, // 是否有新章节
-    historyChapterTitle: {type: 'string', default: ''}, //最后一次阅读的章节名称
-    detailId: {type: 'string', default: ''}, //最后一次阅读的章节序号
+    historyChapterTitle: 'string?', //最后一次阅读的章节名称
+    chapterId: 'string?', //最后一次阅读的章节序号
     historyChapterPage: {type: 'int', default: 0}, //最后一次阅读的章节页数
     isEnd: {type: 'int', default: 0}, // 是否完结：0(不知道)、1(连载中)、2(完结)
     bookState: {type: 'int', default: 1}, // 状态：0(不显示)、1(正常显示)、2(置顶)、3(养肥)
-    sourceKey: {type: 'string', default: ''}, //选中的当前源
+    sourceKey: 'string?', //选中的当前源
     saveTime: 'date', // 最后保存时间
     orderNum: {type: 'int', default: 0}, // 序号
   },
@@ -39,7 +38,7 @@ const BookChapterListSchema = {
   properties: {
     chapterId: 'string', //
     bookId: 'string', //BookList 的主键
-    chapterUrl: 'string', //章节路径
+    thisUrl: 'string', //章节路径
     title: 'string', //章节标题
     num: 'int', //章节数
     orderNum: 'int', //章节序号
@@ -49,13 +48,15 @@ const BookChapterListSchema = {
 // 小说缓存的每一章内容
 const BookChapterDetailSchema = {
   name: 'BookChapterDetail',
-  primaryKey: 'detailId',
+  primaryKey: 'chapterId',
   properties: {
-    detailId: 'string', //小说编号
-    chapterId: 'string', //BookChapterList 的主键
-    bookName: 'string',
-    content: 'string', //小说内容
-    orderNum: 'int', //小说序号
+    chapterId: 'string', //小说章节
+    bookId: 'string',
+    title: 'string?', //小说标题
+    content: 'string?', //小说内容
+    thisUrl: 'string?', //本章路径
+    prevUrl: 'string?', //上一章路径
+    nextUrl: 'string?', // 下一章路径
   },
 };
 
@@ -66,21 +67,21 @@ const HistoryBookListSchema = {
   properties: {
     bookId: 'string', // 主键
     bookName: 'string', // 书名
-    author: {type: 'string', default: ''}, //作者
+    author: 'string?', //作者
     bookUrl: 'string', // 小说主页
     chapterUrl: 'string', // 小说目录
     imgUrl: 'string', // 封面图
-    lastChapterTitle: 'string', // 最新一章标题
-    lastChapterTime: 'string', // 最新更新时间
-    hasNewChapter: 'int', // 是否有新章节
-    historyChapterTitle: {type: 'string', default: ''}, //最后一次阅读的章节名称
-    historyChapterNum: 'int', //最后一次阅读的章节序号
-    historyChapterPage: 'int', //最后一次阅读的章节页数
+    lastChapterTitle: 'string?', // 最新一章标题
+    lastChapterTime: 'string?', // 最新更新时间
+    hasNewChapter: {type: 'int', default: 0}, // 是否有新章节
+    historyChapterTitle: 'string?', //最后一次阅读的章节名称
+    chapterId: 'string?', //最后一次阅读的章节序号
+    historyChapterPage: {type: 'int', default: 0}, //最后一次阅读的章节页数
     isEnd: {type: 'int', default: 0}, // 是否完结：0(不知道)、1(连载中)、2(完结)
-    bookState: {type: 'int', default: 1}, // 状态：0(养肥)、1(正常显示)、2(置顶)
-    sourceKey: {type: 'string', default: ''}, //选中的当前源
+    bookState: {type: 'int', default: 1}, // 状态：0(不显示)、1(正常显示)、2(置顶)、3(养肥)
+    sourceKey: 'string?', //选中的当前源
     saveTime: 'date', // 最后保存时间
-    orderNum: 'int', // 序号
+    orderNum: {type: 'int', default: 0}, // 序号
   },
 };
 
@@ -92,7 +93,7 @@ const ReaderConfigSchema = {
     configId: 'string',
     background: 'string', // 背景
     fontSize: 'int', // 字体大小
-    fontFamily: {type: 'string', default: ''}, // 字体类型
+    fontFamily: 'string?', // 字体类型
     lineHeight: 'int', // 行间距
     brightness: 'string', // 屏幕亮度
     dayNight: {type: 'int', default: 0}, // 夜晚模式
@@ -110,7 +111,7 @@ const schemaArray = [
   ReaderConfigSchema,
 ];
 
-let realm = new Realm({schema: schemaArray, schemaVersion: 3});
+let realm = new Realm({schema: schemaArray, schemaVersion: 4});
 
 // 最底层的查询方法，传入表名和需要查询的主键
 let _findOne = (tableName, primaryKey) => {
@@ -165,7 +166,6 @@ const queryBookList = bookState => {
   if (!bookState) {
     bookState = [0, 1, 2];
   }
-  console.log(bookState);
   try {
     let filter = [];
     if (bookState.length) {
@@ -176,7 +176,6 @@ const queryBookList = bookState => {
       filter.push(' bookState == ' + bookState);
     }
     filter = filter.join(' or ');
-    console.log(filter);
     return cloneObj(
       realm.objects('BookList').filtered(filter).sorted('saveTime', true),
     );
@@ -196,6 +195,15 @@ const saveBook = rows => {
   return _saveRow('BookList', rows);
 };
 
+const queryChapterList = () => {
+  try {
+    return realm.objects('BookChapterList');
+  } catch (e) {
+    console.log('查询失败！');
+    console.log(e);
+  }
+  return [];
+};
 const queryChapter = bookId => {
   try {
     return cloneObj(
@@ -212,17 +220,20 @@ const queryChapter = bookId => {
 };
 // 查询最大章节序号
 const getMaxChapterOrderNum = bookId => {
+  let orderNum = 0;
   try {
-    let orderNum = realm
+    orderNum = realm
       .objects('BookChapterList')
       .filtered('bookId == $0', bookId)
-      .map('orderNum');
-    console.log(orderNum);
+      .max('orderNum');
+    if (orderNum == undefined || orderNum == null) {
+      orderNum = 0;
+    }
   } catch (e) {
     console.log('查询失败！');
     console.log(e);
   }
-  return 0;
+  return orderNum;
 };
 const findChapter = primaryKey => {
   return _findOne('BookChapterList', primaryKey);
@@ -232,6 +243,34 @@ const saveChapter = rows => {
   return _saveRow('BookChapterList', rows);
 };
 
+const queryDetailList = () => {
+  try {
+    return realm.objects('BookChapterDetail');
+  } catch (e) {
+    console.log('查询失败！');
+    console.log(e);
+  }
+  return [];
+};
+const queryDetailByThisUrl = thisUrl => {
+  try {
+    return cloneObj(
+      realm.objects('BookChapterDetail').filtered('thisUrl == $0', thisUrl),
+    );
+  } catch (e) {
+    console.log('查询失败！');
+    console.log(e);
+  }
+  return [];
+};
+const findDetail = primaryKey => {
+  return _findOne('BookChapterDetail', primaryKey);
+};
+
+const saveDetail = rows => {
+  return _saveRow('BookChapterDetail', rows);
+};
+
 module.exports = {
   deleteRow,
 
@@ -239,8 +278,14 @@ module.exports = {
   findBook,
   saveBook,
 
+  queryChapterList,
   queryChapter,
   getMaxChapterOrderNum,
   findChapter,
   saveChapter,
+
+  queryDetailList,
+  queryDetailByThisUrl,
+  findDetail,
+  saveDetail,
 };

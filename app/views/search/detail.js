@@ -76,13 +76,12 @@ export default class SearchDetail extends React.Component {
         bookUrl: d.bookUrl,
         chapterUrl: d.chapterUrl,
         imgUrl: d.imgUrl,
-        lastChapterUrl: d.lastChapterUrl,
         lastChapterTitle: d.lastChapterTitle,
         lastChapterTime: d.lastChapterTime,
         hasNewChapter: 0,
         isEnd: d.isEnd,
         bookState: type ? 0 : 1, // 直接阅读的小说状态为不显示
-        sourceKey: '',
+        sourceKey: d.sourceKey,
         saveTime: new Date(),
       };
 

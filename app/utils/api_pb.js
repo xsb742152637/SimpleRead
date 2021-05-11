@@ -7,8 +7,8 @@ import {getId, textFormat, mergeSpace} from '@/utils/function';
 
 let AppApi;
 export default AppApi = {
-  base: 'http://search.zongheng.com',
-  search: '/s',
+  base: 'http://www.qishusk.com',
+  search: '/modules/article/search.php',
   _getUrl(url) {
     return this.base + url;
   },
@@ -31,28 +31,21 @@ export default AppApi = {
         .fetchHtml(url)
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
-          let main = $('.reader_box');
-          let title = $(main).find('.title_txtbox').text();
-          let content = '';
-          $(main)
-            .find('.content>p')
-            .each(function (i, o) {
-              content += $(o).text() + '\n\n';
-            });
+          let content = $('#main>.content').html();
 
-          let btn = $(main).find('.chap_btnbox>a');
-          let listUrl = $($(btn)[0]).attr('href');
-          let prevUrl = $($(btn)[1]).attr('href');
+          let btn = $('.chapter_go>a');
+          let listUrl = $($(btn)[1]).attr('href');
+          let prevUrl = $($(btn)[0]).attr('href');
           let nextUrl = $($(btn)[2]).attr('href');
 
-          if (prevUrl.indexOf('javascript') >= 0) {
+          if (prevUrl.indexOf('javascript') >= 0 || prevUrl == listUrl) {
             prevUrl = '';
           }
-          if (nextUrl.indexOf('javascript') >= 0) {
+          if (nextUrl.indexOf('javascript') >= 0 || nextUrl == listUrl) {
             nextUrl = '';
           }
           let data = {};
-          data.title = title;
+          data.title = '';
           data.content = content;
           data.listUrl = listUrl;
           data.prevUrl = prevUrl;
@@ -73,7 +66,7 @@ export default AppApi = {
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
           let chapterList = [];
-          $('.volume-list li').each(function (i, o) {
+          $('#main>.list>dl>dd').each(function (i, o) {
             chapterList.push({
               chapterId: getId(),
               thisUrl: $(o).find('a').attr('href'),
@@ -97,25 +90,20 @@ export default AppApi = {
         .fetchHtml(data.bookUrl)
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
-          let main = $('.book-main');
-          let imgUrl = $(main).find('.book-img img').attr('src');
-          let intro = that._getContent($(main).find('.book-dec>p').text());
-          let lastChapterTitle = $(main)
-            .find('.book-new-chapter>.tit>a')
-            .text();
-          let lastChapterTime = $(main).find('.book-new-chapter>.time').text();
-          let chapterUrl = $(main).find('.all-catalog').attr('href');
+          let other = $('.xiaoshuo>.info>p').split('&nbsp;');
+          console.log(other);
+          let intro = $('.new_chapter_list>p>a').text();
+          let lastChapterTitle = $('.new_chapter_list>.new>a').text();
+          let lastChapterTime = other[4].replact('更新：', '');
+          let chapterUrl = $('.read_link>#read').attr('href');
+          let author = $('#author').text();
 
-          data.imgUrl = imgUrl;
           data.intro = textFormat(intro);
           data.lastChapterTitle = lastChapterTitle;
-          data.lastChapterTime = mergeSpace(
-            textFormat(lastChapterTime)
-              .replace(/((\s| )*\r?\n)+/g, '')
-              .replace(/./g, ''),
-          );
+          data.lastChapterTime = lastChapterTime;
           data.chapterUrl = chapterUrl;
-          data.sourceKey = 'xbqg';
+          data.author = author.replace(' / 作者：', '');
+          data.sourceKey = 'pb';
           resolve(data);
         })
         .catch(error => {
@@ -128,21 +116,20 @@ export default AppApi = {
     // 注意：这里params里面的key为全小写
     return new Promise((resolve, reject) => {
       request
-        .fetchHtml(that._getUrl(that.search), {keyword: searchkey})
+        .fetchHtml(that._getUrl(that.search), {searchkey: searchkey})
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
           let data = [];
-          $('.search-tab>.search-result-list').each((i, o) => {
-            let imgUrl = $(o).find('.imgbox img').attr('src');
-            let name = $(o).find('.tit a').text();
-            let intro = $(o).find('.se-result-infos>p').text();
-            let url = $(o).find('.tit a').attr('href');
+          $('.zhuopin').each((i, o) => {
+            let imgUrl = $(o).find('img').attr('src');
+            let name = $(o).find('.book_info h2 a').text();
+            let intro = $(o).find('.p-intro').text();
+            let url = $(o).find('.book_info h2 a').attr('href');
+            let itemTitle = $(o).find('.p-new>a').text();
 
-            let other = $(o).find('.bookinfo').children();
-            let author = $(other[0]).text();
-            let type = $(other[2]).text();
-            let state = $(other[4]).text();
-            let len = $(other[6]).text();
+            let type = '';
+            let state = $(o).find('.f-green').text();
+            let len = '';
             // console.log(name);
             // 排除表头
             if (url == undefined || url == null || url === '') {
@@ -152,7 +139,7 @@ export default AppApi = {
             let item = {
               bookId: getId(),
               bookName: name,
-              author: author,
+              author: '',
               bookUrl: url,
               chapterUrl: '',
               imgUrl: imgUrl,
@@ -162,14 +149,14 @@ export default AppApi = {
               isEnd: state.indexOf('连载') >= 0 ? 1 : 0,
               len: len,
             };
+
             data.push({
-              type: 2,
               key: item.bookId,
-              itemName: item.bookName,
-              imgUrl: item.imgUrl,
-              itemTitle: item.author,
-              itemInfo1: item.type + ' | ' + item.state + ' | ' + item.len,
-              itemInfo2: item.intro,
+              itemName: name,
+              imgUrl: imgUrl,
+              itemTitle: itemTitle,
+              itemInfo1: state,
+              itemInfo2: intro,
               item: item,
             });
           });

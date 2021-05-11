@@ -24,17 +24,17 @@ export default class BookRead extends React.Component {
     super(props);
     let bookInfo = this.props.route.params;
 
-    // console.log(bookInfo);
+    console.log(bookInfo);
     this.scrollRef = null;
     this.state = {
       bookInfo: bookInfo,
       key: bookInfo.bookName,
-      detailId: '',
+      chapterId: bookInfo.chapterId,
       page: 1,
-      lastChapterUrl: bookInfo.lastChapterUrl,
+      thisUrl: '',
       prevUrl: '',
       nextUrl: '',
-      listUrl: '',
+      listUrl: bookInfo.chapterUrl,
       content: '',
       title: '',
     };
@@ -62,66 +62,68 @@ export default class BookRead extends React.Component {
 
   // 上一章/下一章
   _clickButton(type) {
-    let lastChapterUrl;
+    let thisUrl;
     if (type) {
       if (this.state.prevUrl == '') {
         global.toast.add('已经是第一章了……');
         return;
       }
-      lastChapterUrl = this.state.prevUrl;
+      thisUrl = this.state.prevUrl;
     } else {
       if (this.state.nextUrl == '') {
         global.toast.add('已经是最后一章了……');
         return;
       }
-      lastChapterUrl = this.state.nextUrl;
+      thisUrl = this.state.nextUrl;
     }
 
     this.setState(
       {
-        lastChapterUrl: lastChapterUrl,
+        thisUrl: thisUrl,
         prevUrl: '',
         nextUrl: '',
       },
       () => {
-        this._loadHtml();
+        this._loadDetail();
       },
     );
   }
 
   // 请求html内容，并缓存
-  _loadHtml() {
+  _loadDetail(detail) {
     let that = this;
-    global.loading.show();
-    // console.log(this.state.lastChapterUrl);
-    global.appApi
-      .getChapter(this.state.lastChapterUrl)
-      .then(res => {
-        // console.log(res);
-        console.log(res.prevUrl);
-        that.setState(
-          {
-            title: res.title,
-            content: res.content,
-            listUrl: res.listUrl,
-            prevUrl: res.prevUrl,
-            nextUrl: res.nextUrl,
-          },
-          () => {
-            that._saveBook();
-            if (that.scrollRef != null) {
-              that.scrollRef.scrollTo({x: 0, y: 0, animated: true});
-            }
-            global.loading.hide();
-          },
-        );
-      })
-      .catch(error => {
-        global.loading.hide();
-        console.error(error);
-      });
+    if (!detail) {
+      detail = global.realm.findDetail(this.state.chapterId);
+      console.log('根据ID找内容');
+      if (!detail) {
+        detail = global.realm.queryDetailByThisUrl(this.state.chapterId);
+        console.log('根据路径找内容');
+      }
+    }
+    if (detail) {
+      console.log('有内容');
+      console.log(detail);
+      let title = detail.title;
+      that.setState(
+        {
+          title: title,
+          content: detail.content,
+          prevUrl: detail.prevUrl,
+          nextUrl: detail.nextUrl,
+        },
+        () => {
+          that._saveBook();
+          if (that.scrollRef != null) {
+            that.scrollRef.scrollTo({x: 0, y: 0, animated: true});
+          }
+        },
+      );
+    } else {
+      console.log('无内容');
+    }
   }
 
+  // 记录阅读进度
   _saveBook() {
     let that = this;
     let bookId = this.state.bookInfo.bookId;
@@ -131,32 +133,94 @@ export default class BookRead extends React.Component {
       bookId: bookId,
       saveTime: new Date(),
       historyChapterTitle: that.state.title,
-      detailId: that.state.detailId,
-      lastChapterUrl: that.state.lastChapterUrl,
+      chapterId: that.state.chapterId,
       historyChapterPage: that.state.page,
     };
+    console.log('记录进度');
     global.realm.saveBook(book);
   }
 
+  // 保存章节列表
   _saveChapter() {
     let that = this;
     let bookId = this.state.bookInfo.bookId;
+    global.loading.show();
+    console.log('开始缓存目录');
+    // console.log(this.state.thisUrl);
+    global.appApi
+      .getChapterList(this.state.listUrl)
+      .then(res => {
+        console.log('章节总数：' + res.length);
+        if (res.length > 0) {
+          global.realm.saveChapter(res);
+          let thisChapter = res[0];
 
-    let orderNum = global.realm.getMaxChapterOrderNum(bookId);
-    // 保存阅读进度
-    let chapter = {
-      chapterId: getId(),
-      bookId: bookId,
-      chapterUrl: that.state.lastChapterUrl,
-      title: that.state.title,
-      num: 0,
-      orderNum: orderNum,
-    };
-    global.realm.saveChapter(chapter);
+          that.setState(
+            {
+              page: 1,
+              chapterId: thisChapter.chapterId,
+              thisUrl: thisChapter.thisUrl,
+              prevUrl: '',
+              nextUrl: '',
+              content: '',
+              title: thisChapter.title,
+            },
+            () => {
+              global.loading.hide();
+              that._saveDetail();
+            },
+          );
+        } else {
+          alert('获取章节信息失败');
+        }
+      })
+      .catch(error => {
+        global.loading.hide();
+        console.error(error);
+      });
   }
+
+  // 保存当前章的内容
+  _saveDetail() {
+    let that = this;
+    global.loading.show();
+    // console.log(this.state.thisUrl);
+    console.log('开始请求内容');
+    global.appApi
+      .getChapter(this.state.thisUrl)
+      .then(res => {
+        // console.log(res);
+        // 保存一章的明细
+        let title = res.title ? res.title : that.state.title;
+        let detail = {
+          chapterId: that.state.chapterId,
+          bookId: that.state.bookInfo.bookId,
+          title: title,
+          content: res.content,
+          thisUrl: this.state.thisUrl,
+          prevUrl: res.prevUrl,
+          nextUrl: res.nextUrl,
+        };
+        console.log('保存本章内容');
+        global.realm.saveDetail(detail);
+        that._loadDetail(detail);
+        global.loading.hide();
+      })
+      .catch(error => {
+        global.loading.hide();
+        console.error(error);
+      });
+  }
+
   // 初始加载
   componentDidMount() {
-    this._loadHtml();
+    // 如果有明细ID，直接从数据库获取本章内容
+    // 否则缓存章节目录，并打开第一章
+    if (this.state.bookInfo.chapterId == '') {
+      this._saveChapter();
+    } else {
+      this._loadDetail();
+    }
   }
 
   render() {
