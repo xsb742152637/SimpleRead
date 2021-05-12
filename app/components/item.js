@@ -20,6 +20,7 @@ export default class Item extends React.Component {
     super(props);
   }
   _clickItem(item) {
+    item.callback = this.props.callback;
     this.props.navigation.navigate(this.props.navigateName, item);
   }
   render() {

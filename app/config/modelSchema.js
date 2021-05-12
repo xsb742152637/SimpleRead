@@ -227,6 +227,20 @@ const queryChapterByBookId = bookId => {
   }
   return [];
 };
+const queryChapterByThisUrl = (thisUrl, bookId) => {
+  try {
+    let data = realm
+      .objects('BookChapterList')
+      .filtered('thisUrl == $0 and bookId == $1', thisUrl, bookId);
+    if (!isNull(data)) {
+      return data[0];
+    }
+  } catch (e) {
+    console.log('查询失败！');
+    console.log(e);
+  }
+  return [];
+};
 // 查询最大章节序号
 const getMaxChapterOrderNum = bookId => {
   let orderNum = 0;
@@ -268,11 +282,12 @@ const queryDetailListByBookId = (bookId) => {
 };
 const queryDetailByThisUrl = (thisUrl, bookId) => {
   try {
-    return cloneObj(
-      realm
-        .objects('BookChapterDetail')
-        .filtered('thisUrl == $0 and bookId == $1', thisUrl, bookId),
-    );
+    let data = realm
+      .objects('BookChapterDetail')
+      .filtered('thisUrl == $0 and bookId == $1', thisUrl, bookId);
+    if (!isNull(data)) {
+      return data[0];
+    }
   } catch (e) {
     console.log('查询失败！');
     console.log(e);
@@ -302,6 +317,7 @@ module.exports = {
   deleteBookAll,
 
   queryChapterByBookId,
+  queryChapterByThisUrl,
   getMaxChapterOrderNum,
   findChapter,
   saveChapter,

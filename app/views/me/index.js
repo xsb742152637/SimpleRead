@@ -30,19 +30,12 @@ export default class Me extends React.Component {
   }
 
   _deleteAll() {
-    let bookId = 'C06F665E-F145-42F9-827D-0766819CF3BC';
-    global.realm.deleteBookAll();
+    let bookId = '3419E117-41F0-48E6-977D-358D312720E3';
+    // global.realm.deleteBookAll();
 
-    // rows = global.realm.queryChapterByBookId(bookId);
-    // if (!isNull(rows)) {
-    //   global.realm.deleteRow(rows);
-    // }
-    //
-    // rows = global.realm.queryDetailListByBookId(bookId);
-    // console.log(rows);
-    // if (!isNull(rows)) {
-    //   global.realm.deleteRow(rows);
-    // }
+    global.realm.deleteBookAll();
+    // global.realm.deleteChapterByBookId(bookId);
+    // global.realm.deleteDetailByBookId(bookId);
   }
   _getMaxChapterOrderNum() {
     let bookId = 'bbb';
@@ -50,7 +43,7 @@ export default class Me extends React.Component {
     alert(orderNum);
   }
   _queryChapter() {
-    let bookId = 'aaaaa';
+    let bookId = '3419E117-41F0-48E6-977D-358D312720E3';
     let orderNum = global.realm.queryChapterByBookId(bookId);
     console.log(orderNum);
   }

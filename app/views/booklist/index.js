@@ -45,6 +45,10 @@ export default class BookList extends React.Component {
   _goReadHistory() {
     this.props.navigation.navigate('ReadHistory');
   }
+  _callback() {
+    console.log('回调');
+    this._loadBookList();
+  }
   _getItem(item) {
     let item2 = {
       type: 1,
@@ -64,6 +68,9 @@ export default class BookList extends React.Component {
         data={item2}
         navigateName={'BookRead'}
         navigation={this.props.navigation}
+        callback={() => {
+          this._callback();
+        }}
       />
     );
   }

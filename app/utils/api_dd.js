@@ -28,7 +28,7 @@ export default AppApi = {
     // 注意：这里params里面的key为全小写
     return new Promise((resolve, reject) => {
       request
-        .fetchHtml(that._getUrl(url))
+        .fetchHtml(url)
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
           let title = $('#box_con .bookname h1').text();
@@ -71,7 +71,7 @@ export default AppApi = {
             chapterList.push({
               chapterId: getId(),
               bookId: bookId,
-              thisUrl: $(o).find('a').attr('href'),
+              thisUrl: that._getUrl($(o).find('a').attr('href')),
               title: $(o).find('a').text(),
               num: 0,
               orderNum: i,
