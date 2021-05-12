@@ -38,30 +38,8 @@ export default class BookRead extends React.Component {
       content: '',
       title: '',
     };
+    // 将this传递到监听方法中，不然在这个方法中无法正确访问this
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
-  }
-  UNSAFE_componentWillMount() {
-    BackHandler.addEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
-  }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
-  }
-
-  handleBackButtonClick() {
-    // alert('退回');
-    // this.props.navigation.goBack(null);
-    console.log('退回');
-    if (this.state.bookInfo.callback) {
-      this.state.bookInfo.callback();
-    }
-    return false;
   }
 
   // 上一章/下一章
@@ -238,6 +216,11 @@ export default class BookRead extends React.Component {
 
   // 初始加载
   componentDidMount() {
+    // 添加返回监听
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
     // 如果有明细ID，直接从数据库获取本章内容
     // 否则缓存章节目录，并打开第一章
     console.log(this.state.bookInfo.chapterId);
@@ -249,6 +232,22 @@ export default class BookRead extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    // 注销监听
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  // 页面返回触发的方法
+  handleBackButtonClick() {
+    console.log('退回');
+    // 如果有全局回调的key，执行回调
+    if (this.state.bookInfo.callbackKey) {
+      global.callbacks[this.state.bookInfo.callbackKey]();
+    }
+  }
   render() {
     return (
       <View style={styles.myView}>

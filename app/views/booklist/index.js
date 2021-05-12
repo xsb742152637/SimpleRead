@@ -23,6 +23,7 @@ export default class BookList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      callbackKey: 'bookList',
       bookList: [],
     };
   }
@@ -32,6 +33,12 @@ export default class BookList extends React.Component {
 
   // 初始加载
   componentDidMount() {
+    let that = this;
+    // 在全局变量中注册回调
+    global.callbacks[this.state.callbackKey] = () => {
+      console.log('回调');
+      that._loadBookList();
+    };
     this._loadBookList();
   }
 
@@ -40,14 +47,13 @@ export default class BookList extends React.Component {
   }
 
   _goSearch() {
-    this.props.navigation.navigate('Search');
+    // 传递全局回调的key
+    this.props.navigation.navigate('Search', {
+      callbackKey: this.state.callbackKey,
+    });
   }
   _goReadHistory() {
     this.props.navigation.navigate('ReadHistory');
-  }
-  _callback() {
-    console.log('回调');
-    this._loadBookList();
   }
   _getItem(item) {
     let item2 = {
@@ -68,9 +74,7 @@ export default class BookList extends React.Component {
         data={item2}
         navigateName={'BookRead'}
         navigation={this.props.navigation}
-        callback={() => {
-          this._callback();
-        }}
+        callbackKey={'bookList'}
       />
     );
   }

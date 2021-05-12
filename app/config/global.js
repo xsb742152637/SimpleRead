@@ -21,3 +21,5 @@ global.loading = Loading;
 global.toast = Toast;
 global.popup = Popup;
 global.appApi = AppApi;
+// 全局回调
+global.callbacks = {};

@@ -14,7 +14,9 @@ import {
   FlatList,
   Image,
   Keyboard,
+  BackHandler,
 } from 'react-native';
+import {getId, textFormat, isNull} from '@/utils/function';
 import Back from '@/components/back';
 import MyIcon from '@/config/myIcon';
 import StyleConfig from '@/config/styleConfig';
@@ -26,18 +28,47 @@ export default class Search extends React.Component {
     this.inputRef = React.createRef();
     this.scrollRef = null;
     this.state = {
+      callbackKey: this.props.route.params.callbackKey,
       isChange: false,
       searchText: '',
       bookList: [],
     };
+    // 将this传递到监听方法中，不然在这个方法中无法正确访问this
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
+  // 初始加载
   componentDidMount() {
+    // 添加返回监听
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
 
+  componentWillUnmount() {
+    // 注销监听
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  // 页面返回触发的方法
+  handleBackButtonClick() {
+    console.log('退回2');
+    // 如果有全局回调的key，执行回调
+    if (this.state.callbackKey) {
+      global.callbacks[this.state.callbackKey]();
+    }
   }
   // 开始搜索
   _searchBook() {
     let that = this;
+    if (isNull(that.state.searchText)) {
+      global.toast.add('请输入书名或作者名称');
+      return;
+    }
     if (that.state.isChange) {
       // 文本框失去焦点
       that.inputRef.current.blur();

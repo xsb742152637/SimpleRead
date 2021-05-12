@@ -20,7 +20,8 @@ export default class Item extends React.Component {
     super(props);
   }
   _clickItem(item) {
-    item.callback = this.props.callback;
+    // 传递全局回调的key
+    item.callbackKey = this.props.callbackKey;
     this.props.navigation.navigate(this.props.navigateName, item);
   }
   render() {
