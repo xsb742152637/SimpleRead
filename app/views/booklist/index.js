@@ -11,6 +11,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  BackHandler,
 } from 'react-native';
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
@@ -23,9 +24,13 @@ export default class BookList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      lastBackPressed: null,
       callbackKey: 'bookList',
       bookList: [],
     };
+
+    // 将this传递到监听方法中，不然在这个方法中无法正确访问this
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
   // render渲染前触发，仅调用一次
@@ -34,6 +39,12 @@ export default class BookList extends React.Component {
   // 初始加载
   componentDidMount() {
     let that = this;
+    // 添加返回监听
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+
     // 在全局变量中注册回调
     global.callbacks[this.state.callbackKey] = () => {
       console.log('回调');
@@ -42,6 +53,30 @@ export default class BookList extends React.Component {
     this._loadBookList();
   }
 
+  componentWillUnmount() {
+    // 注销监听
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  // 页面返回触发的方法
+  handleBackButtonClick() {
+    console.log('首页返回');
+    // 如果有全局回调的key，执行回调
+    if (
+      this.state.lastBackPressed &&
+      this.state.lastBackPressed + 2000 >= Date.now()
+    ) {
+      //在2秒内按过back返回，可以退出应用
+      BackHandler.exitApp();
+      return false;
+    }
+    this.setState({lastBackPressed: Date.now()});
+    global.toast.add('再按一次退出应用……');
+    return true;
+  }
   _loadBookList() {
     this.setState({bookList: global.realm.queryBookList(1)});
   }

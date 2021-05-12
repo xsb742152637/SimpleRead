@@ -7,6 +7,8 @@ https://icon.wuruihong.com/
 新的小说源
 http://www.qishusk.com/
 
+RN中文文档
+https://reactnative.cn/docs/statusbar
 
 /*
 数据库：realm

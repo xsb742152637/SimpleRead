@@ -287,11 +287,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-    backgroundColor: '#CCE8CF',
+    backgroundColor: StyleConfig.color.headerBackground,
   },
   myView: {
     padding: 6,
-    backgroundColor: '#CCE8CF',
+    backgroundColor: StyleConfig.color.headerBackground,
   },
   myButton: {
     backgroundColor: '#FAF9DE',
