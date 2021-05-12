@@ -15,7 +15,7 @@ import {
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
 import MyIcon from '@/config/myIcon';
-import {getId, textFormat, mergeSpace} from '@/utils/function';
+import {getId, textFormat, mergeSpace, isNull} from '@/utils/function';
 import Item from '@/components/item';
 
 export default class BookList extends React.Component {
@@ -52,8 +52,9 @@ export default class BookList extends React.Component {
       imgUrl: item.imgUrl,
       imgWidth: 70,
       imgHeight: 100,
-      itemTitle:
-        item.historyChapterTitle == '' ? '还未读过' : item.historyChapterTitle,
+      itemTitle: isNull(item.historyChapterTitle)
+        ? '还未读过'
+        : item.historyChapterTitle,
       itemInfo1: '最新章节：' + item.lastChapterTitle,
       itemInfo2: '更新情况：' + mergeSpace(textFormat(item.lastChapterTime)),
       item: item,

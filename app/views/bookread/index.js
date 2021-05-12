@@ -16,7 +16,7 @@ import {
   BackHandler,
 } from 'react-native';
 import StyleConfig from '@/config/styleConfig';
-import {getId, textFormat} from '@/utils/function';
+import {getId, textFormat, isNull} from '@/utils/function';
 
 export default class BookRead extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -40,7 +40,7 @@ export default class BookRead extends React.Component {
     };
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     BackHandler.addEventListener(
       'hardwareBackPress',
       this.handleBackButtonClick,
@@ -64,13 +64,13 @@ export default class BookRead extends React.Component {
   _clickButton(type) {
     let thisUrl;
     if (type) {
-      if (this.state.prevUrl == '') {
+      if (isNull(this.state.prevUrl)) {
         global.toast.add('已经是第一章了……');
         return;
       }
       thisUrl = this.state.prevUrl;
     } else {
-      if (this.state.nextUrl == '') {
+      if (isNull(this.state.nextUrl)) {
         global.toast.add('已经是最后一章了……');
         return;
       }
@@ -92,17 +92,25 @@ export default class BookRead extends React.Component {
   // 请求html内容，并缓存
   _loadDetail(detail) {
     let that = this;
-    if (!detail) {
+    if (isNull(detail)) {
       detail = global.realm.findDetail(this.state.chapterId);
       console.log('根据ID找内容');
-      if (!detail) {
-        detail = global.realm.queryDetailByThisUrl(this.state.chapterId);
-        console.log('根据路径找内容');
-      }
     }
-    if (detail) {
-      console.log('有内容');
-      console.log(detail);
+    if (isNull(detail)) {
+      detail = global.realm.queryDetailByThisUrl(
+        this.state.thisUrl,
+        this.state.bookInfo.bookId,
+      );
+      console.log('根据路径找内容');
+    }
+    if (isNull(detail)) {
+      console.log('没找到');
+      // 都没找到，删除目录和内容缓存，重新缓存
+      global.realm.deleteChapterByBookId(this.state.bookInfo.bookId);
+      global.realm.deleteDetailByBookId(this.state.bookInfo.bookId);
+      this._saveChapter();
+    } else {
+      // console.log('找到了', detail);
       let title = detail.title;
       that.setState(
         {
@@ -118,8 +126,6 @@ export default class BookRead extends React.Component {
           }
         },
       );
-    } else {
-      console.log('无内容');
     }
   }
 
@@ -136,7 +142,7 @@ export default class BookRead extends React.Component {
       chapterId: that.state.chapterId,
       historyChapterPage: that.state.page,
     };
-    console.log('记录进度');
+    // console.log('记录进度');
     global.realm.saveBook(book);
   }
 
@@ -146,9 +152,9 @@ export default class BookRead extends React.Component {
     let bookId = this.state.bookInfo.bookId;
     global.loading.show();
     console.log('开始缓存目录');
-    // console.log(this.state.thisUrl);
+    console.log(this.state.thisUrl);
     global.appApi
-      .getChapterList(this.state.listUrl)
+      .getChapterList(this.state.listUrl, bookId)
       .then(res => {
         console.log('章节总数：' + res.length);
         if (res.length > 0) {
@@ -216,7 +222,8 @@ export default class BookRead extends React.Component {
   componentDidMount() {
     // 如果有明细ID，直接从数据库获取本章内容
     // 否则缓存章节目录，并打开第一章
-    if (this.state.bookInfo.chapterId == '') {
+    console.log(this.state.bookInfo.chapterId);
+    if (isNull(this.state.bookInfo.chapterId)) {
       this._saveChapter();
     } else {
       this._loadDetail();

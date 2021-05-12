@@ -1,5 +1,5 @@
 /**
- * 全局样式变量
+ * 顶点小说
  */
 import cheerio from 'cheerio';
 import request from '@/utils/ajax';
@@ -7,7 +7,7 @@ import {getId, textFormat, mergeSpace, isNull} from '@/utils/function';
 
 let AppApi;
 export default AppApi = {
-  base: 'http://www.qishusk.com',
+  base: 'https://www.x23us.us',
   search: '/modules/article/search.php',
   _getUrl(url) {
     return this.base + url;
@@ -28,15 +28,16 @@ export default AppApi = {
     // 注意：这里params里面的key为全小写
     return new Promise((resolve, reject) => {
       request
-        .fetchHtml(url)
+        .fetchHtml(that._getUrl(url))
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
-          let content = $('#main>.content').html();
+          let title = $('#box_con .bookname h1').text();
+          let content = textFormat($('#content').html());
 
-          let btn = $('.chapter_go>a');
-          let listUrl = $($(btn)[1]).attr('href');
-          let prevUrl = $($(btn)[0]).attr('href');
-          let nextUrl = $($(btn)[2]).attr('href');
+          let btn = $('.bottem>a');
+          let prevUrl = $($(btn)[1]).attr('href');
+          let listUrl = $($(btn)[2]).attr('href');
+          let nextUrl = $($(btn)[3]).attr('href');
 
           if (prevUrl.indexOf('javascript') >= 0 || prevUrl === listUrl) {
             prevUrl = '';
@@ -45,7 +46,7 @@ export default AppApi = {
             nextUrl = '';
           }
           let data = {};
-          data.title = '';
+          data.title = title;
           data.content = content;
           data.listUrl = listUrl;
           data.prevUrl = prevUrl;
@@ -66,7 +67,7 @@ export default AppApi = {
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
           let chapterList = [];
-          $('#main>.list>dl>dd').each(function (i, o) {
+          $('#list dl dd').each(function (i, o) {
             chapterList.push({
               chapterId: getId(),
               bookId: bookId,
@@ -91,20 +92,14 @@ export default AppApi = {
         .fetchHtml(data.bookUrl)
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
-          let other = $('.xiaoshuo>.info>p').split('&nbsp;');
-          console.log(other);
-          let intro = $('.new_chapter_list>p>a').text();
-          let lastChapterTitle = $('.new_chapter_list>.new>a').text();
-          let lastChapterTime = other[4].replact('更新：', '');
-          let chapterUrl = $('.read_link>#read').attr('href');
-          let author = $('#author').text();
+          let main = $('#maininfo');
+          let imgUrl = $(main).find('#fmimg img').attr('src');
+          let intro = that._getContent($(main).find('#intro').text());
 
+          data.imgUrl = imgUrl;
           data.intro = textFormat(intro);
-          data.lastChapterTitle = lastChapterTitle;
-          data.lastChapterTime = lastChapterTime;
-          data.chapterUrl = chapterUrl;
-          data.author = author.replace(' / 作者：', '');
-          data.sourceKey = 'pb';
+          data.chapterUrl = data.bookUrl;
+          data.sourceKey = 'ddxs';
           resolve(data);
         })
         .catch(error => {
@@ -117,20 +112,22 @@ export default AppApi = {
     // 注意：这里params里面的key为全小写
     return new Promise((resolve, reject) => {
       request
-        .ajax(that._getUrl(that.search), 20, true, {searchkey: searchkey})
+        .fetchHtml(that._getUrl(that.search), {q: searchkey})
         .then(html => {
           let $ = cheerio.load(html, {decodeEntities: false});
           let data = [];
-          $('.zhuopin').each((i, o) => {
-            let imgUrl = $(o).find('img').attr('src');
-            let name = $(o).find('.book_info h2 a').text();
-            let intro = $(o).find('.p-intro').text();
-            let url = $(o).find('.book_info h2 a').attr('href');
-            let itemTitle = $(o).find('.p-new>a').text();
+          $('#checkform table #nr').each((i, o) => {
+            let imgUrl = '';
+            let td = $(o).find('td');
+            let name = $(td[0]).find('a').text();
+            let url = $(td[0]).find('a').attr('href');
+            let lastChapterTitle = $(td[1]).find('a').text();
+            let author = $(td[2]).text();
+            let len = $(td[3]).text();
+            let lastChapterTime = $(td[4]).text();
+            let state = $(td[5]).text();
 
             let type = '';
-            let state = $(o).find('.f-green').text();
-            let len = '';
             // console.log(name);
             // 排除表头
             if (isNull(url)) {
@@ -140,24 +137,26 @@ export default AppApi = {
             let item = {
               bookId: getId(),
               bookName: name,
-              author: '',
+              author: author,
               bookUrl: url,
               chapterUrl: '',
               imgUrl: imgUrl,
-              intro: intro,
+              lastChapterTitle: lastChapterTitle,
+              lastChapterTime: lastChapterTime,
               type: type,
               state: state,
               isEnd: state.indexOf('连载') >= 0 ? 1 : 0,
               len: len,
             };
-
             data.push({
+              type: 2,
               key: item.bookId,
-              itemName: name,
-              imgUrl: imgUrl,
-              itemTitle: itemTitle,
-              itemInfo1: state,
-              itemInfo2: intro,
+              itemName: item.bookName,
+              imgUrl: item.imgUrl,
+              itemTitle: item.author,
+              itemInfo1:
+                item.lastChapterTime + ' | ' + item.state + ' | ' + item.len,
+              itemInfo2: item.lastChapterTitle,
               item: item,
             });
           });

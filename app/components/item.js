@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import {isNull} from '@/utils/function';
 import StyleConfig from '@/config/styleConfig';
 
 export default class Item extends React.Component {
@@ -22,14 +23,14 @@ export default class Item extends React.Component {
     this.props.navigation.navigate(this.props.navigateName, item);
   }
   render() {
-    let item2 = {
-      type: 1,
-      itemName: '书名',
-      imgUrl: '图片',
-      itemTitle: '阅读进度或作者',
-      itemInfo1: '11111',
-      itemInfo2: '22222',
-    };
+    // let item2 = {
+    //   type: 1,
+    //   itemName: '书名',
+    //   imgUrl: '图片',
+    //   itemTitle: '阅读进度或作者',
+    //   itemInfo1: '11111',
+    //   itemInfo2: '22222',
+    // };
     let data = this.props.data;
     return (
       <TouchableOpacity
@@ -38,12 +39,16 @@ export default class Item extends React.Component {
           this._clickItem(data.item);
         }}>
         <View style={global.appStyles.card}>
-          <View>
-            <Image
-              source={{uri: data.imgUrl}}
-              style={{width: data.imgWidth, height: data.imgHeight}}
-            />
-          </View>
+          {isNull(data.imgUrl) ? (
+            <Text />
+          ) : (
+            <View>
+              <Image
+                source={{uri: data.imgUrl}}
+                style={{width: data.imgWidth, height: data.imgHeight}}
+              />
+            </View>
+          )}
           <View style={styles.itemContent}>
             <Text style={styles.itemName}>{data.itemName}</Text>
             <Text numberOfLines={1} style={styles.itemTitle}>

@@ -3,7 +3,7 @@
  */
 import cheerio from 'cheerio';
 import request from '@/utils/ajax';
-import {getId, textFormat, mergeSpace} from '@/utils/function';
+import {getId, textFormat, mergeSpace, isNull} from '@/utils/function';
 
 let AppApi;
 export default AppApi = {
@@ -64,7 +64,7 @@ export default AppApi = {
         });
     });
   },
-  getChapterList(url) {
+  getChapterList(url, bookId) {
     let that = this;
     // 注意：这里params里面的key为全小写
     return new Promise((resolve, reject) => {
@@ -76,6 +76,7 @@ export default AppApi = {
           $('.volume-list li').each(function (i, o) {
             chapterList.push({
               chapterId: getId(),
+              bookId: bookId,
               thisUrl: $(o).find('a').attr('href'),
               title: $(o).find('a').text(),
               num: 0,
@@ -145,7 +146,7 @@ export default AppApi = {
             let len = $(other[6]).text();
             // console.log(name);
             // 排除表头
-            if (url == undefined || url == null || url === '') {
+            if (isNull(url)) {
               return;
             }
 

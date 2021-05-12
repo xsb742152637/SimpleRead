@@ -8,16 +8,22 @@ export let getWidth = ratio => {
 
 // 对象克隆
 export let cloneObj = obj => {
-  console.log(obj.length);
-  if (obj.length != undefined) {
-    let a = new Array();
-    for (let i = 0; i < obj.length; i++) {
-      a.push(JSON.parse(JSON.stringify(obj[i])));
-    }
-    return a;
+  if (isNull(obj)) {
+    return obj;
   } else {
-    return JSON.parse(JSON.stringify(obj));
+    if (Array.isArray(obj)) {
+      let a = new Array();
+      // console.log('克隆数组', obj);
+      for (let i = 0; i < obj.length; i++) {
+        a.push(JSON.parse(JSON.stringify(obj[i])));
+      }
+      return a;
+    } else {
+      // console.log('克隆对象', obj);
+      return JSON.parse(JSON.stringify(obj));
+    }
   }
+
 };
 
 // 自动生成uuid
@@ -89,4 +95,11 @@ export let trimBr = str => {
 export let mergeSpace = str => {
   str = str.replace(/(\s| )+/g, ' ');
   return str;
+};
+export let isNull = str => {
+  let state = str == undefined || str === null || str === '' || str === 'null';
+  if (!state) {
+    state = JSON.stringify(str) === '{}' || JSON.stringify(str) === '[]';
+  }
+  return state;
 };

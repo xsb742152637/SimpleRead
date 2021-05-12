@@ -4,7 +4,7 @@
  * @Date: 2021-05-05
  */
 import Realm from 'realm';
-import {cloneObj} from '@/utils/function';
+import {cloneObj, isNull} from '@/utils/function';
 
 // 书架
 const BookListSchema = {
@@ -116,7 +116,11 @@ let realm = new Realm({schema: schemaArray, schemaVersion: 4});
 // 最底层的查询方法，传入表名和需要查询的主键
 let _findOne = (tableName, primaryKey) => {
   try {
-    return cloneObj(realm.objectForPrimaryKey(tableName, primaryKey));
+    if (isNull(primaryKey)) {
+      console.log(tableName, '传入了空值');
+    } else {
+      return cloneObj(realm.objectForPrimaryKey(tableName, primaryKey));
+    }
   } catch (e) {
     console.log('查询一条数据失败：', tableName, primaryKey);
     console.log(e);
@@ -147,15 +151,14 @@ let _saveRow = (tableName, rows) => {
 // 最底层的删除方法，传入需要删除的数组对象或单个对象
 let deleteRow = rows => {
   try {
-    realm.write(() => {
-      if (rows.length) {
-        rows.forEach(row => {
-          realm.delete(row);
-        });
-      } else {
+    if (isNull(rows)) {
+      console.log('没有数据可以删除', rows);
+    } else {
+      realm.write(() => {
         realm.delete(rows);
-      }
-    });
+        console.log('数据删除成功：');
+      });
+    }
   } catch (e) {
     console.log('数据删除失败：', rows);
   }
@@ -194,17 +197,23 @@ const findBook = primaryKey => {
 const saveBook = rows => {
   return _saveRow('BookList', rows);
 };
-
-const queryChapterList = () => {
-  try {
-    return realm.objects('BookChapterList');
-  } catch (e) {
-    console.log('查询失败！');
-    console.log(e);
-  }
-  return [];
+const deleteBook = bookId => {
+  let rows = findBook(bookId);
+  deleteRow(rows);
+  deleteChapterByBookId(bookId);
+  deleteDetailByBookId(bookId);
 };
-const queryChapter = bookId => {
+const deleteBookAll = () => {
+  let rows = realm.objects('BookList');
+  deleteRow(rows);
+  rows = realm.objects('BookChapterList');
+  deleteRow(rows);
+  rows = realm.objects('BookChapterDetail');
+  deleteRow(rows);
+};
+
+
+const queryChapterByBookId = bookId => {
   try {
     return cloneObj(
       realm
@@ -242,20 +251,27 @@ const findChapter = primaryKey => {
 const saveChapter = rows => {
   return _saveRow('BookChapterList', rows);
 };
+const deleteChapterByBookId = bookId => {
+  let rows = queryChapterByBookId(bookId);
+  deleteRow(rows);
+};
 
-const queryDetailList = () => {
+
+const queryDetailListByBookId = (bookId) => {
   try {
-    return realm.objects('BookChapterDetail');
+    return realm.objects('BookChapterDetail').filtered('bookId == $0', bookId);
   } catch (e) {
     console.log('查询失败！');
     console.log(e);
   }
   return [];
 };
-const queryDetailByThisUrl = thisUrl => {
+const queryDetailByThisUrl = (thisUrl, bookId) => {
   try {
     return cloneObj(
-      realm.objects('BookChapterDetail').filtered('thisUrl == $0', thisUrl),
+      realm
+        .objects('BookChapterDetail')
+        .filtered('thisUrl == $0 and bookId == $1', thisUrl, bookId),
     );
   } catch (e) {
     console.log('查询失败！');
@@ -271,21 +287,29 @@ const saveDetail = rows => {
   return _saveRow('BookChapterDetail', rows);
 };
 
+const deleteDetailByBookId = bookId => {
+  let rows = queryDetailListByBookId(bookId);
+  deleteRow(rows);
+};
+
 module.exports = {
   deleteRow,
 
   queryBookList,
   findBook,
   saveBook,
+  deleteBook,
+  deleteBookAll,
 
-  queryChapterList,
-  queryChapter,
+  queryChapterByBookId,
   getMaxChapterOrderNum,
   findChapter,
   saveChapter,
+  deleteChapterByBookId,
 
-  queryDetailList,
+  queryDetailListByBookId,
   queryDetailByThisUrl,
   findDetail,
   saveDetail,
+  deleteDetailByBookId,
 };

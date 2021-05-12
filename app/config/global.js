@@ -12,7 +12,7 @@ import Toast from '@/utils/load/toast';
 // 对话框
 import Popup from '@/utils/load/popup';
 
-import AppApi from '@/utils/api';
+import AppApi from '@/utils/api_dd';
 
 global.realm = realm;
 global.storage = storage;

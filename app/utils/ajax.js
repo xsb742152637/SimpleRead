@@ -16,6 +16,7 @@ request.fetchHtml = (url, params) => {
   if (params) {
     url += '?' + queryString.stringify(params);
   }
+  console.log('开始发起请求', url);
   return new Promise((resolve, reject) => {
     fetch(url)
       .then(response => {

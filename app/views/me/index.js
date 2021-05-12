@@ -12,7 +12,7 @@ import {
   Dimensions,
 } from 'react-native';
 import StyleConfig from '@/config/styleConfig';
-import {getId, textFormat} from '@/utils/function';
+import {getId, textFormat, isNull} from '@/utils/function';
 
 export default class Me extends React.Component {
   constructor(props) {
@@ -30,20 +30,19 @@ export default class Me extends React.Component {
   }
 
   _deleteAll() {
-    let rows = global.realm.queryBookList();
-    if (rows && rows.length > 0) {
-      global.realm.deleteRow(rows);
-    }
+    let bookId = 'C06F665E-F145-42F9-827D-0766819CF3BC';
+    global.realm.deleteBookAll();
 
-    rows = global.realm.queryChapterList();
-    if (rows && rows.length > 0) {
-      global.realm.deleteRow(rows);
-    }
-
-    rows = global.realm.queryDetailList();
-    if (rows && rows.length > 0) {
-      global.realm.deleteRow(rows);
-    }
+    // rows = global.realm.queryChapterByBookId(bookId);
+    // if (!isNull(rows)) {
+    //   global.realm.deleteRow(rows);
+    // }
+    //
+    // rows = global.realm.queryDetailListByBookId(bookId);
+    // console.log(rows);
+    // if (!isNull(rows)) {
+    //   global.realm.deleteRow(rows);
+    // }
   }
   _getMaxChapterOrderNum() {
     let bookId = 'bbb';
@@ -52,7 +51,7 @@ export default class Me extends React.Component {
   }
   _queryChapter() {
     let bookId = 'aaaaa';
-    let orderNum = global.realm.queryChapter(bookId);
+    let orderNum = global.realm.queryChapterByBookId(bookId);
     console.log(orderNum);
   }
   _saveChapter() {
