@@ -7,8 +7,12 @@ import {
   Animated,
   TouchableOpacity,
   BackHandler,
+  StatusBar,
 } from 'react-native';
+import StyleConfig from '@/config/styleConfig';
+import {NavigationContainer} from '@react-navigation/native';
 const {width, height} = Dimensions.get('window');
+var pageHeight = height + StatusBar.currentHeight + 20;
 var _this = null;
 class Popup extends Component {
   constructor(props) {
@@ -18,7 +22,7 @@ class Popup extends Component {
       //显示、隐藏
       show: false,
       //弹窗高度
-      popupHeight: 250,
+      popupHeight: 150,
       //动画值
       animatedValue: new Animated.Value(0),
       //取消文字
@@ -26,30 +30,30 @@ class Popup extends Component {
       //确定文字
       confirmText: '确定',
       //标题
-      title: '请选择',
+      title: '',
       //是否显示头部栏
       isHeader: true,
     };
     this.showAnimated = Animated.timing(this.state.animatedValue, {
       toValue: 1,
-      duration: 300,
+      duration: 150,
       useNativeDriver: true,
     });
     this.hideAnimated = Animated.timing(this.state.animatedValue, {
       toValue: 0,
-      duration: 300,
+      duration: 150,
       useNativeDriver: true,
     });
   }
   componentDidMount() {
     _this = this;
   }
-  static show = (options, callback) => {
+  static show = (options, callback, closeCallback) => {
     let cancelText = options.cancelText || '取消';
     let confirmText = options.confirmText || '确定';
-    let title = options.title || '请选择';
+    let title = options.title || '';
     let isHeader = options.isHeader === false ? false : true;
-    let popupHeight = options.popupHeight || 250;
+    let popupHeight = options.popupHeight || 150;
     let content = options.content || <Text>无内容</Text>;
     _this.setState({
       show: true,
@@ -60,6 +64,7 @@ class Popup extends Component {
       popupHeight,
       content,
       callback,
+      closeCallback,
     });
     //动画值初始化为0
     _this.state.animatedValue.setValue(0);
@@ -92,6 +97,7 @@ class Popup extends Component {
     this.hideAnimated.start(() => {
       this.setState({show: false});
     });
+    this.state.closeCallback && this.state.closeCallback();
   };
   onConfirm() {
     this.state.callback && this.state.callback({confirm: true});
@@ -114,8 +120,20 @@ class Popup extends Component {
             left: 0,
             top: 0,
             width: width,
-            height: height,
+            height: pageHeight,
+            display: 'flex',
+            alignContent: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}>
+          <StatusBar
+            backgroundColor={'transparent'}
+            barStyle={'transparent'}
+            hidden={false}
+            animated={true}
+            translucent={true}
+            showHideTransition={'slide'}
+          />
           <TouchableOpacity
             style={styles.PopupPage}
             activeOpacity={1}
@@ -124,16 +142,26 @@ class Popup extends Component {
           </TouchableOpacity>
           <Animated.View
             style={{
-              position: 'absolute',
-              left: 0,
-              bottom: 0,
+              width: width * 0.7,
+              minHeight: this.state.popupHeight + 50,
               backgroundColor: '#FFF',
-              width: width,
-              height: this.state.popupHeight + 50,
               transform: [{translateY: translateY}],
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: StyleConfig.radius.base,
             }}>
+            <View
+              style={{
+                flex: 1,
+                padding: StyleConfig.padding.baseTop,
+                display: 'flex',
+                alignContent: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              {this.state.content}
+            </View>
             {this.header()}
-            {this.state.content}
           </Animated.View>
         </View>
       );
@@ -147,10 +175,10 @@ class Popup extends Component {
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'space-around',
             alignItems: 'center',
-            borderColor: '#eee',
-            borderBottomWidth: 1,
+            borderColor: StyleConfig.color.border,
+            borderTopWidth: 1,
             height: 50,
           }}>
           <TouchableOpacity onPress={this.popupHide}>
@@ -167,15 +195,15 @@ class Popup extends Component {
           </TouchableOpacity>
           <Text
             style={{
-              color: '#333',
-              fontSize: 16,
+              color: StyleConfig.color.titleText,
+              fontSize: StyleConfig.fontSize.titleText,
             }}>
             {this.state.title}
           </Text>
           <TouchableOpacity onPress={this.onConfirm.bind(this)}>
             <Text
               style={{
-                color: '#333',
+                color: StyleConfig.color.iconActive,
                 paddingLeft: 15,
                 paddingRight: 15,
                 height: 50,
@@ -197,7 +225,7 @@ const styles = StyleSheet.create({
     top: 0,
     backgroundColor: 'rgba(0,0,0,0.4)',
     width: width,
-    height: height,
+    height: pageHeight,
     justifyContent: 'center',
     alignItems: 'center',
   },

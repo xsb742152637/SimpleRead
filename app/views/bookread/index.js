@@ -120,10 +120,14 @@ export default class BookRead extends React.Component {
   }
 
   // 记录阅读进度
-  _saveBook() {
+  _saveBook(bookState) {
     let that = this;
     let bookId = this.state.bookInfo.bookId;
 
+    if (isNull(bookState)) {
+      bookState = this.state.bookInfo.bookState;
+      console.log('没传入状态');
+    }
     // 保存阅读进度
     let book = {
       bookId: bookId,
@@ -131,8 +135,9 @@ export default class BookRead extends React.Component {
       historyChapterTitle: that.state.title,
       chapterId: that.state.chapterId,
       historyChapterPage: that.state.page,
+      bookState: bookState,
     };
-    // console.log('记录进度');
+    console.log('记录进度');
     global.realm.saveBook(book);
   }
 
@@ -243,10 +248,48 @@ export default class BookRead extends React.Component {
   // 页面返回触发的方法
   handleBackButtonClick() {
     console.log('退回');
-    // 如果有全局回调的key，执行回调
-    if (this.state.bookInfo.callbackKey) {
-      global.callbacks[this.state.bookInfo.callbackKey]();
+    let that = this;
+    if (this.state.bookInfo.bookState === 0) {
+      global.popup.show(
+        {
+          content: (
+            <Text
+              style={{
+                fontSize: StyleConfig.fontSize.base,
+                color: StyleConfig.color.text,
+              }}>
+              是否加入书架？
+            </Text>
+          ),
+          cancelText: '不了',
+          confirmText: '立即加入',
+        },
+        res => {
+          console.log(res);
+          that._saveBook(1);
+          //关闭Popup
+          global.popup.hide();
+        },
+        res => {
+          console.log('关闭弹窗');
+          setTimeout(function () {
+            // 如果有全局回调的key，执行回调
+            if (this.state.bookInfo.callbackKey) {
+              global.callbacks[this.state.bookInfo.callbackKey]();
+            }
+            // 关闭
+            that.props.navigation.goBack();
+          }, 300);
+        },
+      );
+      return true;
+    } else {
+      // 如果有全局回调的key，执行回调
+      if (this.state.bookInfo.callbackKey) {
+        global.callbacks[this.state.bookInfo.callbackKey]();
+      }
     }
+    return false;
   }
   render() {
     return (
