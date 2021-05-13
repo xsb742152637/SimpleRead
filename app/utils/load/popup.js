@@ -108,7 +108,7 @@ class Popup extends Component {
         inputRange: [0, 1],
         outputRange: [
           this.state.isHeader
-            ? this.state.popupHeight + 50
+            ? this.state.popupHeight + StyleConfig.headerHeight
             : this.state.popupHeight,
           0,
         ],
@@ -143,7 +143,7 @@ class Popup extends Component {
           <Animated.View
             style={{
               width: width * 0.7,
-              minHeight: this.state.popupHeight + 50,
+              minHeight: this.state.popupHeight + StyleConfig.headerHeight,
               backgroundColor: '#FFF',
               transform: [{translateY: translateY}],
               display: 'flex',
@@ -179,7 +179,7 @@ class Popup extends Component {
             alignItems: 'center',
             borderColor: StyleConfig.color.border,
             borderTopWidth: 1,
-            height: 50,
+            height: StyleConfig.headerHeight,
           }}>
           <TouchableOpacity onPress={this.popupHide}>
             <Text
@@ -187,8 +187,8 @@ class Popup extends Component {
                 color: '#999',
                 paddingLeft: 15,
                 paddingRight: 15,
-                height: 50,
-                lineHeight: 50,
+                height: StyleConfig.headerHeight,
+                lineHeight: StyleConfig.headerHeight,
               }}>
               {this.state.cancelText}
             </Text>
@@ -206,8 +206,8 @@ class Popup extends Component {
                 color: StyleConfig.color.iconActive,
                 paddingLeft: 15,
                 paddingRight: 15,
-                height: 50,
-                lineHeight: 50,
+                height: StyleConfig.headerHeight,
+                lineHeight: StyleConfig.headerHeight,
               }}>
               {this.state.confirmText}
             </Text>

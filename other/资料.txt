@@ -24,3 +24,26 @@ https://reactnative.cn/docs/statusbar
  double?[] 表示存double的数组
  indexed: true 表示该列支持索引，支持的字段：int，string，bool，和date
 */
+
+nativeEvent
+    changedTouches - 在上一次事件之后，所有发生变化的触摸事件的数组集合（即上一次事件后，所有移动过的触摸点）
+    identifier - 触摸点的ID
+    locationX - 触摸点相对于父元素的横坐标
+    locationY - 触摸点相对于父元素的纵坐标
+    pageX - 触摸点相对于根元素的横坐标
+    pageY - 触摸点相对于根元素的纵坐标
+    target - 触摸点所在的元素ID
+    timestamp - 触摸事件的时间戳，可用于移动速度的计算
+    touches - 当前屏幕上的所有触摸点的集合
+
+gestureState
+    stateID - 触摸状态的ID。在屏幕上有至少一个触摸点的情况下，这个ID会一直有效。
+    moveX - 最近一次移动时的屏幕横坐标
+    moveY - 最近一次移动时的屏幕纵坐标
+    x0 - 当响应器产生时的屏幕坐标
+    y0 - 当响应器产生时的屏幕坐标
+    dx - 从触摸操作开始时的累计横向路程
+    dy - 从触摸操作开始时的累计纵向路程
+    vx - 当前的横向移动速度
+    vy - 当前的纵向移动速度
+    numberActiveTouches - 当前在屏幕上的有效触摸点的数量

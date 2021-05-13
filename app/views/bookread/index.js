@@ -16,6 +16,7 @@ import {
   BackHandler,
 } from 'react-native';
 import StyleConfig from '@/config/styleConfig';
+import MyIcon from '@/config/myIcon';
 import {getId, textFormat, isNull} from '@/utils/function';
 
 export default class BookRead extends React.Component {
@@ -27,6 +28,7 @@ export default class BookRead extends React.Component {
     console.log(bookInfo);
     this.scrollRef = null;
     this.state = {
+      isSetting: false,
       bookInfo: bookInfo,
       key: bookInfo.bookName,
       chapterId: bookInfo.chapterId,
@@ -291,32 +293,78 @@ export default class BookRead extends React.Component {
     }
     return false;
   }
+
+  _clickScreen(e) {
+    console.log('\n点击屏幕位置：', e.nativeEvent.pageX, e.nativeEvent.pageY);
+    let pageX = e.nativeEvent.pageX;
+    let width = Dimensions.get('window').width;
+    if (this.state.isSetting) {
+      this.setState({isSetting: false});
+      console.log('关闭设置');
+    } else {
+      if (pageX <= width * 0.3) {
+        console.log('上一页');
+      } else if (pageX >= width * 0.9) {
+        console.log('下一页');
+      } else {
+        this.setState({isSetting: true});
+        console.log('打开设置');
+      }
+    }
+  }
+  _header() {
+    if (this.state.isSetting) {
+      console.log('加载头');
+      return (
+        <View style={styles.headerView}>
+          <TouchableOpacity onPress={() => this._goBack()}>
+            <MyIcon
+              name={'fanhuishangyizhang'}
+              style={global.appStyles.headerIcon}
+              size={StyleConfig.fontSize.icon}
+            />
+          </TouchableOpacity>
+          <Text>我时头</Text>
+        </View>
+      );
+    }
+  }
+  _content() {
+    return (
+      <ScrollView ref={c => (this.scrollRef = c)} style={styles.myScrollView}>
+        <Button
+          title={'上一章'}
+          accessibilityLabel="accessibility title"
+          disabled={false}
+          testID={'buttonTag'}
+          onPress={() => {
+            this._clickButton(true);
+          }}
+        />
+        <Text style={styles.title}>{this.state.title}</Text>
+        <Text style={styles.bookContent}>{this.state.content}</Text>
+        <Button
+          title={'下一章'}
+          style={styles.myButton}
+          accessibilityLabel="accessibility title"
+          disabled={false}
+          testID={'buttonTag'}
+          onPress={() => {
+            this._clickButton(false);
+          }}
+        />
+      </ScrollView>
+    );
+  }
   render() {
     return (
       <View style={styles.myView}>
-        <ScrollView ref={c => (this.scrollRef = c)} style={styles.myScrollView}>
-          <Button
-            title={'上一章'}
-            accessibilityLabel="accessibility title"
-            disabled={false}
-            testID={'buttonTag'}
-            onPress={() => {
-              this._clickButton(true);
-            }}
-          />
-          <Text style={styles.title}>{this.state.title}</Text>
-          <Text style={styles.bookContent}>{this.state.content}</Text>
-          <Button
-            title={'下一章'}
-            style={styles.myButton}
-            accessibilityLabel="accessibility title"
-            disabled={false}
-            testID={'buttonTag'}
-            onPress={() => {
-              this._clickButton(false);
-            }}
-          />
-        </ScrollView>
+        {/*<TouchableOpacity*/}
+        {/*  activeOpacity={1}*/}
+        {/*  onPress={event => this._clickScreen(event)}>*/}
+        {/*  /!*{this._header()}*!/*/}
+        {/*</TouchableOpacity>*/}
+        {this._content()}
       </View>
     );
   }
@@ -331,6 +379,13 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
     backgroundColor: StyleConfig.color.headerBackground,
+  },
+  headerView: {
+    position: 'absolute',
+    width: Dimensions.get('window').width,
+    height: StyleConfig.headerHeight,
+    left: 0,
+    top: 0,
   },
   myView: {
     padding: 6,
