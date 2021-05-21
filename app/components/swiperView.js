@@ -1,27 +1,19 @@
 /*
- * 书城
+ * 左右滑动
  * @Author: xie
- * @Date: 2021-05-02
+ * @Date: 2021-05-17
  */
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Animated,
-  Dimensions,
-  PanResponder,
-  Image,
-} from 'react-native';
+import {Animated, Dimensions, PanResponder} from 'react-native';
 const {width} = Dimensions.get('window');
-
-import StyleConfig from '@/config/styleConfig';
 
 export default class SwiperView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       sports: 0, // 设置初始值
-      limit: 0.2, // 滑动到屏幕的比例
+      limit: 0.1, // 滑动到屏幕的比例
+      duration: 150, // 滑动动画持续时间
       maxPage: this.props.children.length, // 最大页数
     };
     this.startTimestamp = 0; // 拖拽开始时间戳（用于计算滑动速度）
@@ -32,55 +24,55 @@ export default class SwiperView extends React.Component {
     this.panResponder();
   }
   panResponder() {
-    this._panResponder = PanResponder.create({
+    let that = this;
+    that._panResponder = PanResponder.create({
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
       onPanResponderGrant: (evt, gestureState) => {
         // 滑动开始，记录时间戳
-        this.startTimestamp = evt.nativeEvent.timestamp;
+        that.startTimestamp = evt.nativeEvent.timestamp;
       },
       onPanResponderMove: (evt, gestureState) => {
         // 滑动横向距离
         let x = gestureState.dx;
         // 实时改变滑动位置
         if (x > 0) {
-          this.setState({
-            sports: new Animated.Value(-this.page * width + x),
+          that.setState({
+            sports: new Animated.Value(-that.page * width + x),
           });
         } else {
-          this.setState({
-            sports: new Animated.Value(x - this.page * width),
+          that.setState({
+            sports: new Animated.Value(x - that.page * width),
           });
         }
       },
       onPanResponderRelease: (evt, gestureState) => {
         // 滑动结束时间戳
-        this.endTimestamp = evt.nativeEvent.timestamp;
+        that.endTimestamp = evt.nativeEvent.timestamp;
         // 滑动距离，根据滑动距离与时间戳计算是否切换到下一个条目
         let x = gestureState.dx;
         // 上一页
         if (x > 0) {
           // 滑动距离大于屏幕1半，开启动画，滑动到下一个界面，或者滑动速度很快，并且滑动距离大于20，也滑动到下一个条目
           if (
-            x > width * this.state.limit ||
-            (this.endTimestamp - this.startTimestamp < 300 && x > 20)
+            x > width * that.state.limit ||
+            (that.endTimestamp - that.startTimestamp < 300 && x > 20)
           ) {
-            this.page -= 1;
+            that.page -= 1;
           }
-          Animated.timing(this.state.sports, {
-            toValue: -this.page * width,
-            duration: 200,
+          Animated.timing(that.state.sports, {
+            toValue: -that.page * width,
+            duration: that.state.duration,
             useNativeDriver: false,
           }).start(state => {
             // 动画完成，判断是否需要重置位置
             if (state.finished) {
-              console.log('页数  ', this.page);
-              if (this.page <= 0) {
-                console.log('重置位置');
-                this.page = 3;
-                this.setState({
-                  sports: new Animated.Value(-3 * width),
+              // 从第一页滑动到最后一页
+              if (that.page <= 0) {
+                that.page = that.state.maxPage - 1;
+                that.setState({
+                  sports: new Animated.Value(-that.page * width),
                 });
               }
             }
@@ -90,22 +82,22 @@ export default class SwiperView extends React.Component {
           x = Math.abs(x);
           // 滑动距离大于屏幕1半，开启动画，滑动到下一个界面，或者滑动速度很快，并且滑动距离大于20，也滑动到下一个条目
           if (
-            x > width * this.state.limit ||
-            this.endTimestamp - this.startTimestamp < 300
+            x > width * that.state.limit ||
+            that.endTimestamp - that.startTimestamp < 300
           ) {
-            this.page += 1;
+            that.page += 1;
           }
-          Animated.timing(this.state.sports, {
-            toValue: -this.page * width,
-            duration: 200,
+          Animated.timing(that.state.sports, {
+            toValue: -that.page * width,
+            duration: that.state.duration,
             useNativeDriver: false,
           }).start(state => {
             // 动画完成，判断是否需要重置位置
             if (state.finished) {
-              console.log('页数  ', this.page);
-              if (this.page >= this.state.maxPage) {
-                this.page = 0;
-                this.setState({
+              // 从最后一页滑动到第一页
+              if (that.page >= that.state.maxPage) {
+                that.page = 0;
+                that.setState({
                   sports: 0,
                 });
               }
@@ -119,7 +111,6 @@ export default class SwiperView extends React.Component {
     });
   }
   render() {
-    // console.log('位置:', this.state.sports);
     return (
       <Animated.View
         style={{...this.props.style, left: this.state.sports}}

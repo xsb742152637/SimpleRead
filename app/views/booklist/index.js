@@ -153,6 +153,7 @@ export default class BookList extends React.Component {
           </View>
         ) : (
           <FlatList
+            showsVerticalScrollIndicator={false}
             style={global.appStyles.main}
             data={this.state.bookList}
             keyExtractor={item => item.bookId}

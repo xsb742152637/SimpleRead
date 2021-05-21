@@ -145,6 +145,7 @@ export default class Search extends React.Component {
         </View>
         <View style={global.appStyles.main}>
           <FlatList
+            showsVerticalScrollIndicator={false}
             ref={c => (this.scrollRef = c)}
             data={this.state.bookList}
             keyExtractor={item => item.key}

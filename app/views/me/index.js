@@ -18,13 +18,15 @@ export default class Me extends React.Component {
   constructor(props) {
     super(props);
   }
-  componentDidMount() {}
+  componentDidMount() {
+    this._bookRead();
+  }
 
   _back() {
     // alert('You tapped the next button2');
-    this.props.navigation.navigate('BookRead');
+    // this.props.navigation.navigate('BookRead');
     //返回
-    // this.props.navigation.goBack()
+    this.props.navigation.goBack();
     // 返回到第一层
     // this.props.navigation.popToTop()
   }
@@ -63,6 +65,9 @@ export default class Me extends React.Component {
     };
     global.realm.saveChapter(chapter);
   }
+  _bookRead() {
+    this.props.navigation.navigate('BookRead3');
+  }
   render() {
     return (
       <View style={global.appStyles.content}>
@@ -71,7 +76,7 @@ export default class Me extends React.Component {
         <TouchableOpacity
           style={global.appStyles.padding}
           onPress={() => this._back()}>
-          <Text>看书</Text>
+          <Text>返回</Text>
         </TouchableOpacity>
         <TouchableOpacity style={global.appStyles.padding} onPress={() => this._deleteAll()}>
           <Text>清空全部数据</Text>
@@ -84,6 +89,9 @@ export default class Me extends React.Component {
         </TouchableOpacity>
         <TouchableOpacity style={global.appStyles.padding} onPress={() => this._getMaxChapterOrderNum()}>
           <Text>查询最大章节序号</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={global.appStyles.padding} onPress={() => this._bookRead()}>
+          <Text>看小说</Text>
         </TouchableOpacity>
       </View>
     );

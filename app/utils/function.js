@@ -1,9 +1,49 @@
 'use strict';
-import {Dimensions} from 'react-native';
+import {Dimensions, PixelRatio} from 'react-native';
+import {setSpText, scaleSize} from '@/utils/screenUtil';
 
 // 传入比例小数，返回宽度
 export let getWidth = ratio => {
   return Dimensions.get('window').width * ratio;
+};
+
+export let contentFormat = (content, font_size, line_height) => {
+  // 一行可容纳文字数量
+  let fontCount = parseInt(
+    setSpText(Dimensions.get('window').width) / font_size - 1,
+  );
+  // 一屏可容纳文字行数
+  let fontLines = parseInt(
+    scaleSize(Dimensions.get('window').height) / line_height - 1,
+  );
+  console.log(fontCount, fontLines);
+  const length = content.length;
+  let array = [];
+  let x = 0,
+    y,
+    m = 0;
+  while (x < length) {
+    let _array = [];
+    let hh = 0;
+    let fs = fontLines;
+    for (var i = 0; i <= fontCount; i++) {
+      y = x + fontCount;
+      let str = content.substring(x, y);
+      if (str.indexOf('\n') >= 0) {
+        // console.log('换行');
+        hh++;
+        i++;
+      }
+      console.log(str);
+      _array.push(str);
+      x = y;
+    }
+    // console.log('第', m + 1, '页换行：', hh);
+    array[m] = _array;
+    m++;
+    break;
+  }
+  return array;
 };
 
 // 对象克隆
@@ -23,7 +63,6 @@ export let cloneObj = obj => {
       return JSON.parse(JSON.stringify(obj));
     }
   }
-
 };
 
 // 自动生成uuid

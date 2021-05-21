@@ -20,7 +20,8 @@ import StyleConfig from '@/config/styleConfig';
 module.exports = StyleSheet.create({
   content: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    // height: Dimensions.get('window').height,
+    height: '100%',
     backgroundColor: StyleConfig.color.baseBackground,
   },
   main: {

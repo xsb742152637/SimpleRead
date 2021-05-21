@@ -9,7 +9,6 @@ import {
   StyleSheet,
   View,
   Dimensions,
-  FlatList,
   TouchableOpacity,
   ScrollView,
   Button,
@@ -42,6 +41,7 @@ export default class BookRead extends React.Component {
     };
     // 将this传递到监听方法中，不然在这个方法中无法正确访问this
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+    this.scrollTop = bookInfo.historyChapterPage;
   }
 
   // 上一章/下一章
@@ -61,6 +61,7 @@ export default class BookRead extends React.Component {
       thisUrl = this.state.nextUrl;
     }
 
+    this.scrollTop = 0;
     let chapter = global.realm.queryChapterByThisUrl(
       thisUrl,
       this.state.bookInfo.bookId,
@@ -114,7 +115,7 @@ export default class BookRead extends React.Component {
         () => {
           that._saveBook();
           if (that.scrollRef != null) {
-            that.scrollRef.scrollTo({x: 0, y: 0, animated: true});
+            that.scrollRef.scrollTo({x: 0, y: that.scrollTop, animated: true});
           }
         },
       );
@@ -329,9 +330,31 @@ export default class BookRead extends React.Component {
       );
     }
   }
+  _onMomentumScrollEnd(e) {
+    if (e.nativeEvent.contentOffset.y != this.scrollTop) {
+      this.scrollTop = e.nativeEvent.contentOffset.y;
+      let that = this;
+      let bookId = this.state.bookInfo.bookId;
+
+      // 保存阅读进度
+      let book = {
+        bookId: bookId,
+        saveTime: new Date(),
+        historyChapterPage: this.scrollTop,
+      };
+      console.log('记录滑动进度', this.scrollTop);
+      global.realm.saveBook(book);
+    }
+  }
   _content() {
     return (
-      <ScrollView ref={c => (this.scrollRef = c)} style={styles.myScrollView}>
+      <ScrollView
+        ref={c => (this.scrollRef = c)}
+        style={styles.myScrollView}
+        showsVerticalScrollIndicator={false}
+        onMomentumScrollEnd={e => {
+          this._onMomentumScrollEnd(e);
+        }}>
         <Button
           title={'上一章'}
           accessibilityLabel="accessibility title"
