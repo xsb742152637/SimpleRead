@@ -1,49 +1,80 @@
 'use strict';
 import {Dimensions, PixelRatio} from 'react-native';
 import {setSpText, scaleSize} from '@/utils/screenUtil';
+const {width, height} = Dimensions.get('window'); // 可用显示屏幕的宽高，不包括顶部的状态信息栏
+// const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
 // 传入比例小数，返回宽度
 export let getWidth = ratio => {
-  return Dimensions.get('window').width * ratio;
+  return width * ratio;
 };
 
-export let contentFormat = (content, font_size, line_height) => {
-  // 一行可容纳文字数量
-  let fontCount = parseInt(
-    setSpText(Dimensions.get('window').width) / font_size - 1,
-  );
-  // 一屏可容纳文字行数
-  let fontLines = parseInt(
-    scaleSize(Dimensions.get('window').height) / line_height - 1,
-  );
-  console.log(fontCount, fontLines);
-  const length = content.length;
-  let array = [];
-  let x = 0,
-    y,
-    m = 0;
-  while (x < length) {
-    let _array = [];
-    let hh = 0;
-    let fs = fontLines;
-    for (var i = 0; i <= fontCount; i++) {
-      y = x + fontCount;
-      let str = content.substring(x, y);
-      if (str.indexOf('\n') >= 0) {
-        // console.log('换行');
-        hh++;
-        i++;
-      }
-      console.log(str);
-      _array.push(str);
-      x = y;
+// 获取字符串的字节长度
+export let getByteLength = str => {
+  //将非ascii码转换为2个ascii码
+  str = str.replace(/[“”"]/g, '*');
+  let len = 0;
+  for (let i = 0; i < str.length; i++) {
+    let a = str.charAt(i);
+    if (a.match(/[^\x00-\xff]/gi) != null) {
+      len += 4;
+    } else if (a === ' ') {
+      len += 1;
+    } else {
+      len += 2;
     }
-    // console.log('第', m + 1, '页换行：', hh);
-    array[m] = _array;
-    m++;
-    break;
   }
-  return array;
+  return len / 2;
+};
+export let contentFormat = (content, font_size, line_height) => {
+  // content = ' 了一下，\n嗅\n了卷';
+  // content = '              槐诗愣了一下，\n嗅了嗅那一根手工卷';
+  console.log(height, line_height);
+  content = trimBr(content).toLowerCase();
+  // console.log(content);
+
+  // 一行可容纳文字数量
+  let fontCount = parseInt((width / font_size) * 2) - 1;
+  // 一屏可容纳文字行数
+  let fontLines = parseInt(height / line_height - 2);
+  console.log(fontCount, fontLines);
+
+  let r = 0,
+    p = 0;
+  let row = [];
+  let rows = [];
+  let pages = [];
+  for (let i = 0; i < content.length; i++) {
+    let s = content.charAt(i);
+    // console.log(s, s.indexOf('\n'));
+    r += getByteLength(s);
+
+    if (r > fontCount || s.indexOf('\n') >= 0) {
+      if (s.indexOf('\n') >= 0) {
+        p++;
+      }
+      p++;
+      rows.push(row.join(''));
+      r = 0;
+      row = [];
+      // console.log('满了');
+      if (p >= fontLines) {
+        pages.push(cloneObj(rows));
+        rows = [];
+        p = 0;
+      }
+    }
+    row.push(s);
+  }
+  // 最后一行
+  if (row.length > 0) {
+    rows.push(row.join(''));
+  }
+  if (rows.length > 0) {
+    pages.push(rows);
+  }
+
+  return pages;
 };
 
 // 对象克隆
@@ -125,7 +156,7 @@ export let escape2Html = str => {
 
 //去除开头结尾换行,并将连续3次以上换行转换成2次换行
 export let trimBr = str => {
-  str = str.replace(/((\s| )*\r?\n){3,}/g, '\r\n\r\n'); //限制最多2次换行
+  str = str.replace(/((\s| )*\r?\n){2,}/g, '\r\n'); //限制最多1次换行
   str = str.replace(/^((\s| )*\r?\n)+/g, ''); //清除开头换行
   str = str.replace(/((\s| )*\r?\n)+$/g, ''); //清除结尾换行
   return str;

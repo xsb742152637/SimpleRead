@@ -66,7 +66,7 @@ export default class Me extends React.Component {
     global.realm.saveChapter(chapter);
   }
   _bookRead() {
-    this.props.navigation.navigate('BookRead3');
+    this.props.navigation.navigate('BookRead2');
   }
   render() {
     return (
@@ -78,19 +78,29 @@ export default class Me extends React.Component {
           onPress={() => this._back()}>
           <Text>返回</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={global.appStyles.padding} onPress={() => this._deleteAll()}>
+        <TouchableOpacity
+          style={global.appStyles.padding}
+          onPress={() => this._deleteAll()}>
           <Text>清空全部数据</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={global.appStyles.padding} onPress={() => this._saveChapter()}>
+        <TouchableOpacity
+          style={global.appStyles.padding}
+          onPress={() => this._saveChapter()}>
           <Text>保存章节</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={global.appStyles.padding} onPress={() => this._queryChapter()}>
+        <TouchableOpacity
+          style={global.appStyles.padding}
+          onPress={() => this._queryChapter()}>
           <Text>查询全部章节</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={global.appStyles.padding} onPress={() => this._getMaxChapterOrderNum()}>
+        <TouchableOpacity
+          style={global.appStyles.padding}
+          onPress={() => this._getMaxChapterOrderNum()}>
           <Text>查询最大章节序号</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={global.appStyles.padding} onPress={() => this._bookRead()}>
+        <TouchableOpacity
+          style={global.appStyles.padding}
+          onPress={() => this._bookRead()}>
           <Text>看小说</Text>
         </TouchableOpacity>
       </View>
@@ -98,6 +108,4 @@ export default class Me extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
