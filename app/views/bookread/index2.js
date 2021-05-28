@@ -4,7 +4,15 @@
  * @LastEditTime: 2021-01-09 23:22:31
  */
 import React from 'react';
-import {Text, StyleSheet, Dimensions, View, ScrollView} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  Dimensions,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import StyleConfig from '@/config/styleConfig';
 import {
   getId,
@@ -14,7 +22,7 @@ import {
   contentFormat,
   getByteLength,
 } from '@/utils/function';
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 import SwiperView from '@/components/swiperView';
 
 export default class BookRead2 extends React.Component {
@@ -39,7 +47,104 @@ export default class BookRead2 extends React.Component {
   }
   componentDidMount() {}
 
+  _handleScroll() {
+    console.log('_handleScroll');
+  }
+  _onScrollEndDrag() {
+    console.log('_onScrollEndDrag');
+  }
+  _showControlStation_LR() {
+    console.log('_showControlStation_LR');
+  }
+
+  //每页
+  renderRow(rowData) {
+    return (
+      <View>
+        <TouchableOpacity style={{flex: 1, width: width}} activeOpacity={1}>
+          {this.renderContent(rowData.item)}
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  //当前页正文
+  renderContent(rowData) {
+    // console.log(rowData);
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'space-between',
+          width: width,
+          height: height,
+          borderWidth: 0.1,
+        }}
+        onStartShouldSetResponder={() => true}
+        onResponderRelease={evt => {
+          this._showControlStation_LR(evt);
+        }}>
+        <Text
+          style={{
+            fontSize: this.state.font_size,
+            marginLeft: 10,
+            marginBottom: 5,
+          }}>
+          {this.state.title}
+        </Text>
+        <View style={{alignSelf: 'center', flex: 1}}>
+          {rowData
+            ? rowData.map((value, index) => {
+                return (
+                  <Text
+                    style={{
+                      fontSize: this.state.font_size,
+                      lineHeight: this.state.line_height,
+                    }}
+                    key={index}>
+                    {value ? value : ' '}
+                  </Text>
+                );
+              })
+            : null}
+        </View>
+        <View
+          style={{
+            marginBottom: 2,
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+          }}>
+          <Text style={{fontSize: 12}}>{this.state.time}</Text>
+          <Text style={{fontSize: 12}}>
+            {' 第 ' + (1 + 1) + '/' + 2 + ' 页 '}
+            {/*{this.state.pageStr+'  第 '+(rowData.num + 1) + ' / ' + this.state.chapterLength+' 章'}*/}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   _content() {
+    return (
+      <FlatList
+        pagingEnabled={true}
+        horizontal={true}
+        initialNumToRender={100}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        onScroll={this._handleScroll.bind(this)}
+        onScrollEndDrag={this._onScrollEndDrag.bind(this)}
+        data={this.state.pages}
+        keyExtractor={(value, index) => index}
+        renderItem={this.renderRow.bind(this)}
+        ListEmptyComponent={this._ListEmptyComponent()}
+      />
+    );
+  }
+  _ListEmptyComponent() {
+    return <Text>暂无数据</Text>;
+  }
+  _content2() {
     return (
       <View
         style={[
