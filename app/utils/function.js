@@ -34,30 +34,41 @@ export let contentFormat = (content, font_size, line_height) => {
   // console.log(content);
 
   // 一行可容纳文字数量
-  let fontCount = parseInt((width / font_size) * 2) - 1;
+  let fontCount = parseInt((width / font_size) * 2) - 4;
   // 一屏可容纳文字行数
-  let fontLines = parseInt(height / line_height - 2);
+  let fontLines = parseInt(height / line_height - 1);
   console.log(fontCount, fontLines);
 
   let r = 0,
     p = 0;
+  // 一行数据
   let row = [];
+  // 一页数据
   let rows = [];
+  // 分页结果
   let pages = [];
   for (let i = 0; i < content.length; i++) {
     let s = content.charAt(i);
     // console.log(s, s.indexOf('\n'));
     r += getByteLength(s);
 
+    // 满一行 或 遇到换行符
     if (r > fontCount || s.indexOf('\n') >= 0) {
+      // console.log(p, rows.length);
       if (s.indexOf('\n') >= 0) {
-        p++;
+        s = '';
+        // console.log(content.charAt(i - 1));
+        // 第一行不允许有换行
+        if (row.join('') == '' && (p == 0 || p >= fontLines - 1)) {
+          continue;
+        }
       }
       p++;
       rows.push(row.join(''));
       r = 0;
       row = [];
       // console.log('满了');
+      // 满一页
       if (p >= fontLines) {
         pages.push(cloneObj(rows));
         rows = [];
@@ -156,7 +167,7 @@ export let escape2Html = str => {
 
 //去除开头结尾换行,并将连续3次以上换行转换成2次换行
 export let trimBr = str => {
-  str = str.replace(/((\s| )*\r?\n){2,}/g, '\r\n'); //限制最多1次换行
+  str = str.replace(/((\s| )*\r?\n){3,}/g, '\r\n\r\n'); //限制最多2次换行
   str = str.replace(/^((\s| )*\r?\n)+/g, ''); //清除开头换行
   str = str.replace(/((\s| )*\r?\n)+$/g, ''); //清除结尾换行
   return str;
