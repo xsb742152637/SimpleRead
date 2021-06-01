@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Dimensions,
   View,
-  ScrollView,
+  Modal,
   TouchableOpacity,
   FlatList,
 } from 'react-native';
@@ -48,6 +48,7 @@ export default class BookRead2 extends React.Component {
       pages: pages,
       font_size: font_size,
       line_height: line_height,
+      isSetting: false,
     };
     this.scrollRef = null;
     this.x = 0; // 当前的偏移量
@@ -75,6 +76,7 @@ export default class BookRead2 extends React.Component {
       });
     } else {
       console.log('点击中间');
+      this.setState({isSetting: !this.state.isSetting});
     }
   }
 
@@ -156,8 +158,31 @@ export default class BookRead2 extends React.Component {
   _ListEmptyComponent() {
     return <Text>暂无数据</Text>;
   }
+  _onShow() {
+    console.log('显示弹出框');
+  }
+  _onDismiss() {
+    console.log('关闭弹出框');
+  }
+  _onRequestClose() {
+    console.log('返回按钮');
+    this.setState({isSetting: !this.state.isSetting});
+  }
   render() {
-    return this._content();
+    return (
+      <View>
+        <View style={{width: width, height: height}}>{this._content()}</View>
+        <Modal
+          animationType="fade" // 淡入淡出
+          transparent={true} // 背景透明
+          visible={this.state.isSetting} // 是否显示
+          onShow={this._onShow.bind(this)}
+          onDismiss={this._onDismiss.bind(this)}
+          onRequestClose={this._onRequestClose.bind(this)}>
+          <Text>{this.state.title}</Text>
+        </Modal>
+      </View>
+    );
   }
 }
 
