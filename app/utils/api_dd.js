@@ -7,7 +7,7 @@ import {getId, textFormat, mergeSpace, isNull} from '@/utils/function';
 
 let AppApi;
 export default AppApi = {
-  base: 'https://www.x23us.us',
+  base: 'https://www.23us.tw',
   search: '/modules/article/search.php',
   _getUrl(url) {
     return this.base + url;

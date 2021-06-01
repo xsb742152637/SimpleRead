@@ -119,7 +119,7 @@ let _findOne = (tableName, primaryKey) => {
     if (isNull(primaryKey)) {
       console.log(tableName, '传入了空值');
     } else {
-      return cloneObj(realm.objectForPrimaryKey(tableName, primaryKey));
+      return realm.objectForPrimaryKey(tableName, primaryKey);
     }
   } catch (e) {
     console.log('查询一条数据失败：', tableName, primaryKey);
@@ -179,9 +179,7 @@ const queryBookList = bookState => {
       filter.push(' bookState == ' + bookState);
     }
     filter = filter.join(' or ');
-    return cloneObj(
-      realm.objects('BookList').filtered(filter).sorted('saveTime', true),
-    );
+    return realm.objects('BookList').filtered(filter).sorted('saveTime', true);
   } catch (e) {
     console.log('书架查询失败！');
     console.log(e);
@@ -212,15 +210,12 @@ const deleteBookAll = () => {
   deleteRow(rows);
 };
 
-
 const queryChapterByBookId = bookId => {
   try {
-    return cloneObj(
-      realm
-        .objects('BookChapterList')
-        .filtered('bookId == $0', bookId)
-        .sorted('orderNum'),
-    );
+    return realm
+      .objects('BookChapterList')
+      .filtered('bookId == $0', bookId)
+      .sorted('orderNum');
   } catch (e) {
     console.log('查询失败！');
     console.log(e);
@@ -270,8 +265,7 @@ const deleteChapterByBookId = bookId => {
   deleteRow(rows);
 };
 
-
-const queryDetailListByBookId = (bookId) => {
+const queryDetailListByBookId = bookId => {
   try {
     return realm.objects('BookChapterDetail').filtered('bookId == $0', bookId);
   } catch (e) {

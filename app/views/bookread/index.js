@@ -46,6 +46,7 @@ export default class BookRead extends React.Component {
 
   // 上一章/下一章
   _clickButton(type) {
+    let that = this;
     let thisUrl;
     if (type) {
       if (isNull(this.state.prevUrl)) {
@@ -68,6 +69,35 @@ export default class BookRead extends React.Component {
     );
     if (isNull(chapter)) {
       console.log('没有找到缓存的目录', thisUrl, this.state.bookInfo.bookId);
+      global.realm.deleteChapterByBookId(that.state.bookInfo.bookId);
+      global.loading.show();
+      console.log('开始缓存目录');
+      console.log(this.state.thisUrl);
+      global.appApi
+        .getChapterList(this.state.listUrl, that.state.bookInfo.bookId)
+        .then(res => {
+          console.log('章节总数：' + res.length);
+          if (res.length > 0) {
+            global.realm.saveChapter(res);
+            that.setState(
+              {
+                thisUrl: thisUrl,
+                chapterId: chapter.chapterId,
+                prevUrl: '',
+                nextUrl: '',
+              },
+              () => {
+                this._loadDetail();
+              },
+            );
+          } else {
+            alert('获取章节信息失败');
+          }
+        })
+        .catch(error => {
+          global.loading.hide();
+          console.error(error);
+        });
     } else {
       console.log('找到缓存的目录', chapter);
       this.setState(
