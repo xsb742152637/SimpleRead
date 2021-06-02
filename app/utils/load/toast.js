@@ -8,7 +8,7 @@ import {
   Text,
   Animated,
 } from 'react-native';
-const {width, height} = Dimensions.get('window');
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 class AddToast extends Component {
   constructor(props) {
     super(props);

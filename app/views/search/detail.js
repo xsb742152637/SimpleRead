@@ -9,7 +9,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions,
   Image,
 } from 'react-native';
 import {getWidth} from '@/utils/function';

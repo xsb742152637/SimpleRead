@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-const {width, height} = Dimensions.get('window');
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 var _this = null;
 class Loading extends Component {
   constructor(props) {

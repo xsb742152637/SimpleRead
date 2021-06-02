@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import StyleConfig from '@/config/styleConfig';
 import {NavigationContainer} from '@react-navigation/native';
-const {width, height} = Dimensions.get('window');
-var pageHeight = height + StatusBar.currentHeight + 20;
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 var _this = null;
 class Popup extends Component {
   constructor(props) {
@@ -120,7 +119,7 @@ class Popup extends Component {
             left: 0,
             top: 0,
             width: width,
-            height: pageHeight,
+            height: height,
             display: 'flex',
             alignContent: 'center',
             alignItems: 'center',
@@ -225,7 +224,7 @@ const styles = StyleSheet.create({
     top: 0,
     backgroundColor: 'rgba(0,0,0,0.4)',
     width: width,
-    height: pageHeight,
+    height: height,
     justifyContent: 'center',
     alignItems: 'center',
   },

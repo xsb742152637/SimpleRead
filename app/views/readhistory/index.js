@@ -9,7 +9,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions,
 } from 'react-native';
 import Back from '@/components/back';
 import StyleConfig from '@/config/styleConfig';

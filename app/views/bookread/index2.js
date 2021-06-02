@@ -22,8 +22,8 @@ import {
   contentFormat,
   getByteLength,
 } from '@/utils/function';
-const {width, height} = Dimensions.get('window');
-import SwiperView from '@/components/swiperView';
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
+import Back from '@/components/back';
 
 export default class BookRead2 extends React.Component {
   constructor(props) {
@@ -168,24 +168,85 @@ export default class BookRead2 extends React.Component {
     console.log('返回按钮');
     this.setState({isSetting: !this.state.isSetting});
   }
+  readerSetting() {
+    return (
+      <Modal
+        animationType="fade" // 淡入淡出
+        transparent={true} // 背景透明
+        visible={this.state.isSetting} // 是否显示
+        onShow={this._onShow.bind(this)}
+        onDismiss={this._onDismiss.bind(this)}
+        onRequestClose={this._onRequestClose.bind(this)}>
+        <view style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+          <view style={global.appStyles.header}>
+            <Back navigation={this.props.navigation} />
+          </view>
+          <view style={[global.appStyles.header, {height: 'auto'}]}>
+            <view style={styles.st_row}>
+              <view>
+                <Text>上一章</Text>
+              </view>
+              <view>
+                <Text>目录</Text>
+              </view>
+              <view>
+                <Text>下一章</Text>
+              </view>
+            </view>
+            <view style={styles.st_row}>
+              <view>
+                <text>字号</text>
+              </view>
+              <view>
+                <text>减</text>
+              </view>
+              <view>
+                <text>19</text>
+              </view>
+              <view>
+                <text>加</text>
+              </view>
+            </view>
+            <view style={styles.st_row}>
+              <view>
+                <text>字号</text>
+              </view>
+              <view>
+                <text>白色</text>
+              </view>
+              <view>
+                <text>咖色</text>
+              </view>
+              <view>
+                <text>护眼</text>
+              </view>
+              <view>
+                <text>灰蓝</text>
+              </view>
+              <view>
+                <text>夜间</text>
+              </view>
+            </view>
+            {/*<view style={styles.st_row}>翻页</view>*/}
+          </view>
+        </view>
+      </Modal>
+    );
+  }
   render() {
     return (
       <View>
         <View style={{width: width, height: height}}>{this._content()}</View>
-        <Modal
-          animationType="fade" // 淡入淡出
-          transparent={true} // 背景透明
-          visible={this.state.isSetting} // 是否显示
-          onShow={this._onShow.bind(this)}
-          onDismiss={this._onDismiss.bind(this)}
-          onRequestClose={this._onRequestClose.bind(this)}>
-          <Text>{this.state.title}</Text>
-        </Modal>
+        {this.readerSetting()}
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  myScrollView: {},
+  st_row: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between'
+  },
 });

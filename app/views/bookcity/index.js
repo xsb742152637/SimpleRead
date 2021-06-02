@@ -12,7 +12,7 @@ import {
   PanResponder,
   Text,
 } from 'react-native';
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
 import StyleConfig from '@/config/styleConfig';
 import SwiperView from '@/components/swiperView';

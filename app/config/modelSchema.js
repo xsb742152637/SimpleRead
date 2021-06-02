@@ -4,7 +4,7 @@
  * @Date: 2021-05-05
  */
 import Realm from 'realm';
-import {cloneObj, isNull} from '@/utils/function';
+import {cloneObj, isNull, getId} from '@/utils/function';
 
 // 书架
 const BookListSchema = {
@@ -94,8 +94,8 @@ const ReaderConfigSchema = {
     background: 'string', // 背景
     fontSize: 'int', // 字体大小
     fontFamily: 'string?', // 字体类型
-    lineHeight: 'int', // 行间距
-    brightness: 'string', // 屏幕亮度
+    lineHeight: 'double', // 行间距
+    brightness: 'string?', // 屏幕亮度
     dayNight: {type: 'int', default: 0}, // 夜晚模式
     turnPage: {type: 'int', default: 1}, // 翻页模式：1(仿真)、2(覆盖)、3(平移)、4(上下)、5(自动上下翻页)
     volumePage: {type: 'int', default: 0}, // 是否音量翻页
@@ -111,7 +111,7 @@ const schemaArray = [
   ReaderConfigSchema,
 ];
 
-let realm = new Realm({schema: schemaArray, schemaVersion: 4});
+let realm = new Realm({schema: schemaArray, schemaVersion: 6});
 
 // 最底层的查询方法，传入表名和需要查询的主键
 let _findOne = (tableName, primaryKey) => {
@@ -301,6 +301,35 @@ const deleteDetailByBookId = bookId => {
   deleteRow(rows);
 };
 
+const findConfig = () => {
+  let config;
+  try {
+    config = realm.objects('ReaderConfig');
+    if (config && config.length > 0) {
+      return config[0];
+    }
+  } catch (e) {
+    console.log('配置查询失败！');
+    console.log(e);
+  }
+  config = {
+    configId: getId(),
+    background: '#edefee',
+    fontSize: 15,
+    lineHeight: 1,
+    dayNight: 0,
+    turnPage: 4,
+    volumePage: 0,
+    isFirstOpen: 1,
+  };
+  saveConfig(config);
+  return config;
+};
+
+const saveConfig = rows => {
+  return _saveRow('ReaderConfig', rows);
+};
+
 module.exports = {
   deleteRow,
 
@@ -322,4 +351,7 @@ module.exports = {
   findDetail,
   saveDetail,
   deleteDetailByBookId,
+
+  findConfig: findConfig,
+  saveConfig: saveConfig,
 };

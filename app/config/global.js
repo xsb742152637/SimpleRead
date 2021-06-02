@@ -14,6 +14,7 @@ import Popup from '@/utils/load/popup';
 
 import AppApi from '@/utils/api_dd';
 
+// let deviceHeight = Dimensions.get('window').height/Dimensions.get('window').width > 1.8 ? screenH + NativeModules.StatusBarManager.HEIGHT :  screenH;
 global.realm = realm;
 global.storage = storage;
 global.appStyles = AppStyles;

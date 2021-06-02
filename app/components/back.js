@@ -9,7 +9,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions,
 } from 'react-native';
 import {goBack} from '@/utils/function';
 import MyIcon from '@/config/myIcon';

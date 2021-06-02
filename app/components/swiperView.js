@@ -10,7 +10,7 @@ import {
   PanResponder,
   TouchableOpacity,
 } from 'react-native';
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
 export default class SwiperView extends React.Component {
   constructor(props) {

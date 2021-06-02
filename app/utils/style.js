@@ -16,11 +16,12 @@ import {
   Keyboard,
 } from 'react-native';
 import StyleConfig from '@/config/styleConfig';
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
 module.exports = StyleSheet.create({
   content: {
-    width: Dimensions.get('window').width,
-    // height: Dimensions.get('window').height,
+    width: width,
+    // height: height,
     height: '100%',
     backgroundColor: StyleConfig.color.baseBackground,
   },

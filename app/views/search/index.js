@@ -9,7 +9,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions,
   TextInput,
   FlatList,
   Image,

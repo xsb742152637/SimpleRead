@@ -9,10 +9,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions,
 } from 'react-native';
 import StyleConfig from '@/config/styleConfig';
-import {getId, textFormat, isNull} from '@/utils/function';
+import {getId, textFormat, isNull, cloneObj} from '@/utils/function';
 
 export default class Me extends React.Component {
   constructor(props) {
@@ -66,7 +65,8 @@ export default class Me extends React.Component {
     global.realm.saveChapter(chapter);
   }
   _bookRead() {
-    this.props.navigation.navigate('BookRead2');
+    let bookId = '53548BB6-32C6-4EC0-9345-29DCB2BE43E7';
+    this.props.navigation.navigate('BookRead3', cloneObj(global.realm.findBook(bookId)));
   }
   render() {
     return (

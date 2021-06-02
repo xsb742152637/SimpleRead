@@ -17,6 +17,7 @@ import {
 import StyleConfig from '@/config/styleConfig';
 import MyIcon from '@/config/myIcon';
 import {getId, textFormat, isNull} from '@/utils/function';
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
 export default class BookRead extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -328,7 +329,6 @@ export default class BookRead extends React.Component {
   _clickScreen(e) {
     console.log('\n点击屏幕位置：', e.nativeEvent.pageX, e.nativeEvent.pageY);
     let pageX = e.nativeEvent.pageX;
-    let width = Dimensions.get('window').width;
     if (this.state.isSetting) {
       this.setState({isSetting: false});
       console.log('关闭设置');
@@ -429,13 +429,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width: width,
+    height: height,
     backgroundColor: StyleConfig.color.headerBackground,
   },
   headerView: {
     position: 'absolute',
-    width: Dimensions.get('window').width,
+    width: width,
     height: StyleConfig.headerHeight,
     left: 0,
     top: 0,

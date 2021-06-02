@@ -41,6 +41,7 @@ export default StyleConfig = {
   opacity: {
     active: 0.7, // 按下时，标签透明程度
     cardBackground: 0.5, // 卡片背景
+    buttonBackground: 0.3, // 按钮背景
   },
   headerHeight: 50, // 页面头部高度
 };
