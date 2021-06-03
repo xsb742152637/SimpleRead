@@ -58,7 +58,6 @@ export default class BookRead3 extends React.Component {
       textColor: ['#111111', '#767676'],
       selectedColor: ['#111111', '#767676'],
     };
-    console.log('aaa:' ,this.state.fontSize, this.state.lineHeight,readCF.lineHeight);
     // 将this传递到监听方法中，不然在这个方法中无法正确访问this
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.historyChapterPage = bookInfo.historyChapterPage;
@@ -497,63 +496,53 @@ export default class BookRead3 extends React.Component {
   //当前页正文
   renderContent(rowData) {
     return (
-      <View>
-        <TouchableOpacity
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'space-between',
+          width: width,
+          height: height - StatusBar.currentHeight,
+          paddingTop: 10,
+        }}
+        onStartShouldSetResponder={() => true}
+        onResponderRelease={evt => {
+          this._showControlStation_LR(evt);
+        }}>
+        <View style={{alignSelf: 'center', flex: 1}}>
+          {rowData.item
+            ? rowData.item.map((value, index) => {
+                return (
+                  <Text
+                    style={{
+                      color: this.state.textColor[this.state.dayNight],
+                      fontSize: this.state.fontSize,
+                      lineHeight: this.state.lineHeight,
+                    }}
+                    key={index}>
+                    {value ? value : ' '}
+                  </Text>
+                );
+              })
+            : null}
+        </View>
+        <View
           style={{
-            flex: 1,
-            width: width,
-            backgroundColor: this.state.background2,
-          }}
-          activeOpacity={1}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'space-between',
-              width: width,
-              height: height,
-              paddingTop: 10,
-            }}
-            onStartShouldSetResponder={() => true}
-            onResponderRelease={evt => {
-              this._showControlStation_LR(evt);
-            }}>
-            <View style={{alignSelf: 'center', flex: 1}}>
-              {rowData.item
-                ? rowData.item.map((value, index) => {
-                    return (
-                      <Text
-                        style={{
-                          color: this.state.textColor[this.state.dayNight],
-                          fontSize: this.state.fontSize,
-                          lineHeight: this.state.lineHeight,
-                        }}
-                        key={index}>
-                        {value ? value : ' '}
-                      </Text>
-                    );
-                  })
-                : null}
-            </View>
-            <View
-              style={{
-                marginBottom: 2,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingLeft: 20,
-                paddingRight: 20,
-                paddingBottom: 5,
-              }}>
-              {/*<Text style={{fontSize: 12}}>{this.state.time}</Text>*/}
-              <Text style={{fontSize: 12}}>
-                {' 第 ' +
-                  (rowData.index + 1) +
-                  '/' +
-                  this.state.contents.length +
-                  ' 页 '}
-              </Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+            marginBottom: 2,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 5,
+          }}>
+          <Text style={{fontSize: 12}}></Text>
+          <Text style={{fontSize: 12}}>
+            {' 第 ' +
+              (rowData.index + 1) +
+              '/' +
+              this.state.contents.length +
+              ' 页 '}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -565,15 +554,18 @@ export default class BookRead3 extends React.Component {
   }
   _onDismiss() {
     console.log('关闭弹出框');
+    this.setState({isSetting: !this.state.isSetting});
   }
   _onRequestClose() {
     console.log('返回按钮');
-    this.setState({isSetting: !this.state.isSetting});
+
+    this.handleBackButtonClick();
+    this.props.navigation.goBack();
   }
   readerSetting() {
     let lhs = [
       {text: '窄', num: 0.2},
-      {text: '默认', num: 0.5},
+      {text: '默认', num: 0.7},
       {text: '宽', num: 1},
     ];
     let bcs = ['#edefee', '#d8d1bf', '#d7dcc8', '#cad0de'];
@@ -609,7 +601,7 @@ export default class BookRead3 extends React.Component {
               width: width,
             }}
             onPress={() => {
-              this._onRequestClose();
+              this._onDismiss();
             }}
           />
           <View
@@ -638,7 +630,9 @@ export default class BookRead3 extends React.Component {
                       {
                         color: this.state.textColor[this.state.dayNight],
                         borderColor:
-                          this.state.fontSize + this.state.fontSize * value.num === this.state.lineHeight
+                          this.state.fontSize +
+                            this.state.fontSize * value.num ===
+                          this.state.lineHeight
                             ? 'rgba(45,52,58,' +
                               StyleConfig.opacity.buttonBackground +
                               ')'
