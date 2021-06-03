@@ -210,12 +210,16 @@ const deleteBookAll = () => {
   deleteRow(rows);
 };
 
-const queryChapterByBookId = bookId => {
+const queryChapterByBookId = (bookId, orderBy) => {
+  console.log('orderBy：', orderBy);
+  if (orderBy == undefined || orderBy == null) {
+    orderBy = true;
+  }
   try {
     return realm
       .objects('BookChapterList')
       .filtered('bookId == $0', bookId)
-      .sorted('orderNum');
+      .sorted('orderNum', orderBy);
   } catch (e) {
     console.log('查询失败！');
     console.log(e);

@@ -38,6 +38,7 @@ export default class BookRead3 extends React.Component {
     let readCF = cloneObj(global.realm.findConfig());
     this.state = {
       isSetting: false,
+      isChapter: false,
       bookInfo: bookInfo,
       key: bookInfo.bookName,
       chapterId: bookInfo.chapterId,
@@ -49,6 +50,8 @@ export default class BookRead3 extends React.Component {
       contents: [],
       readCF: readCF,
       title: '',
+      chapterOrder: false, // 目录排序方式
+      chapterList: [], // 目录
 
       dayNight: readCF.dayNight,
       lineHeight: readCF.fontSize + readCF.fontSize * readCF.lineHeight,
@@ -62,6 +65,7 @@ export default class BookRead3 extends React.Component {
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.historyChapterPage = bookInfo.historyChapterPage;
     this.scrollRef = null;
+    this.scrollRef_chapter = null;
     this.x = 0; // 当前的偏移量
   }
 
@@ -138,6 +142,14 @@ export default class BookRead3 extends React.Component {
   // 显示目录
   _showChapter() {
     console.log('显示目录');
+    this.setState({
+      isChapter: true,
+      isSetting: false,
+      chapterList: global.realm.queryChapterByBookId(
+        this.state.bookInfo.bookId,
+        this.state.chapterOrder,
+      ),
+    });
   }
   _changeFontSize(fontSize, lineHeight) {
     let readCF = this.state.readCF;
@@ -342,6 +354,7 @@ export default class BookRead3 extends React.Component {
     } else {
       this._loadDetail();
     }
+    this._showChapter();
   }
 
   componentWillUnmount() {
@@ -534,7 +547,7 @@ export default class BookRead3 extends React.Component {
             paddingRight: 20,
             paddingBottom: 5,
           }}>
-          <Text style={{fontSize: 12}}></Text>
+          <Text style={{fontSize: 12}} />
           <Text style={{fontSize: 12}}>
             {' 第 ' +
               (rowData.index + 1) +
@@ -561,6 +574,108 @@ export default class BookRead3 extends React.Component {
 
     this.handleBackButtonClick();
     this.props.navigation.goBack();
+  }
+  _onDismiss2() {
+    console.log('关闭弹出框');
+    this.setState({isChapter: !this.state.isChapter});
+  }
+  _onRequestClose2() {
+    console.log('返回按钮');
+    this._onDismiss2();
+  }
+  readerChapters() {
+    return (
+      <Modal
+        animationType="fade" // 淡入淡出
+        transparent={true} // 背景透明
+        visible={this.state.isChapter} // 是否显示
+        onDismiss={this._onDismiss2.bind(this)}
+        onRequestClose={this._onRequestClose2.bind(this)}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: width,
+            height: height,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}>
+          <View
+            style={[
+              global.appStyles.padding,
+              {flex: 1, backgroundColor: this.state.background2},
+            ]}>
+            <Text
+              style={{
+                paddingBottom: StyleConfig.padding.baseTop,
+                paddingTop: StyleConfig.padding.baseTop,
+                textAlign: 'right',
+              }}
+              onPress={() => {
+                this._changeOrder();
+              }}>
+              {this.state.chapterOrder ? '正序' : '倒序'}
+            </Text>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              ref={c => (this.scrollRef_chapter = c)}
+              data={this.state.chapterList}
+              keyExtractor={item => item.chapterId}
+              renderItem={({item}) => this._getItem(item)}
+            />
+          </View>
+          <Text
+            style={{
+              width: 80,
+              height: height,
+            }}
+            onPress={() => {
+              this._onDismiss2();
+            }}
+          />
+        </View>
+      </Modal>
+    );
+  }
+  _getItem(data) {
+    return (
+      <Text
+        style={{
+          paddingBottom: StyleConfig.padding.baseTop,
+          paddingTop: StyleConfig.padding.baseTop,
+          color: this.state.textColor[this.state.dayNight],
+          fontSize: StyleConfig.fontSize.titleText,
+        }}
+        onPress={() => {
+          this._clickChapter(data);
+        }}>
+        {data.title}
+      </Text>
+    );
+  }
+  _changeOrder() {
+    let that = this;
+    this.setState(
+      {
+        chapterOrder: !this.state.chapterOrder,
+      },
+      () => {
+        that._showChapter();
+      },
+    );
+  }
+  _clickChapter(chapter) {
+    this.setState(
+      {
+        isChapter: false,
+        thisUrl: chapter.thisUrl,
+        chapterId: chapter.chapterId,
+        prevUrl: '',
+        nextUrl: '',
+      },
+      () => {
+        this._loadDetail();
+      },
+    );
   }
   readerSetting() {
     let lhs = [
@@ -790,6 +905,7 @@ export default class BookRead3 extends React.Component {
         />
         <View style={{width: width, height: height}}>{this._content()}</View>
         {this.readerSetting()}
+        {this.readerChapters()}
       </View>
     );
   }
