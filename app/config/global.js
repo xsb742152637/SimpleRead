@@ -12,7 +12,7 @@ import Toast from '@/utils/load/toast';
 // 对话框
 import Popup from '@/utils/load/popup';
 
-import AppApi from '@/utils/api_dd';
+import AppApiBase from '@/utils/api';
 
 // let deviceHeight = Dimensions.get('window').height/Dimensions.get('window').width > 1.8 ? screenH + NativeModules.StatusBarManager.HEIGHT :  screenH;
 global.realm = realm;
@@ -21,6 +21,6 @@ global.appStyles = AppStyles;
 global.loading = Loading;
 global.toast = Toast;
 global.popup = Popup;
-global.appApi = AppApi;
+global.appApi = AppApiBase;
 // 全局回调
 global.callbacks = {};

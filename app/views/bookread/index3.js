@@ -28,7 +28,6 @@ import {
 } from '@/utils/function';
 const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 import Back from '@/components/back';
-import {NavigationContainer} from '@react-navigation/native';
 
 export default class BookRead3 extends React.Component {
   // 构造函数，可以在里面初始化props和state
@@ -87,154 +86,7 @@ export default class BookRead3 extends React.Component {
       thisUrl = this.state.nextUrl;
     }
 
-    this.historyChapterPage = 0;
-    let chapter = global.realm.queryChapterByThisUrl(
-      thisUrl,
-      this.state.bookInfo.bookId,
-    );
-    if (isNull(chapter)) {
-      console.log('没有找到缓存的目录', thisUrl, this.state.bookInfo.bookId);
-      global.realm.deleteChapterByBookId(that.state.bookInfo.bookId);
-      global.loading.show();
-      console.log('开始缓存目录');
-      console.log(this.state.thisUrl);
-      global.appApi
-        .getChapterList(this.state.listUrl, that.state.bookInfo.bookId)
-        .then(res => {
-          console.log('章节总数：' + res.length);
-          if (res.length > 0) {
-            global.realm.saveChapter(res);
-            that.setState(
-              {
-                thisUrl: thisUrl,
-                chapterId: chapter.chapterId,
-                prevUrl: '',
-                nextUrl: '',
-              },
-              () => {
-                this._loadDetail();
-              },
-            );
-          } else {
-            alert('获取章节信息失败');
-          }
-        })
-        .catch(error => {
-          global.loading.hide();
-          console.error(error);
-        });
-    } else {
-      console.log('找到缓存的目录', chapter);
-      this.setState(
-        {
-          thisUrl: thisUrl,
-          chapterId: chapter.chapterId,
-          prevUrl: '',
-          nextUrl: '',
-        },
-        () => {
-          this._loadDetail();
-        },
-      );
-    }
-  }
-
-  // 显示目录
-  _showChapter() {
-    console.log('显示目录');
-    this.setState({
-      isChapter: true,
-      isSetting: false,
-      chapterList: global.realm.queryChapterByBookId(
-        this.state.bookInfo.bookId,
-        this.state.chapterOrder,
-      ),
-    });
-  }
-  _changeFontSize(fontSize, lineHeight) {
-    let readCF = this.state.readCF;
-    if (fontSize != null) {
-      readCF.fontSize = fontSize;
-    }
-    if (lineHeight != null) {
-      readCF.lineHeight = lineHeight;
-    }
-    console.log('改变字体:', fontSize);
-    global.realm.saveConfig(readCF);
-    this.setState(
-      {
-        readCF: readCF,
-        fontSize: readCF.fontSize,
-        lineHeight: readCF.fontSize + readCF.fontSize * readCF.lineHeight,
-      },
-      () => {
-        this._loadDetail();
-      },
-    );
-  }
-  _changeBackground(color, dayNight) {
-    let readCF = this.state.readCF;
-    if (dayNight === 0) {
-      readCF.background = color;
-    } else if (dayNight === 2) {
-      // 再次点击夜间模式时，关闭夜间模式
-      dayNight = 0;
-      color = readCF.background;
-    }
-    readCF.dayNight = dayNight;
-    console.log('改变背景:', color, dayNight);
-    global.realm.saveConfig(readCF);
-    this.setState({
-      readCF: readCF,
-      dayNight: dayNight,
-      background: readCF.background,
-      background2: color,
-    });
-  }
-  // 请求html内容，并缓存
-  _loadDetail(detail) {
-    let that = this;
-    if (isNull(detail) && !isNull(this.state.chapterId)) {
-      detail = global.realm.findDetail(this.state.chapterId);
-      console.log('根据ID找内容');
-    }
-    if (isNull(detail)) {
-      detail = global.realm.queryDetailByThisUrl(
-        this.state.thisUrl,
-        this.state.bookInfo.bookId,
-      );
-      console.log('根据路径找内容');
-    }
-    if (isNull(detail)) {
-      console.log('没找到');
-      that._saveDetail();
-    } else {
-      console.log('找到了');
-      // console.log('找到了', detail);
-      let title = detail.title;
-
-      let contents = contentFormat(
-        detail.title + '\n\n' + detail.content,
-        that.state.fontSize,
-        that.state.lineHeight,
-      );
-      that.setState(
-        {
-          title: title,
-          contents: contents,
-          prevUrl: detail.prevUrl,
-          nextUrl: detail.nextUrl,
-        },
-        () => {
-          that._saveBook();
-
-          this.scrollRef.scrollToOffset({
-            offset: that.historyChapterPage - width,
-            animated: true,
-          });
-        },
-      );
-    }
+    this._loadDetail(null, thisUrl);
   }
 
   // 记录阅读进度
@@ -259,84 +111,6 @@ export default class BookRead3 extends React.Component {
     global.realm.saveBook(book);
   }
 
-  // 保存章节列表
-  _saveChapter() {
-    let that = this;
-    let bookId = this.state.bookInfo.bookId;
-    global.loading.show();
-    console.log('开始缓存目录');
-    console.log(this.state.thisUrl);
-    global.appApi
-      .getChapterList(this.state.listUrl, bookId)
-      .then(res => {
-        console.log('章节总数：' + res.length);
-        if (res.length > 0) {
-          global.realm.saveChapter(res);
-          let thisChapter = res[0];
-
-          console.log('第一章：', thisChapter);
-          that.setState(
-            {
-              page: 1,
-              chapterId: thisChapter.chapterId,
-              thisUrl: thisChapter.thisUrl,
-              prevUrl: '',
-              nextUrl: '',
-              content: '',
-              title: thisChapter.title,
-            },
-            () => {
-              global.loading.hide();
-              that._saveDetail();
-            },
-          );
-        } else {
-          alert('获取章节信息失败');
-        }
-      })
-      .catch(error => {
-        global.loading.hide();
-        console.error(error);
-      });
-  }
-
-  // 保存当前章的内容
-  _saveDetail() {
-    let that = this;
-    global.loading.show();
-    // console.log(this.state.thisUrl);
-    console.log('开始请求内容');
-    global.appApi
-      .getChapter(this.state.thisUrl)
-      .then(res => {
-        // console.log(res);
-        // 保存一章的明细
-        let title = res.title ? res.title : that.state.title;
-        let detail = {
-          chapterId: that.state.chapterId,
-          bookId: that.state.bookInfo.bookId,
-          title: title,
-          content: res.content,
-          thisUrl: this.state.thisUrl,
-          prevUrl: res.prevUrl,
-          nextUrl: res.nextUrl,
-        };
-        if (isNull(detail.chapterId)) {
-          console.log('主键缺失');
-        } else {
-          console.log('保存本章内容');
-          global.realm.saveDetail(detail);
-        }
-
-        that._loadDetail(detail);
-        global.loading.hide();
-      })
-      .catch(error => {
-        global.loading.hide();
-        console.error(error);
-      });
-  }
-
   // 初始加载
   componentDidMount() {
     // 添加返回监听
@@ -345,16 +119,7 @@ export default class BookRead3 extends React.Component {
       this.handleBackButtonClick,
     );
 
-    // 如果有明细ID，直接从数据库获取本章内容
-    // 否则缓存章节目录，并打开第一章
-    console.log(this.state.bookInfo.chapterId);
-    // 如果是第一次阅读这本书，缓存目录，并获取第一章
-    if (isNull(this.state.bookInfo.chapterId)) {
-      this._saveChapter();
-    } else {
-      this._loadDetail();
-    }
-    this._showChapter();
+    this._loadDetail();
   }
 
   componentWillUnmount() {
@@ -412,64 +177,171 @@ export default class BookRead3 extends React.Component {
     return false;
   }
 
-  _clickScreen(e) {
-    console.log('\n点击屏幕位置：', e.nativeEvent.pageX, e.nativeEvent.pageY);
-    let pageX = e.nativeEvent.pageX;
-    if (this.state.isSetting) {
-      this.setState({isSetting: false});
-      console.log('关闭设置');
-    } else {
-      if (pageX <= width * 0.3) {
-        console.log('上一页');
-      } else if (pageX >= width * 0.9) {
-        console.log('下一页');
-      } else {
-        this.setState({isSetting: true});
-        console.log('打开设置');
-      }
+  // 请求html内容，并缓存
+  _loadDetail(chapterId, thisUrl) {
+    if (isNull(thisUrl)) {
+      chapterId = this.state.chapterId;
+      thisUrl = this.state.thisUrl;
     }
-  }
-  _header() {
-    if (this.state.isSetting) {
-      console.log('加载头');
-      return (
-        <View style={styles.headerView}>
-          <TouchableOpacity onPress={() => this._goBack()}>
-            <MyIcon
-              name={'fanhuishangyizhang'}
-              style={global.appStyles.headerIcon}
-              size={StyleConfig.fontSize.icon}
-            />
-          </TouchableOpacity>
-          <Text>我时头</Text>
-        </View>
-      );
-    }
-  }
-  _onMomentumScrollEnd(e) {
-    if (e.nativeEvent.contentOffset.y != this.scrollTop) {
-      this.scrollTop = e.nativeEvent.contentOffset.y;
-      let that = this;
-      let bookId = this.state.bookInfo.bookId;
+    let that = this;
+    this._getDetail(chapterId, thisUrl)
+      .then(detail => {
+        let title = detail.title;
 
-      // 保存阅读进度
-      let book = {
-        bookId: bookId,
-        saveTime: new Date(),
-        historyChapterPage: this.scrollTop,
-      };
-      console.log('记录滑动进度', this.scrollTop);
-      global.realm.saveBook(book);
+        let contents = contentFormat(
+          detail.title + '\n\n' + detail.content,
+          that.state.fontSize,
+          that.state.lineHeight,
+        );
+        that.setState(
+          {
+            title: title,
+            contents: contents,
+            prevUrl: detail.prevUrl,
+            nextUrl: detail.nextUrl,
+          },
+          () => {
+            that._saveBook();
+
+            this.scrollRef.scrollToOffset({
+              offset: that.historyChapterPage - width,
+              animated: true,
+            });
+          },
+        );
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  // 得到小说内容
+  _getDetail(chapterId, thisUrl) {
+    let that = this;
+    let bookId = this.state.bookInfo.bookId;
+    let chapter = null;
+    // 是否有目录缓存
+    if (!isNull(chapterId)) {
+      chapter = global.realm.findChapter(chapterId);
+    } else if (!isNull(thisUrl)) {
+      chapter = global.realm.queryChapterByThisUrl(thisUrl, bookId);
     }
+    let isRequestList = isNull(chapter);
+    // 目录无缓存
+    if (isRequestList) {
+      // console.log('没有找到缓存的目录，删除该小说所有缓存目录和小说内容', thisUrl, bookId);
+      global.realm.deleteChapterByBookId(bookId);
+    }
+    return new Promise((resolve, reject) => {
+      global.appApi
+        .getChapterList(isRequestList, this.state.listUrl, bookId)
+        .then(res => {
+          let detail = null;
+          if (isRequestList && res.length > 0) {
+            console.log('章节总数：' + res.length);
+            chapter = res[0];
+          } else {
+            // 小说内容是否有缓存
+            detail = global.realm.findDetail(chapter.chapterId);
+            console.log('根据ID找内容');
+            if (isNull(detail)) {
+              detail = global.realm.queryDetailByThisUrl(
+                chapter.thisUrl,
+                bookId,
+              );
+              console.log('根据路径找内容');
+            }
+          }
+
+          // 小说明细没有缓存
+          let isRequestDetail = isNull(detail);
+          global.appApi
+            .getChapter(
+              isRequestDetail,
+              that.state.thisUrl,
+              bookId,
+              chapter.chapterId,
+              that.state.title,
+            )
+            .then(res => {
+              if (isRequestDetail) {
+                detail = res;
+              }
+              resolve(detail);
+            })
+            .catch(error => {
+              reject(error);
+            });
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+
+  // 显示目录
+  _showChapter() {
+    console.log('显示目录');
+    this.setState({
+      isChapter: true,
+      isSetting: false,
+      chapterList: global.realm.queryChapterByBookId(
+        this.state.bookInfo.bookId,
+        this.state.chapterOrder,
+      ),
+    });
+  }
+
+  _changeFontSize(fontSize, lineHeight) {
+    let readCF = this.state.readCF;
+    if (fontSize != null) {
+      readCF.fontSize = fontSize;
+    }
+    if (lineHeight != null) {
+      readCF.lineHeight = lineHeight;
+    }
+    console.log('改变字体:', fontSize);
+    global.realm.saveConfig(readCF);
+    this.setState(
+      {
+        readCF: readCF,
+        fontSize: readCF.fontSize,
+        lineHeight: readCF.fontSize + readCF.fontSize * readCF.lineHeight,
+      },
+      () => {
+        this._loadDetail();
+      },
+    );
+  }
+
+  _changeBackground(color, dayNight) {
+    let readCF = this.state.readCF;
+    if (dayNight === 0) {
+      readCF.background = color;
+    } else if (dayNight === 2) {
+      // 再次点击夜间模式时，关闭夜间模式
+      dayNight = 0;
+      color = readCF.background;
+    }
+    readCF.dayNight = dayNight;
+    console.log('改变背景:', color, dayNight);
+    global.realm.saveConfig(readCF);
+    this.setState({
+      readCF: readCF,
+      dayNight: dayNight,
+      background: readCF.background,
+      background2: color,
+    });
   }
 
   _handleScroll(e) {
-    // console.log('_handleScroll');
     this.x = e.nativeEvent.contentOffset.x;
   }
+
   _onScrollEndDrag() {
     console.log('翻页');
   }
+
   _showControlStation_LR(evt) {
     console.log('点击', evt.nativeEvent.pageX, evt.nativeEvent.pageY);
     if (evt.nativeEvent.pageX <= width * 0.3) {
@@ -486,6 +358,20 @@ export default class BookRead3 extends React.Component {
       console.log('点击中间');
       this.setState({isSetting: !this.state.isSetting});
     }
+  }
+
+  _ListEmptyComponent() {
+    return <Text>暂无数据</Text>;
+  }
+  _onDismiss() {
+    this.setState({isSetting: !this.state.isSetting});
+  }
+  _onRequestClose() {
+    this.handleBackButtonClick();
+    this.props.navigation.goBack();
+  }
+  _onDismiss2() {
+    this.setState({isChapter: !this.state.isChapter});
   }
 
   _content() {
@@ -559,30 +445,7 @@ export default class BookRead3 extends React.Component {
       </View>
     );
   }
-  _ListEmptyComponent() {
-    return <Text>暂无数据</Text>;
-  }
-  _onShow() {
-    console.log('显示弹出框');
-  }
-  _onDismiss() {
-    console.log('关闭弹出框');
-    this.setState({isSetting: !this.state.isSetting});
-  }
-  _onRequestClose() {
-    console.log('返回按钮');
 
-    this.handleBackButtonClick();
-    this.props.navigation.goBack();
-  }
-  _onDismiss2() {
-    console.log('关闭弹出框');
-    this.setState({isChapter: !this.state.isChapter});
-  }
-  _onRequestClose2() {
-    console.log('返回按钮');
-    this._onDismiss2();
-  }
   readerChapters() {
     return (
       <Modal
@@ -590,24 +453,28 @@ export default class BookRead3 extends React.Component {
         transparent={true} // 背景透明
         visible={this.state.isChapter} // 是否显示
         onDismiss={this._onDismiss2.bind(this)}
-        onRequestClose={this._onRequestClose2.bind(this)}>
+        onRequestClose={this._onDismiss2.bind(this)}>
         <View
           style={{
             display: 'flex',
             flexDirection: 'row',
             width: width,
             height: height,
-            backgroundColor: 'rgba(0,0,0,0.5)',
+            backgroundColor: 'rgba(0,0,0,0.4)',
           }}>
           <View
             style={[
               global.appStyles.padding,
-              {flex: 1, backgroundColor: this.state.background2},
+              {
+                flex: 1,
+                backgroundColor: this.state.background2,
+              },
             ]}>
             <Text
               style={{
                 paddingBottom: StyleConfig.padding.baseTop,
                 paddingTop: StyleConfig.padding.baseTop,
+                color: this.state.textColor[this.state.dayNight],
                 textAlign: 'right',
               }}
               onPress={() => {
@@ -621,6 +488,16 @@ export default class BookRead3 extends React.Component {
               data={this.state.chapterList}
               keyExtractor={item => item.chapterId}
               renderItem={({item}) => this._getItem(item)}
+              ItemSeparatorComponent={() => {
+                return (
+                  <View
+                    style={{
+                      height: 1,
+                      backgroundColor: 'rgba(186,186,186,0.4)',
+                    }}
+                  />
+                );
+              }}
             />
           </View>
           <Text
@@ -646,7 +523,7 @@ export default class BookRead3 extends React.Component {
           fontSize: StyleConfig.fontSize.titleText,
         }}
         onPress={() => {
-          this._clickChapter(data);
+          this._loadDetail(data.chapterId, data.thisUrl);
         }}>
         {data.title}
       </Text>
@@ -663,20 +540,7 @@ export default class BookRead3 extends React.Component {
       },
     );
   }
-  _clickChapter(chapter) {
-    this.setState(
-      {
-        isChapter: false,
-        thisUrl: chapter.thisUrl,
-        chapterId: chapter.chapterId,
-        prevUrl: '',
-        nextUrl: '',
-      },
-      () => {
-        this._loadDetail();
-      },
-    );
-  }
+
   readerSetting() {
     let lhs = [
       {text: '窄', num: 0.2},
@@ -689,7 +553,6 @@ export default class BookRead3 extends React.Component {
         animationType="fade" // 淡入淡出
         transparent={true} // 背景透明
         visible={this.state.isSetting} // 是否显示
-        onShow={this._onShow.bind(this)}
         onDismiss={this._onDismiss.bind(this)}
         onRequestClose={this._onRequestClose.bind(this)}>
         <View

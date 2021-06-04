@@ -199,7 +199,6 @@ const deleteBook = bookId => {
   let rows = findBook(bookId);
   deleteRow(rows);
   deleteChapterByBookId(bookId);
-  deleteDetailByBookId(bookId);
 };
 const deleteBookAll = () => {
   let rows = realm.objects('BookList');
@@ -267,6 +266,7 @@ const saveChapter = rows => {
 const deleteChapterByBookId = bookId => {
   let rows = queryChapterByBookId(bookId);
   deleteRow(rows);
+  deleteDetailByBookId(bookId);
 };
 
 const queryDetailListByBookId = bookId => {
