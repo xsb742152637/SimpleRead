@@ -40,6 +40,7 @@ const BookChapterListSchema = {
     bookId: 'string', //BookList 的主键
     thisUrl: 'string', //章节路径
     title: 'string', //章节标题
+    isSave: {type: 'int', default: 0}, // 是否缓存小说明细内容
     num: 'int', //章节数
     orderNum: 'int', //章节序号
   },
@@ -111,7 +112,7 @@ const schemaArray = [
   ReaderConfigSchema,
 ];
 
-let realm = new Realm({schema: schemaArray, schemaVersion: 6});
+let realm = new Realm({schema: schemaArray, schemaVersion: 7});
 
 // 最底层的查询方法，传入表名和需要查询的主键
 let _findOne = (tableName, primaryKey) => {
@@ -297,6 +298,8 @@ const findDetail = primaryKey => {
 };
 
 const saveDetail = rows => {
+  let chapter = findChapter(rows.chapterId);
+  saveChapter({chapterId: chapter.chapterId, isSave: 1});
   return _saveRow('BookChapterDetail', rows);
 };
 

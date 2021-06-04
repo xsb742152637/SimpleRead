@@ -51,6 +51,7 @@ export default class BookRead extends React.Component {
       title: '',
       chapterOrder: false, // 目录排序方式
       chapterList: [], // 目录
+      thisChapter: null,
 
       dayNight: readCF.dayNight,
       lineHeight: readCF.fontSize + readCF.fontSize * readCF.lineHeight,
@@ -154,7 +155,7 @@ export default class BookRead extends React.Component {
 
   // 页面返回触发的方法
   handleBackButtonClick() {
-    // console.log('退回');
+    console.log('退回');
     let that = this;
     if (this.state.bookInfo.bookState === 0) {
       global.popup.show(
@@ -384,10 +385,17 @@ export default class BookRead extends React.Component {
 
   // 显示目录
   _showChapter() {
+    let chapter = null;
+    if (!isNull(this.details[1])) {
+      chapter = global.realm.findChapter(this.details[1].chapterId);
+    }
+    console.log(chapter);
+
     // console.log('显示目录');
     this.setState({
       isChapter: true,
       isSetting: false,
+      thisChapter: chapter,
       chapterList: global.realm.queryChapterByBookId(
         this.state.bookInfo.bookId,
         this.state.chapterOrder,
@@ -657,6 +665,17 @@ export default class BookRead extends React.Component {
               {this.state.chapterOrder ? '正序' : '倒序'}
             </Text>
             <FlatList
+              initialScrollIndex={
+                !isNull(this.state.thisChapter)
+                  ? this.state.thisChapter.orderNum
+                  : 0
+              }
+              getItemLayout={(data, index) => ({
+                length: 41,
+                offset: 41 * index,
+                index,
+              })}
+              // initialNumToRender={100}
               showsVerticalScrollIndicator={false}
               ref={c => (this.scrollRef_chapter = c)}
               data={this.state.chapterList}
@@ -689,13 +708,13 @@ export default class BookRead extends React.Component {
   }
   _getItem(data) {
     return (
-      <Text
+      <TouchableOpacity
         style={{
-          paddingBottom: StyleConfig.padding.baseTop,
-          paddingTop: StyleConfig.padding.baseTop,
-          color: this.state.textColor[this.state.dayNight],
-          fontSize: StyleConfig.fontSize.titleText,
+          height: 40,
+          justifyContent: 'center',
+          display: 'flex',
         }}
+        activeOpacity={1}
         onPress={() => {
           this.details = [null, null, null];
           this.x2 = width;
@@ -710,8 +729,19 @@ export default class BookRead extends React.Component {
             },
           );
         }}>
-        {data.title}
-      </Text>
+        <Text
+          style={{
+            color:
+              !isNull(this.state.thisChapter) &&
+              this.state.thisChapter.chapterId == data.chapterId
+                ? 'red'
+                : this.state.textColor[this.state.dayNight],
+            fontSize: this.state.fontSize,
+            lineHeight: this.state.lineHeight,
+          }}>
+          {data.title + (data.isSave == 1 ? ' (已缓存)' : '')}
+        </Text>
+      </TouchableOpacity>
     );
   }
   _changeOrder() {
