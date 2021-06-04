@@ -69,4 +69,10 @@ export default AppApiBase = {
       }
     });
   },
+  getBookInfo(data) {
+    return AppApi.getBookInfo(data);
+  },
+  getSearchList(searchkey) {
+    return AppApi.getSearchList(searchkey);
+  },
 };

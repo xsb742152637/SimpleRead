@@ -62,6 +62,7 @@ export default class BookRead extends React.Component {
       selectedColor: ['#111111', '#444444'],
     };
 
+    console.log(bookInfo);
     this.details = [null, null, null];
 
     // 将this传递到监听方法中，不然在这个方法中无法正确访问this
@@ -209,7 +210,7 @@ export default class BookRead extends React.Component {
     }
 
     this.setState({contents: []}, () => {
-      // console.log('初始加载', chapterId, thisUrl);
+      console.log('初始加载', chapterId, thisUrl);
       // 本章
       // console.log('开始加载当前章');
       setTimeout(() => {
@@ -240,6 +241,9 @@ export default class BookRead extends React.Component {
                   prevDetail.pageNum = prevDS.length;
                   // 上一章的最后一页添加到当前章的最前面
                   thisDS.unshift(prevDS[prevDS.length - 1]);
+                } else {
+                  // 上一章的最后一页添加到当前章的最前面
+                  thisDS.unshift(this.state.bookInfo.bookName.split(''));
                 }
 
                 // console.log('开始加载下一章');
@@ -321,19 +325,23 @@ export default class BookRead extends React.Component {
         // 是否有目录缓存
         if (!isNull(chapterId)) {
           chapter = global.realm.findChapter(chapterId);
-          // console.log('根据ID找到的：', chapter);
+          console.log('根据ID找到的：', chapter);
         } else if (!isNull(thisUrl)) {
           chapter = global.realm.queryChapterByThisUrl(thisUrl, bookId);
-          // console.log('根据路径找到的：', chapter);
+          console.log('根据路径找到的：', chapter);
         }
         let isRequestList = isNull(chapter);
         // 目录无缓存
         if (isRequestList) {
-          // console.log('没有找到缓存的目录，删除该小说所有缓存目录和小说内容', thisUrl, bookId);
+          console.log(
+            '没有找到缓存的目录，删除该小说所有缓存目录和小说内容',
+            thisUrl,
+            bookId,
+          );
           // console.log('没有找到目录', thisUrl);
           global.realm.deleteChapterByBookId(bookId);
         } else {
-          // console.log('找到了目录', chapter);
+          console.log('找到了目录', chapter);
         }
 
         global.appApi
@@ -341,7 +349,7 @@ export default class BookRead extends React.Component {
           .then(res => {
             let detail = null;
             if (isRequestList && res.length > 0) {
-              // console.log('章节总数：' + res.length);
+              console.log('章节总数：' + res.length);
               chapter = res[0];
             } else {
               // 小说内容是否有缓存
@@ -555,10 +563,16 @@ export default class BookRead extends React.Component {
     let p = '';
     let c = '';
     let t = '';
-    if (rowData.index == 0 && !isNull(this.details[0])) {
-      p = this.details[0].pageNum;
-      c = this.details[0].pageNum;
-      t = this.details[0].title;
+    if (rowData.index == 0) {
+      if (isNull(this.details[0])) {
+        p = 1;
+        c = 1;
+        t = '';
+      } else {
+        p = this.details[0].pageNum;
+        c = this.details[0].pageNum;
+        t = this.details[0].title;
+      }
     } else if (
       rowData.index == this.state.contents.length - 1 &&
       !isNull(this.details[2])

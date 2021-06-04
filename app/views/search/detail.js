@@ -4,14 +4,8 @@
  * @Date: 2021-05-02
  */
 import React from 'react';
-import {
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Image,
-} from 'react-native';
-import {getWidth} from '@/utils/function';
+import {Text, StyleSheet, TouchableOpacity, View, Image} from 'react-native';
+import {getWidth, getId} from '@/utils/function';
 import Back from '@/components/back';
 import MyIcon from '@/config/myIcon';
 import StyleConfig from '@/config/styleConfig';
@@ -73,6 +67,7 @@ export default class SearchDetail extends React.Component {
         bookName: d.bookName,
         author: d.author,
         bookUrl: d.bookUrl,
+        chapterId: getId(), // 这里先随便填一个ID
         chapterUrl: d.chapterUrl,
         imgUrl: d.imgUrl,
         lastChapterTitle: d.lastChapterTitle,
