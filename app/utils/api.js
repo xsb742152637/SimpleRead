@@ -14,8 +14,7 @@ export default AppApiBase = {
   getChapterList(isRequest, url, bookId) {
     return new Promise((resolve, reject) => {
       if (isRequest) {
-        global.appApi
-          .getChapterList(url, bookId)
+        AppApi.getChapterList(url, bookId)
           .then(res => {
             console.log('章节总数：' + res.length);
             if (res.length > 0) {
@@ -37,8 +36,8 @@ export default AppApiBase = {
   getChapter(isRequestDetail, url, bookId, chapterId, title) {
     return new Promise((resolve, reject) => {
       if (isRequestDetail) {
-        global.appApi
-          .getChapter(url)
+        console.log('请求小说：', url);
+        AppApi.getChapter(url)
           .then(res => {
             // console.log(res);
             // 保存一章的明细
@@ -48,7 +47,7 @@ export default AppApiBase = {
               bookId: bookId,
               title: title,
               content: res.content,
-              thisUrl: this.state.thisUrl,
+              thisUrl: url,
               prevUrl: res.prevUrl,
               nextUrl: res.nextUrl,
             };

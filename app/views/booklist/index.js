@@ -16,7 +16,13 @@ import {
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
 import MyIcon from '@/config/myIcon';
-import {getId, textFormat, mergeSpace, isNull} from '@/utils/function';
+import {
+  getId,
+  textFormat,
+  mergeSpace,
+  isNull,
+  cloneObj,
+} from '@/utils/function';
 import Item from '@/components/item';
 
 export default class BookList extends React.Component {
@@ -78,7 +84,7 @@ export default class BookList extends React.Component {
     return true;
   }
   _loadBookList() {
-    this.setState({bookList: global.realm.queryBookList(1)});
+    this.setState({bookList: cloneObj(global.realm.queryBookList(1))});
   }
 
   _goSearch() {
@@ -122,11 +128,6 @@ export default class BookList extends React.Component {
             <Text style={global.appStyles.headerText}>简 阅</Text>
           </View>
           <View style={styles.tools}>
-            <TouchableOpacity
-              style={styles.myButton}
-              onPress={() => this._loadBookList()}>
-              <Text style={global.appStyles.headerText}>{'刷新'}</Text>
-            </TouchableOpacity>
             <TouchableOpacity
               style={styles.myButton}
               onPress={() => this._goReadHistory()}>

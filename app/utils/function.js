@@ -29,7 +29,7 @@ export let getByteLength = str => {
 export let contentFormat = (content, font_size, line_height) => {
   // content = ' 了一下，\n嗅\n了卷';
   // content = '              槐诗愣了一下，\n嗅了嗅那一根手工卷';
-  console.log(height, line_height);
+  // console.log(height, line_height);
   content = trimBr(content).toLowerCase();
   // console.log(content);
 
@@ -37,7 +37,7 @@ export let contentFormat = (content, font_size, line_height) => {
   let fontCount = parseInt((width / font_size) * 2) - 4;
   // 一屏可容纳文字行数
   let fontLines = parseInt(height / line_height - 1);
-  console.log(fontCount, fontLines);
+  // console.log(fontCount, fontLines);
 
   let r = 0,
     p = 0;

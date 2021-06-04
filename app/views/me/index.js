@@ -4,12 +4,7 @@
  * @LastEditTime: 2021-01-09 23:22:31
  */
 import React from 'react';
-import {
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, View} from 'react-native';
 import StyleConfig from '@/config/styleConfig';
 import {getId, textFormat, isNull, cloneObj} from '@/utils/function';
 
@@ -18,7 +13,7 @@ export default class Me extends React.Component {
     super(props);
   }
   componentDidMount() {
-    this._bookRead();
+    // this._bookRead();
   }
 
   _back() {
@@ -44,8 +39,13 @@ export default class Me extends React.Component {
     alert(orderNum);
   }
   _queryChapter() {
-    let bookId = '3419E117-41F0-48E6-977D-358D312720E3';
+    let bookId = '53548BB6-32C6-4EC0-9345-29DCB2BE43E7';
     let orderNum = global.realm.queryChapterByBookId(bookId);
+    console.log(orderNum);
+  }
+  _getOneChapter() {
+    let chapterId = '7E4A2A21-57CD-4E43-A3D3-12B2D3CD0684';
+    let orderNum = global.realm.findChapter(chapterId);
     console.log(orderNum);
   }
   _saveChapter() {
@@ -66,7 +66,10 @@ export default class Me extends React.Component {
   }
   _bookRead() {
     let bookId = '53548BB6-32C6-4EC0-9345-29DCB2BE43E7';
-    this.props.navigation.navigate('BookRead3', cloneObj(global.realm.findBook(bookId)));
+    this.props.navigation.navigate(
+      'BookRead3',
+      cloneObj(global.realm.findBook(bookId)),
+    );
   }
   render() {
     return (
@@ -87,6 +90,11 @@ export default class Me extends React.Component {
           style={global.appStyles.padding}
           onPress={() => this._saveChapter()}>
           <Text>保存章节</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={global.appStyles.padding}
+          onPress={() => this._getOneChapter()}>
+          <Text>查询某一章节</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={global.appStyles.padding}

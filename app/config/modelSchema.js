@@ -264,7 +264,7 @@ const saveChapter = rows => {
   return _saveRow('BookChapterList', rows);
 };
 const deleteChapterByBookId = bookId => {
-  let rows = queryChapterByBookId(bookId);
+  let rows = queryChapterByBookId(bookId, true);
   deleteRow(rows);
   deleteDetailByBookId(bookId);
 };
@@ -293,7 +293,7 @@ const queryDetailByThisUrl = (thisUrl, bookId) => {
   return [];
 };
 const findDetail = primaryKey => {
-  return _findOne('BookChapterDetail', primaryKey);
+  return cloneObj(_findOne('BookChapterDetail', primaryKey));
 };
 
 const saveDetail = rows => {
