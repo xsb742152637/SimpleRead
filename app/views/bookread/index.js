@@ -58,10 +58,10 @@ export default class BookRead extends React.Component {
       lineHeight: readCF.fontSize + readCF.fontSize * readCF.lineHeight,
       fontSize: readCF.fontSize,
       background: readCF.background,
-      background2: readCF.dayNight === 1 ? '#111111' : readCF.background,
+      background2: readCF.dayNight === 1 ? '#1f1f1f' : readCF.background,
       selectedChapter: ['#9e7758', '#175b46'],
-      textColor: ['#111111', '#444444'],
-      selectedColor: ['#111111', '#444444'],
+      textColor: ['#1f1f1f', '#7f7f7f'],
+      selectedColor: ['#1f1f1f', '#7f7f7f'],
     };
 
     this.details = [null, null, null];
@@ -685,14 +685,29 @@ export default class BookRead extends React.Component {
         <View
           style={{
             marginBottom: 2,
+            display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
             paddingLeft: 20,
             paddingRight: 20,
             paddingBottom: 5,
           }}>
-          <Text style={{fontSize: 12}}>{t}</Text>
-          <Text style={{fontSize: 12}}>{' 第 ' + p + '/' + c + ' 页 '}</Text>
+          <Text
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              color: this.state.textColor[this.state.dayNight],
+              fontSize: 12,
+            }}>
+            {t}
+          </Text>
+          <Text
+            style={{
+              color: this.state.textColor[this.state.dayNight],
+              fontSize: 12,
+            }}>
+            {' 第 ' + p + '/' + c + ' 页 '}
+          </Text>
         </View>
       </View>
     );
@@ -964,20 +979,17 @@ export default class BookRead extends React.Component {
               </Text>
             </View>
             <View style={styles.st_row}>
-              <Text>翻页</Text>
+              <Text style={{color: this.state.textColor[this.state.dayNight]}}>
+                翻页
+              </Text>
               <Text
                 style={[
                   styles.st_lh,
                   {
                     color: this.state.textColor[this.state.dayNight],
-                    borderColor:
-                      this.state.readCF.isLeft === 1
-                        ? 'rgba(45,52,58,' +
-                          StyleConfig.opacity.buttonBackground +
-                          ')'
-                        : 'rgba(239,239,239,' +
-                          StyleConfig.opacity.buttonBackground +
-                          ')',
+                    borderColor: this._getBorderColor(
+                      this.state.readCF.isLeft === 1,
+                    ),
                   },
                 ]}
                 onPress={() => {
@@ -991,14 +1003,9 @@ export default class BookRead extends React.Component {
                   styles.st_lh,
                   {
                     color: this.state.textColor[this.state.dayNight],
-                    borderColor:
-                      this.state.readCF.isLeft === 0
-                        ? 'rgba(45,52,58,' +
-                          StyleConfig.opacity.buttonBackground +
-                          ')'
-                        : 'rgba(239,239,239,' +
-                          StyleConfig.opacity.buttonBackground +
-                          ')',
+                    borderColor: this._getBorderColor(
+                      this.state.readCF.isLeft === 0,
+                    ),
                   },
                 ]}
                 onPress={() => {
@@ -1019,16 +1026,11 @@ export default class BookRead extends React.Component {
                       styles.st_lh,
                       {
                         color: this.state.textColor[this.state.dayNight],
-                        borderColor:
+                        borderColor: this._getBorderColor(
                           this.state.fontSize +
                             this.state.fontSize * value.num ===
-                          this.state.lineHeight
-                            ? 'rgba(45,52,58,' +
-                              StyleConfig.opacity.buttonBackground +
-                              ')'
-                            : 'rgba(239,239,239,' +
-                              StyleConfig.opacity.buttonBackground +
-                              ')',
+                            this.state.lineHeight,
+                        ),
                       },
                     ]}
                     onPress={() => {
@@ -1046,7 +1048,10 @@ export default class BookRead extends React.Component {
               <Text
                 style={[
                   styles.st_lh,
-                  {color: this.state.textColor[this.state.dayNight]},
+                  {
+                    borderColor: this.state.background2,
+                    color: this.state.textColor[this.state.dayNight],
+                  },
                 ]}
                 onPress={() => {
                   this._changeFontSize(this.state.fontSize - 1, null);
@@ -1064,7 +1069,10 @@ export default class BookRead extends React.Component {
               <Text
                 style={[
                   styles.st_lh,
-                  {color: this.state.textColor[this.state.dayNight]},
+                  {
+                    borderColor: this.state.background2,
+                    color: this.state.textColor[this.state.dayNight],
+                  },
                 ]}
                 onPress={() => {
                   this._changeFontSize(this.state.fontSize + 1, null);
@@ -1115,22 +1123,22 @@ export default class BookRead extends React.Component {
                     borderColor:
                       this.state.dayNight === 1
                         ? this.state.selectedColor[this.state.dayNight]
-                        : '#111111',
-                    backgroundColor: '#111111',
+                        : '#1f1f1f',
+                    backgroundColor: '#1f1f1f',
                   },
                 ]}>
                 <TouchableOpacity
                   activeOpacity={1}
                   onPress={() => {
                     this._changeBackground(
-                      '#111111',
+                      '#1f1f1f',
                       this.state.dayNight === 1 ? 2 : 1,
                     );
                   }}>
                   <MyIcon
                     name={'yejianmoshi'}
                     style={{
-                      color: '#444444',
+                      color: '#7f7f7f',
                     }}
                     size={15}
                   />
@@ -1143,6 +1151,11 @@ export default class BookRead extends React.Component {
     );
   }
 
+  _getBorderColor(type) {
+    return type
+      ? this.state.selectedColor[this.state.dayNight]
+      : this.state.background2;
+  }
   render() {
     return (
       <View style={[styles.content, {backgroundColor: this.state.background2}]}>
@@ -1208,8 +1221,7 @@ const styles = StyleSheet.create({
     width: 70,
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor:
-      'rgba(239,239,239,' + StyleConfig.opacity.buttonBackground + ')',
+    borderColor: 'rgba(239,239,239,1)',
     borderRadius: StyleConfig.radius.button,
     backgroundColor:
       'rgba(239,239,239,' + StyleConfig.opacity.buttonBackground + ')',
