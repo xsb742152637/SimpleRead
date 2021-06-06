@@ -15,7 +15,6 @@ import {
 const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
 import StyleConfig from '@/config/styleConfig';
-import SwiperView from '@/components/swiperView';
 
 export default class BookCity extends React.Component {
   constructor(props) {
@@ -24,25 +23,16 @@ export default class BookCity extends React.Component {
 
   render() {
     return (
-      <View style={[{width: width, height: '100%'}]}>
-        <SwiperView
-          style={{width: width * 5, height: '100%', flexDirection: 'row'}}>
-          <View style={[{width, height: '100%', backgroundColor: '#ff0000'}]}>
-            <Text>11111aaa</Text>
-          </View>
-          <View style={[{width, height: '100%', backgroundColor: '#ff6f00'}]}>
-            <Text>222222bbb</Text>
-          </View>
-          <View style={[{width, height: '100%', backgroundColor: '#f7ff00'}]}>
-            <Text>333333ccc</Text>
-          </View>
-          <View style={[{width, height: '100%', backgroundColor: '#44ff00'}]}>
-            <Text>44444ddd</Text>
-          </View>
-          <View style={[{width, height: '100%', backgroundColor: '#0037ff'}]}>
-            <Text>55555eee</Text>
-          </View>
-        </SwiperView>
+      <View
+        style={[
+          {
+            width: width,
+            height: height,
+            justifyContent: 'center',
+            display: 'flex',
+          },
+        ]}>
+        <Text style={{textAlign: 'center'}}>敬请期待</Text>
       </View>
     );
   }

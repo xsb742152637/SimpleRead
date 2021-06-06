@@ -4,7 +4,14 @@
  * @LastEditTime: 2021-01-09 23:22:31
  */
 import React from 'react';
-import {Text, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 import StyleConfig from '@/config/styleConfig';
 import {getId, textFormat, isNull, cloneObj} from '@/utils/function';
 
@@ -71,7 +78,7 @@ export default class Me extends React.Component {
       cloneObj(global.realm.findBook(bookId)),
     );
   }
-  render() {
+  render2() {
     return (
       <View style={global.appStyles.content}>
         <Text>11</Text>
@@ -111,6 +118,22 @@ export default class Me extends React.Component {
           onPress={() => this._bookRead()}>
           <Text>看小说</Text>
         </TouchableOpacity>
+      </View>
+    );
+  }
+
+  render() {
+    return (
+      <View
+        style={[
+          {
+            width: width,
+            height: height,
+            justifyContent: 'center',
+            display: 'flex',
+          },
+        ]}>
+        <Text style={{textAlign: 'center'}}>敬请期待</Text>
       </View>
     );
   }
