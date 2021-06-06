@@ -52,17 +52,18 @@ export default class BookRead extends React.Component {
       chapterOrder: false, // 目录排序方式
       chapterList: [], // 目录
       thisChapter: null,
+      isSaveDetail: false, // 是否正在缓存，及缓存进度
 
       dayNight: readCF.dayNight,
       lineHeight: readCF.fontSize + readCF.fontSize * readCF.lineHeight,
       fontSize: readCF.fontSize,
       background: readCF.background,
       background2: readCF.dayNight === 1 ? '#111111' : readCF.background,
+      selectedChapter: ['#9e7758', '#175b46'],
       textColor: ['#111111', '#444444'],
       selectedColor: ['#111111', '#444444'],
     };
 
-    console.log(bookInfo);
     this.details = [null, null, null];
 
     // 将this传递到监听方法中，不然在这个方法中无法正确访问this
@@ -71,6 +72,11 @@ export default class BookRead extends React.Component {
     this.scrollRef_chapter = null;
     this.x = bookInfo.historyChapterPage * width; // 当前的偏移量
     this.x2 = this.x; // 当前的偏移量
+    this.isShowLog = false; // 是否打印输出信息
+
+    if (this.isShowLog) {
+      console.log(bookInfo);
+    }
   }
 
   // 初始加载
@@ -82,6 +88,7 @@ export default class BookRead extends React.Component {
     );
 
     this._loadDetail();
+    // this._showChapter();
   }
 
   componentWillUnmount() {
@@ -114,13 +121,15 @@ export default class BookRead extends React.Component {
       this.details[2] = null;
       this.x2 = width;
     }
-    // console.log(
-    //   '翻页：',
-    //   type,
-    //   isAuto,
-    //   this.details[1].title,
-    //   parseInt(this.x2 / width),
-    // );
+    if (this.isShowLog) {
+      // console.log(
+      //   '翻页：',
+      //   type,
+      //   isAuto,
+      //   this.details[1].title,
+      //   parseInt(this.x2 / width),
+      // );
+    }
     this.setState(
       {
         isLoad: true,
@@ -139,7 +148,9 @@ export default class BookRead extends React.Component {
 
     if (isNull(bookState)) {
       bookState = this.state.bookInfo.bookState;
-      // console.log('没传入状态');
+      if (this.isShowLog) {
+        // console.log('没传入状态');
+      }
     }
     // 保存阅读进度
     let book = {
@@ -210,7 +221,9 @@ export default class BookRead extends React.Component {
     }
 
     this.setState({contents: []}, () => {
-      console.log('初始加载', chapterId, thisUrl);
+      if (this.isShowLog) {
+        console.log('初始加载', chapterId, thisUrl);
+      }
       // 本章
       // console.log('开始加载当前章');
       setTimeout(() => {
@@ -281,18 +294,23 @@ export default class BookRead extends React.Component {
                       },
                       () => {
                         that._saveBook();
-                        // console.log(
-                        //   '偏移：',
-                        //   parseInt(this.x2 / width),
-                        //   this.x,
-                        // );
 
-                        setTimeout(() => {
-                          this.scrollRef.scrollToOffset({
-                            offset: this.x2,
-                            animated: false,
-                          });
-                        }, 100);
+                        if (this.isShowLog) {
+                          console.log(
+                            '偏移：',
+                            parseInt(this.x2 / width),
+                            this.x,
+                          );
+                        }
+
+                        if (that.scrollRef) {
+                          setTimeout(() => {
+                            that.scrollRef.scrollToOffset({
+                              offset: that.x2,
+                              animated: false,
+                            });
+                          }, 50);
+                        }
                       },
                     );
                   })
@@ -325,22 +343,28 @@ export default class BookRead extends React.Component {
         // 是否有目录缓存
         if (!isNull(chapterId)) {
           chapter = global.realm.findChapter(chapterId);
-          console.log('根据ID找到的：', chapter);
+          if (this.isShowLog) {
+            console.log('根据ID找到的：', chapter);
+          }
         } else if (!isNull(thisUrl)) {
           chapter = global.realm.queryChapterByThisUrl(thisUrl, bookId);
-          console.log('根据路径找到的：', chapter);
+          if (this.isShowLog) {
+            console.log('根据路径找到的：', chapter);
+          }
         }
         let isRequestList = isNull(chapter);
         // 目录无缓存
         if (isRequestList) {
-          console.log(
-            '没有找到缓存的目录，删除该小说所有缓存目录和小说内容',
-            thisUrl,
-            bookId,
-          );
+          if (this.isShowLog) {
+            console.log(
+              '没有找到缓存的目录，删除该小说所有缓存目录和小说内容',
+              thisUrl,
+              bookId,
+            );
+          }
           // console.log('没有找到目录', thisUrl);
           global.realm.deleteChapterByBookId(bookId);
-        } else {
+        } else if (this.isShowLog) {
           console.log('找到了目录', chapter);
         }
 
@@ -392,25 +416,49 @@ export default class BookRead extends React.Component {
   }
 
   // 显示目录
-  _showChapter() {
+  _showChapter(chapterOrder) {
+    if (isNull(chapterOrder)) {
+      chapterOrder = false;
+    }
     let chapter = null;
     if (!isNull(this.details[1])) {
       chapter = global.realm.findChapter(this.details[1].chapterId);
     }
-    console.log(chapter);
+
+    if (this.scrollRef_chapter) {
+      let x =
+        !isNull(this.state.thisChapter) && !chapterOrder
+          ? this.state.thisChapter.orderNum * 41
+          : 0;
+      // console.log(x, chapterOrder);
+      this.scrollRef_chapter.scrollToOffset({
+        offset: x,
+        animated: false,
+      });
+    }
 
     // console.log('显示目录');
     this.setState({
       isChapter: true,
       isSetting: false,
+      chapterOrder: chapterOrder,
       thisChapter: chapter,
       chapterList: global.realm.queryChapterByBookId(
         this.state.bookInfo.bookId,
-        this.state.chapterOrder,
+        chapterOrder,
       ),
     });
   }
 
+  _changeLeft(isLeft) {
+    let readCF = this.state.readCF;
+    readCF.isLeft = isLeft;
+    console.log('翻页方式:', isLeft);
+    global.realm.saveConfig(readCF);
+    this.setState({
+      readCF: readCF,
+    });
+  }
   _changeFontSize(fontSize, lineHeight) {
     let readCF = this.state.readCF;
     if (fontSize != null) {
@@ -466,14 +514,22 @@ export default class BookRead extends React.Component {
     // console.log('点击', evt.nativeEvent.pageX, evt.nativeEvent.pageY);
     let isChange = true;
     if (evt.nativeEvent.pageX <= width * 0.3) {
-      this.x -= width;
+      if (this.state.readCF.isLeft === 1) {
+        this.x += width;
+      } else {
+        this.x -= width;
+      }
       // 向前翻页
       this.scrollRef.scrollToOffset({
         offset: this.x,
         animated: true,
       });
     } else if (evt.nativeEvent.pageX >= width * 0.6) {
-      this.x += width;
+      if (this.state.readCF.isLeft === 1) {
+        this.x -= width;
+      } else {
+        this.x += width;
+      }
       // 向后翻页
       this.scrollRef.scrollToOffset({
         offset: this.x,
@@ -641,7 +697,48 @@ export default class BookRead extends React.Component {
       </View>
     );
   }
-
+  _saveDetails2(bookId, list, index) {
+    let that = this;
+    if (index >= list.length - 1) {
+      that.setState({isSaveDetail: true}, () => {
+        this._showChapter();
+      });
+      return;
+    }
+    let chapter = list[index];
+    global.appApi
+      .getChapter(
+        true,
+        chapter.thisUrl,
+        bookId,
+        chapter.chapterId,
+        chapter.title,
+      )
+      .then(res => {
+        let i = ++index;
+        // console.log(i + '下载成功：' + res.title);
+        that.setState({isSaveDetail: [i, list.length]}, () => {
+          setTimeout(() => {
+            that._saveDetails2(bookId, list, i);
+          }, 100);
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+  _saveDetails() {
+    if (this.state.isSaveDetail === false) {
+      // 先删除全部小说缓存
+      global.realm.deleteDetailByBookId(this.state.bookInfo.bookId);
+      // 正序查询全部小说目录
+      let list = global.realm.queryChapterByBookId(
+        this.state.bookInfo.bookId,
+        false,
+      );
+      this._saveDetails2(this.state.bookInfo.bookId, list, 0);
+    }
+  }
   readerChapters() {
     return (
       <Modal
@@ -671,16 +768,25 @@ export default class BookRead extends React.Component {
                 paddingBottom: StyleConfig.padding.baseTop,
                 paddingTop: StyleConfig.padding.baseTop,
                 color: this.state.textColor[this.state.dayNight],
+                fontSize: StyleConfig.fontSize.base,
+              }}>
+              {this.state.bookInfo.bookName}
+            </Text>
+            <Text
+              style={{
+                paddingBottom: StyleConfig.padding.baseTop,
+                paddingTop: StyleConfig.padding.baseTop,
+                color: this.state.textColor[this.state.dayNight],
                 textAlign: 'right',
               }}
               onPress={() => {
-                this._changeOrder();
+                this._showChapter(!this.state.chapterOrder);
               }}>
               {this.state.chapterOrder ? '正序' : '倒序'}
             </Text>
             <FlatList
               initialScrollIndex={
-                !isNull(this.state.thisChapter)
+                !isNull(this.state.thisChapter) && !this.state.chapterOrder
                   ? this.state.thisChapter.orderNum
                   : 0
               }
@@ -706,6 +812,25 @@ export default class BookRead extends React.Component {
                 );
               }}
             />
+            <Text
+              style={{
+                paddingBottom: StyleConfig.padding.baseTop * 4,
+                paddingTop: StyleConfig.padding.baseTop,
+                color: this.state.textColor[this.state.dayNight],
+                textAlign: 'center',
+              }}
+              onPress={() => {
+                this._saveDetails();
+              }}>
+              {this.state.isSaveDetail === false
+                ? '下载全部章节，没网也能看'
+                : this.state.isSaveDetail === true
+                ? '下载完成'
+                : '下载进度：' +
+                  this.state.isSaveDetail[0] +
+                  ' / ' +
+                  this.state.isSaveDetail[1]}
+            </Text>
           </View>
           <Text
             style={{
@@ -744,37 +869,28 @@ export default class BookRead extends React.Component {
           );
         }}>
         <Text
+          numberOfLines={1}
           style={{
             color:
               !isNull(this.state.thisChapter) &&
               this.state.thisChapter.chapterId == data.chapterId
-                ? 'red'
+                ? this.state.selectedChapter[this.state.dayNight]
                 : this.state.textColor[this.state.dayNight],
             fontSize: this.state.fontSize,
             lineHeight: this.state.lineHeight,
+            opacity: data.isSave == 1 ? 1 : 0.6,
           }}>
-          {data.title + (data.isSave == 1 ? ' (已缓存)' : '')}
+          {data.title}
         </Text>
       </TouchableOpacity>
-    );
-  }
-  _changeOrder() {
-    let that = this;
-    this.setState(
-      {
-        chapterOrder: !this.state.chapterOrder,
-      },
-      () => {
-        that._showChapter();
-      },
     );
   }
 
   readerSetting() {
     let lhs = [
-      {text: '窄', num: 0.2},
+      {text: '极窄', num: 0.2},
       {text: '默认', num: 0.7},
-      {text: '宽', num: 1},
+      {text: '略宽', num: 1},
     ];
     let bcs = ['#edefee', '#d8d1bf', '#d7dcc8', '#cad0de'];
     return (
@@ -824,6 +940,73 @@ export default class BookRead extends React.Component {
                 backgroundColor: this.state.background2,
               },
             ]}>
+            <View style={styles.st_row}>
+              <Text
+                style={{color: this.state.textColor[this.state.dayNight]}}
+                onPress={() => {
+                  this._changeChapter(true, false);
+                }}>
+                上一章
+              </Text>
+              <Text
+                style={{color: this.state.textColor[this.state.dayNight]}}
+                onPress={() => {
+                  this._showChapter();
+                }}>
+                目录
+              </Text>
+              <Text
+                style={{color: this.state.textColor[this.state.dayNight]}}
+                onPress={() => {
+                  this._changeChapter(false, false);
+                }}>
+                下一章
+              </Text>
+            </View>
+            <View style={styles.st_row}>
+              <Text>翻页</Text>
+              <Text
+                style={[
+                  styles.st_lh,
+                  {
+                    color: this.state.textColor[this.state.dayNight],
+                    borderColor:
+                      this.state.readCF.isLeft === 1
+                        ? 'rgba(45,52,58,' +
+                          StyleConfig.opacity.buttonBackground +
+                          ')'
+                        : 'rgba(239,239,239,' +
+                          StyleConfig.opacity.buttonBackground +
+                          ')',
+                  },
+                ]}
+                onPress={() => {
+                  this._changeLeft(1);
+                }}>
+                左手
+              </Text>
+              <Text style={{width: 70}} />
+              <Text
+                style={[
+                  styles.st_lh,
+                  {
+                    color: this.state.textColor[this.state.dayNight],
+                    borderColor:
+                      this.state.readCF.isLeft === 0
+                        ? 'rgba(45,52,58,' +
+                          StyleConfig.opacity.buttonBackground +
+                          ')'
+                        : 'rgba(239,239,239,' +
+                          StyleConfig.opacity.buttonBackground +
+                          ')',
+                  },
+                ]}
+                onPress={() => {
+                  this._changeLeft(0);
+                }}>
+                右手
+              </Text>
+            </View>
             <View style={styles.st_row}>
               <Text style={{color: this.state.textColor[this.state.dayNight]}}>
                 行距
@@ -954,30 +1137,6 @@ export default class BookRead extends React.Component {
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={styles.st_row}>
-              <Text
-                style={{color: this.state.textColor[this.state.dayNight]}}
-                onPress={() => {
-                  this._changeChapter(true, false);
-                }}>
-                上一章
-              </Text>
-              <Text
-                style={{color: this.state.textColor[this.state.dayNight]}}
-                onPress={() => {
-                  this._showChapter();
-                }}>
-                目录
-              </Text>
-              <Text
-                style={{color: this.state.textColor[this.state.dayNight]}}
-                onPress={() => {
-                  this._changeChapter(false, false);
-                }}>
-                下一章
-              </Text>
-            </View>
-            {/*<View style={styles.st_row}>翻页</View>*/}
           </View>
         </View>
       </Modal>

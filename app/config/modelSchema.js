@@ -99,6 +99,7 @@ const ReaderConfigSchema = {
     brightness: 'string?', // 屏幕亮度
     dayNight: {type: 'int', default: 0}, // 夜晚模式
     turnPage: {type: 'int', default: 1}, // 翻页模式：1(仿真)、2(覆盖)、3(平移)、4(上下)、5(自动上下翻页)
+    isLeft: {type: 'int', default: 0}, // 左手翻页
     volumePage: {type: 'int', default: 0}, // 是否音量翻页
     isFirstOpen: {type: 'int', default: 1},
   },
@@ -112,7 +113,7 @@ const schemaArray = [
   ReaderConfigSchema,
 ];
 
-let realm = new Realm({schema: schemaArray, schemaVersion: 7});
+let realm = new Realm({schema: schemaArray, schemaVersion: 8});
 
 // 最底层的查询方法，传入表名和需要查询的主键
 let _findOne = (tableName, primaryKey) => {
