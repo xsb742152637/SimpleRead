@@ -70,7 +70,9 @@ export default class BookRead extends React.Component {
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.scrollRef = null;
     this.scrollRef_chapter = null;
-    this.x = bookInfo.historyChapterPage * width; // 当前的偏移量
+    this.x =
+      (isNull(bookInfo.historyChapterPage) ? 0 : bookInfo.historyChapterPage) *
+      width; // 当前的偏移量
     this.x2 = this.x; // 当前的偏移量
     this.isShowLog = false; // 是否打印输出信息
 
@@ -161,7 +163,7 @@ export default class BookRead extends React.Component {
       historyChapterPage: parseInt(that.x / width) + 1,
       bookState: bookState,
     };
-    // console.log('记录进度', book);
+    console.log('记录进度', book, that.x, width);
     global.realm.saveBook(book);
   }
 
@@ -194,8 +196,8 @@ export default class BookRead extends React.Component {
           // console.log('关闭弹窗');
           setTimeout(function () {
             // 如果有全局回调的key，执行回调
-            if (this.state.bookInfo.callbackKey) {
-              global.callbacks[this.state.bookInfo.callbackKey]();
+            if (that.state.bookInfo.callbackKey) {
+              global.callbacks[that.state.bookInfo.callbackKey]();
             }
             // 关闭
             that.props.navigation.goBack();
@@ -205,8 +207,8 @@ export default class BookRead extends React.Component {
       return true;
     } else {
       // 如果有全局回调的key，执行回调
-      if (this.state.bookInfo.callbackKey) {
-        global.callbacks[this.state.bookInfo.callbackKey]();
+      if (that.state.bookInfo.callbackKey) {
+        global.callbacks[that.state.bookInfo.callbackKey]();
       }
     }
     return false;
@@ -701,16 +703,41 @@ export default class BookRead extends React.Component {
             }}>
             {t}
           </Text>
+          {this.renderLeft()}
           <Text
             style={{
               color: this.state.textColor[this.state.dayNight],
               fontSize: 12,
             }}>
-            {' 第 ' + p + '/' + c + ' 页 '}
+            {' 第 ' +
+              p +
+              '/' +
+              c +
+              ' 页 '}
           </Text>
         </View>
       </View>
     );
+  }
+  renderLeft() {
+    if (this.state.readCF.isLeft === 1) {
+      return (
+        <Text
+          style={{
+            color: this.state.textColor[this.state.dayNight],
+            fontSize: 12,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderStyle: 'solid',
+            width: 18,
+            height: 18,
+            textAlign: 'center',
+            borderColor: this.state.selectedColor[this.state.dayNight],
+          }}>
+          左
+        </Text>
+      );
+    }
   }
   _saveDetails2(bookId, list, index) {
     let that = this;
@@ -837,11 +864,18 @@ export default class BookRead extends React.Component {
               onPress={() => {
                 this._saveDetails();
               }}>
+              <MyIcon
+                name={'xiazai'}
+                style={{
+                  color: this.state.textColor[this.state.dayNight],
+                }}
+                size={StyleConfig.fontSize.icon}
+              />
               {this.state.isSaveDetail === false
-                ? '下载全部章节，没网也能看'
+                ? '  下载全部章节，没网也能看'
                 : this.state.isSaveDetail === true
-                ? '下载完成'
-                : '下载进度：' +
+                ? '  下载完成'
+                : '  下载进度：' +
                   this.state.isSaveDetail[0] +
                   ' / ' +
                   this.state.isSaveDetail[1]}

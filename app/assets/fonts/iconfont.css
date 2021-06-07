@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2524721 */
-  src: url('iconfont.woff2?t=1619960851865') format('woff2'),
-       url('iconfont.woff?t=1619960851865') format('woff'),
-       url('iconfont.ttf?t=1619960851865') format('truetype');
+  src: url('iconfont.woff2?t=1623033546895') format('woff2'),
+       url('iconfont.woff?t=1623033546895') format('woff'),
+       url('iconfont.ttf?t=1623033546895') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,54 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icongou:before {
+  content: "\e62c";
+}
+
+.iconshangchuan:before {
+  content: "\e62d";
+}
+
+.iconxiazai:before {
+  content: "\e62e";
+}
+
+.icondagou:before {
+  content: "\e603";
+}
+
+.iconbianji:before {
+  content: "\e602";
+}
+
+.iconjiahao:before {
+  content: "\e607";
+}
+
+.iconhuo:before {
+  content: "\e606";
+}
+
+.iconjianhao:before {
+  content: "\e608";
+}
+
+.icontianjia:before {
+  content: "\e6b1";
+}
+
+.iconjianshao:before {
+  content: "\e6b4";
+}
+
+.iconweixuanzhong:before {
+  content: "\e62a";
+}
+
+.iconxuanzhong:before {
+  content: "\e62b";
 }
 
 .iconbiaoqing:before {

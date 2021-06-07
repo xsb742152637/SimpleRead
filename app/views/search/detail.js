@@ -125,14 +125,23 @@ export default class SearchDetail extends React.Component {
                       styles.myButton1,
                       styles.myButton,
                     ]}>
-                    <Text style={styles.buttonText}>开始阅读</Text>
+                    <MyIcon
+                      name={'yuedu'}
+                      style={styles.buttonText}
+                      size={StyleConfig.fontSize.icon}
+                    />
+                    <Text style={styles.buttonText}> 开始阅读</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={StyleConfig.opacity.active}
                   onPress={() => this._addBookList(false)}>
                   <View style={[global.appStyles.padding, styles.myButton]}>
-                    <Text>加入书架</Text>
+                    <MyIcon
+                      name={'jiarushujia'}
+                      size={StyleConfig.fontSize.icon}
+                    />
+                    <Text> 加入书架</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -187,12 +196,15 @@ const styles = StyleSheet.create({
     borderColor: StyleConfig.color.button,
     borderStyle: 'solid',
     borderRadius: StyleConfig.radius.button,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   myButton1: {
     backgroundColor: StyleConfig.color.button,
   },
   buttonText: {
-    color: StyleConfig.color.titleText,
+    color: '#ffffff',
   },
   emptyText: {
     textAlign: 'center',

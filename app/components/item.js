@@ -18,11 +18,6 @@ export default class Item extends React.Component {
   constructor(props) {
     super(props);
   }
-  _clickItem(item) {
-    // 传递全局回调的key
-    item.callbackKey = this.props.callbackKey;
-    this.props.navigation.navigate(this.props.navigateName, item);
-  }
   render() {
     // let item2 = {
     //   type: 1,
@@ -34,36 +29,30 @@ export default class Item extends React.Component {
     // };
     let data = this.props.data;
     return (
-      <TouchableOpacity
-        activeOpacity={StyleConfig.opacity.active}
-        onPress={() => {
-          this._clickItem(data.item);
-        }}>
-        <View style={global.appStyles.card}>
-          {isNull(data.imgUrl) ? (
-            <Text />
-          ) : (
-            <View>
-              <Image
-                source={{uri: data.imgUrl}}
-                style={{width: data.imgWidth, height: data.imgHeight}}
-              />
-            </View>
-          )}
-          <View style={styles.itemContent}>
-            <Text style={styles.itemName}>{data.itemName}</Text>
-            <Text numberOfLines={1} style={styles.itemTitle}>
-              {data.itemTitle}
-            </Text>
-            <Text numberOfLines={1} style={styles.itemInfo}>
-              {data.itemInfo1}
-            </Text>
-            <Text numberOfLines={3} style={styles.itemInfo}>
-              {data.itemInfo2}
-            </Text>
+      <View style={global.appStyles.card}>
+        {isNull(data.imgUrl) ? (
+          <Text />
+        ) : (
+          <View>
+            <Image
+              source={{uri: data.imgUrl}}
+              style={{width: data.imgWidth, height: data.imgHeight}}
+            />
           </View>
+        )}
+        <View style={styles.itemContent}>
+          <Text style={styles.itemName}>{data.itemName}</Text>
+          <Text numberOfLines={1} style={styles.itemTitle}>
+            {data.itemTitle}
+          </Text>
+          <Text numberOfLines={1} style={styles.itemInfo}>
+            {data.itemInfo1}
+          </Text>
+          <Text numberOfLines={3} style={styles.itemInfo}>
+            {data.itemInfo2}
+          </Text>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   }
 }

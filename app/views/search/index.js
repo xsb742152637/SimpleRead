@@ -112,12 +112,18 @@ export default class Search extends React.Component {
     data.imgHeight = 120;
 
     return (
-      <Item
-        data={data}
-        navigateName={'SearchDetail'}
-        navigation={this.props.navigation}
-      />
+      <TouchableOpacity
+        activeOpacity={StyleConfig.opacity.active}
+        onPress={() => {
+          this._clickItem(data.item);
+        }}>
+        <Item data={data} navigation={this.props.navigation} />
+      </TouchableOpacity>
     );
+  }
+  _clickItem(item) {
+    // 传递全局回调的key
+    this.props.navigation.navigate('SearchDetail', item);
   }
   render() {
     return (

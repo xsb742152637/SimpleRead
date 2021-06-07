@@ -33,6 +33,8 @@ export default class BookList extends React.Component {
     super(props);
     this.state = {
       isSetting: false,
+      isDelete: false, // 是否启动删除功能
+      deleteIds: [], //
       lastBackPressed: null,
       callbackKey: 'bookList',
       bookList: [],
@@ -114,15 +116,49 @@ export default class BookList extends React.Component {
       item: item,
     };
     return (
-      <Item
-        data={item2}
-        navigateName={'BookRead'}
-        navigation={this.props.navigation}
-        callbackKey={'bookList'}
-      />
+      <TouchableOpacity
+        style={{position: 'relative'}}
+        activeOpacity={StyleConfig.opacity.active}
+        onPress={() => {
+          this._clickItem(item);
+        }}>
+        <Item data={item2} navigation={this.props.navigation} />
+        {this.renderSel(item)}
+      </TouchableOpacity>
     );
   }
+  renderSel(item) {
+    if (this.state.isDelete) {
+      let isSel = this.state.deleteIds.join(';').indexOf(item.bookId) >= 0;
+      return (
+        <MyIcon
+          name={isSel ? 'xuanzhong' : 'weixuanzhong'}
+          style={{
+            width: 30,
+            color: isSel ? StyleConfig.color.iconActive : StyleConfig.color.icon,
+            position: 'absolute',
+            right: 0,
+            top: 20,
+          }}
+          size={StyleConfig.fontSize.icon}
+        />
+      );
+    }
+  }
 
+  _clickItem(item) {
+    // 传递全局回调的key
+    if (this.state.isDelete) {
+      let deleteIds = this.state.deleteIds;
+      deleteIds.push(item.bookId);
+      this.setState({
+        deleteIds: deleteIds,
+      });
+    } else {
+      item.callbackKey = 'bookList';
+      this.props.navigation.navigate('BookRead', item);
+    }
+  }
   _showSetting() {
     this.setState({isSetting: true});
   }
@@ -166,6 +202,36 @@ export default class BookList extends React.Component {
     console.log('点到了');
     this.setState({isSetting: false});
   }
+  _updateBooks() {
+    console.log('更新');
+  }
+  _localImport() {
+    console.log('导入');
+  }
+  _deleteBooks(isDelete) {
+    console.log('删除', isDelete);
+    this.setState({isSetting: false, isDelete: isDelete, deleteIds: []});
+  }
+  _clickDelete() {
+    let rows = [];
+    this.state.deleteIds.map((value, index) => {
+      rows.push({bookId: value, bookState: 0});
+    });
+    if (rows.length > 0) {
+      global.realm.saveBook(rows);
+      this.setState({isDelete: false});
+      this._loadBookList();
+    }
+  }
+  _setSelected(type) {
+    let deleteIds = [];
+    if (type) {
+      this.state.bookList.map((value, index) => {
+        deleteIds.push(value.bookId);
+      });
+    }
+    this.setState({deleteIds: deleteIds});
+  }
   renderSetting() {
     return (
       <Modal
@@ -174,15 +240,12 @@ export default class BookList extends React.Component {
         visible={this.state.isSetting} // 是否显示
         onDismiss={this._onDismiss.bind(this)}
         onRequestClose={this._onDismiss.bind(this)}>
-        <TouchableOpacity
+        <Text
           style={{
             width: width,
             height: height,
           }}
-          activeOpacity={1}
-          onPress={() => {
-            this._onDismiss.bind(this);
-          }}
+          onPress={this._onDismiss.bind(this)}
         />
         <View
           style={[
@@ -196,30 +259,117 @@ export default class BookList extends React.Component {
               borderRadius: StyleConfig.radius.button,
             },
           ]}>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-            }}>
-            <MyIcon
-              name={'shuaxin'}
-              style={{
-                width: 30,
-                color: StyleConfig.color.text,
-              }}
-              size={StyleConfig.fontSize.icon}
-            />
-            <Text
-              style={{
-                color: StyleConfig.color.text,
-              }}>
-              更新连载书
-            </Text>
+          <View>
+            <TouchableOpacity
+              style={styles.settingOpacity}
+              activeOpacity={StyleConfig.opacity.active}
+              onPress={this._updateBooks.bind(this)}>
+              <MyIcon
+                name={'shuaxin'}
+                style={{
+                  width: 30,
+                  color: StyleConfig.color.text,
+                }}
+                size={StyleConfig.fontSize.icon}
+              />
+              <Text
+                style={{
+                  color: StyleConfig.color.text,
+                }}>
+                更新连载书
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={styles.settingOpacity}
+              activeOpacity={StyleConfig.opacity.active}
+              onPress={this._localImport.bind(this)}>
+              <MyIcon
+                name={'shangchuan'}
+                style={{
+                  width: 30,
+                  color: StyleConfig.color.text,
+                }}
+                size={StyleConfig.fontSize.icon}
+              />
+              <Text
+                style={{
+                  color: StyleConfig.color.text,
+                }}>
+                本地导入
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={styles.settingOpacity}
+              activeOpacity={StyleConfig.opacity.active}
+              onPress={this._deleteBooks.bind(this, true)}>
+              <MyIcon
+                name={'bianji'}
+                style={{
+                  width: 30,
+                  color: StyleConfig.color.text,
+                }}
+                size={StyleConfig.fontSize.icon}
+              />
+              <Text
+                style={{
+                  color: StyleConfig.color.text,
+                }}>
+                书籍管理
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
     );
+  }
+  renderDelete() {
+    if (this.state.isDelete) {
+      return (
+        <View style={
+          [
+            global.appStyles.card,
+            {
+              marginLeft: StyleConfig.padding.baseLeft,
+              marginRight: StyleConfig.padding.baseLeft,
+              display: 'flex',
+              justifyContent: 'space-between',
+            }
+          ]
+        }>
+          <Text
+            onPress={() => {
+              this._setSelected(
+                this.state.deleteIds.length === this.state.bookList.length
+                  ? false
+                  : true,
+              );
+            }}>
+            {this.state.deleteIds.length === this.state.bookList.length
+              ? '取消全选'
+              : '全选'}
+          </Text>
+          <Text
+            style={{
+              color:
+                this.state.deleteIds.length > 0
+                  ? '#d00404'
+                  : StyleConfig.color.detailText,
+            }}
+            onPress={() => {
+              this._clickDelete();
+            }}>
+            删除所选({this.state.deleteIds.length})
+          </Text>
+          <Text onPress={this._deleteBooks.bind(this, false)}>
+            完成
+          </Text>
+        </View>
+      );
+    }
   }
   render() {
     let isEmpty = this.state.bookList.length == 0;
@@ -227,6 +377,8 @@ export default class BookList extends React.Component {
       <View style={global.appStyles.content}>
         {this.renderHeader()}
         {this.renderSetting()}
+        {this.renderDelete()}
+
         {isEmpty ? (
           <View style={styles.emptyView}>
             <Text style={styles.emptyText}>不要试图揣摩读书的快乐</Text>
@@ -277,5 +429,15 @@ const styles = StyleSheet.create({
   emptyText: {
     color: StyleConfig.color.detailText,
     paddingTop: StyleConfig.padding.baseTop,
+  },
+  settingOpacity: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: 30,
+    // borderColor: 'red',
+    // borderStyle: 'solid',
+    // borderWidth: 1,
   },
 });
