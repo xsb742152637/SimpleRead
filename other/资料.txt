@@ -1,3 +1,7 @@
+签名密码：我名字的全拼
+打包命令 （android目录下执行）：gradlew assembleRelease
+打包结束后的文件路径:android/app/build/outputs/apk/
+
 自动设计图片
 http://www.uugai.com/logoa/index.php
 

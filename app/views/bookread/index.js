@@ -458,6 +458,7 @@ export default class BookRead extends React.Component {
     console.log('翻页方式:', isLeft);
     global.realm.saveConfig(readCF);
     this.setState({
+      isSetting: false,
       readCF: readCF,
     });
   }
@@ -473,6 +474,7 @@ export default class BookRead extends React.Component {
     global.realm.saveConfig(readCF);
     this.setState(
       {
+        isSetting: false,
         isLoad: true,
         readCF: readCF,
         fontSize: readCF.fontSize,
@@ -497,6 +499,7 @@ export default class BookRead extends React.Component {
     // console.log('改变背景:', color, dayNight);
     global.realm.saveConfig(readCF);
     this.setState({
+      isSetting: false,
       readCF: readCF,
       dayNight: dayNight,
       background: readCF.background,

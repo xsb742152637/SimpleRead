@@ -1,7 +1,5 @@
 // 数据库建表 与 增删改查方法
 import realm from '@/config/modelSchema';
-// 本次存储
-import storage from '@/config/storage';
 // 公共样式
 import AppStyles from '@/utils/style';
 
@@ -16,7 +14,6 @@ import AppApiBase from '@/utils/api';
 
 // let deviceHeight = Dimensions.get('window').height/Dimensions.get('window').width > 1.8 ? screenH + NativeModules.StatusBarManager.HEIGHT :  screenH;
 global.realm = realm;
-global.storage = storage;
 global.appStyles = AppStyles;
 global.loading = Loading;
 global.toast = Toast;
