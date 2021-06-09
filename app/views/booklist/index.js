@@ -101,51 +101,6 @@ export default class BookList extends React.Component {
   _goReadHistory() {
     this.props.navigation.navigate('ReadHistory');
   }
-  _getItem(item) {
-    let item2 = {
-      type: 1,
-      itemName: item.bookName,
-      imgUrl: item.imgUrl,
-      imgWidth: 70,
-      imgHeight: 100,
-      itemTitle: isNull(item.historyChapterTitle)
-        ? '还未读过'
-        : item.historyChapterTitle,
-      itemInfo1: '最新章节：' + item.lastChapterTitle,
-      itemInfo2: '更新情况：' + mergeSpace(textFormat(item.lastChapterTime)),
-      item: item,
-    };
-    return (
-      <TouchableOpacity
-        style={{position: 'relative'}}
-        activeOpacity={StyleConfig.opacity.active}
-        onPress={() => {
-          this._clickItem(item);
-        }}>
-        <Item data={item2} navigation={this.props.navigation} />
-        {this.renderSel(item)}
-      </TouchableOpacity>
-    );
-  }
-  renderSel(item) {
-    if (this.state.isDelete) {
-      let isSel = this.state.deleteIds.join(';').indexOf(item.bookId) >= 0;
-      return (
-        <MyIcon
-          name={isSel ? 'xuanzhong' : 'weixuanzhong'}
-          style={{
-            width: 30,
-            color: isSel ? StyleConfig.color.iconActive : StyleConfig.color.icon,
-            position: 'absolute',
-            right: 0,
-            top: 20,
-          }}
-          size={StyleConfig.fontSize.icon}
-        />
-      );
-    }
-  }
-
   _clickItem(item) {
     // 传递全局回调的key
     if (this.state.isDelete) {
@@ -162,42 +117,6 @@ export default class BookList extends React.Component {
   _showSetting() {
     this.setState({isSetting: true});
   }
-  renderHeader() {
-    return (
-      <View style={global.appStyles.header}>
-        <View>
-          <Text style={global.appStyles.headerText}>简 阅</Text>
-        </View>
-        <View style={styles.tools}>
-          {/*<TouchableOpacity*/}
-          {/*  style={styles.myButton}*/}
-          {/*  onPress={() => this._goReadHistory()}>*/}
-          {/*  <MyIcon*/}
-          {/*    name={'yuedujilu'}*/}
-          {/*    style={global.appStyles.headerIcon}*/}
-          {/*    size={StyleConfig.fontSize.icon}*/}
-          {/*  />*/}
-          {/*</TouchableOpacity>*/}
-          <TouchableOpacity
-            style={styles.myButton}
-            onPress={() => this._showSetting()}>
-            <MyIcon
-              name={'shezhi'}
-              style={global.appStyles.headerIcon}
-              size={StyleConfig.fontSize.icon}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => this._goSearch()}>
-            <MyIcon
-              name={'sousuo'}
-              style={global.appStyles.headerIcon}
-              size={StyleConfig.fontSize.icon}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
   _onDismiss() {
     console.log('点到了');
     this.setState({isSetting: false});
@@ -208,20 +127,9 @@ export default class BookList extends React.Component {
   _localImport() {
     console.log('导入');
   }
-  _deleteBooks(isDelete) {
+  _showDelete(isDelete) {
     console.log('删除', isDelete);
     this.setState({isSetting: false, isDelete: isDelete, deleteIds: []});
-  }
-  _clickDelete() {
-    let rows = [];
-    this.state.deleteIds.map((value, index) => {
-      rows.push({bookId: value, bookState: 0});
-    });
-    if (rows.length > 0) {
-      global.realm.saveBook(rows);
-      this.setState({isDelete: false});
-      this._loadBookList();
-    }
   }
   _setSelected(type) {
     let deleteIds = [];
@@ -231,6 +139,20 @@ export default class BookList extends React.Component {
       });
     }
     this.setState({deleteIds: deleteIds});
+  }
+  _deleteBooks() {
+    let rows = [];
+    this.state.deleteIds.map((value, index) => {
+      rows.push({bookId: value, bookState: 0});
+    });
+    if (rows.length > 0) {
+      global.realm.saveBook(rows);
+      this.state.deleteIds.map((value, index) => {
+        global.realm.deleteDetailByBookId(value);
+      });
+      this.setState({isDelete: false});
+      this._loadBookList();
+    }
   }
   renderSetting() {
     return (
@@ -305,7 +227,7 @@ export default class BookList extends React.Component {
             <TouchableOpacity
               style={styles.settingOpacity}
               activeOpacity={StyleConfig.opacity.active}
-              onPress={this._deleteBooks.bind(this, true)}>
+              onPress={this._showDelete.bind(this, true)}>
               <MyIcon
                 name={'bianji'}
                 style={{
@@ -329,17 +251,16 @@ export default class BookList extends React.Component {
   renderDelete() {
     if (this.state.isDelete) {
       return (
-        <View style={
-          [
+        <View
+          style={[
             global.appStyles.card,
             {
               marginLeft: StyleConfig.padding.baseLeft,
               marginRight: StyleConfig.padding.baseLeft,
               display: 'flex',
               justifyContent: 'space-between',
-            }
-          ]
-        }>
+            },
+          ]}>
           <Text
             onPress={() => {
               this._setSelected(
@@ -360,16 +281,98 @@ export default class BookList extends React.Component {
                   : StyleConfig.color.detailText,
             }}
             onPress={() => {
-              this._clickDelete();
+              this._deleteBooks();
             }}>
             删除所选({this.state.deleteIds.length})
           </Text>
-          <Text onPress={this._deleteBooks.bind(this, false)}>
-            完成
-          </Text>
+          <Text onPress={this._showDelete.bind(this, false)}>完成</Text>
         </View>
       );
     }
+  }
+
+  renderItem(item) {
+    let item2 = {
+      type: 1,
+      itemName: item.bookName,
+      imgUrl: item.imgUrl,
+      imgWidth: 70,
+      imgHeight: 100,
+      itemTitle: isNull(item.historyChapterTitle)
+        ? '还未读过'
+        : item.historyChapterTitle,
+      itemInfo1: '最新章节：' + item.lastChapterTitle,
+      itemInfo2: '更新情况：' + mergeSpace(textFormat(item.lastChapterTime)),
+      item: item,
+    };
+    return (
+      <TouchableOpacity
+        style={{position: 'relative'}}
+        activeOpacity={StyleConfig.opacity.active}
+        onPress={() => {
+          this._clickItem(item);
+        }}>
+        <Item data={item2} navigation={this.props.navigation} />
+        {this.renderSel(item)}
+      </TouchableOpacity>
+    );
+  }
+  renderSel(item) {
+    if (this.state.isDelete) {
+      let isSel = this.state.deleteIds.join(';').indexOf(item.bookId) >= 0;
+      return (
+        <MyIcon
+          name={isSel ? 'xuanzhong' : 'weixuanzhong'}
+          style={{
+            width: 30,
+            color: isSel
+              ? StyleConfig.color.iconActive
+              : StyleConfig.color.icon,
+            position: 'absolute',
+            right: 0,
+            top: 20,
+          }}
+          size={StyleConfig.fontSize.icon}
+        />
+      );
+    }
+  }
+
+  renderHeader() {
+    return (
+      <View style={global.appStyles.header}>
+        <View>
+          <Text style={global.appStyles.headerText}>简 阅</Text>
+        </View>
+        <View style={styles.tools}>
+          {/*<TouchableOpacity*/}
+          {/*  style={styles.myButton}*/}
+          {/*  onPress={() => this._goReadHistory()}>*/}
+          {/*  <MyIcon*/}
+          {/*    name={'yuedujilu'}*/}
+          {/*    style={global.appStyles.headerIcon}*/}
+          {/*    size={StyleConfig.fontSize.icon}*/}
+          {/*  />*/}
+          {/*</TouchableOpacity>*/}
+          <TouchableOpacity
+            style={styles.myButton}
+            onPress={() => this._showSetting()}>
+            <MyIcon
+              name={'shezhi'}
+              style={global.appStyles.headerIcon}
+              size={StyleConfig.fontSize.icon}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this._goSearch()}>
+            <MyIcon
+              name={'sousuo'}
+              style={global.appStyles.headerIcon}
+              size={StyleConfig.fontSize.icon}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   }
   render() {
     let isEmpty = this.state.bookList.length == 0;
@@ -391,7 +394,7 @@ export default class BookList extends React.Component {
             style={global.appStyles.main}
             data={this.state.bookList}
             keyExtractor={item => item.bookId}
-            renderItem={({item}) => this._getItem(item)}
+            renderItem={({item}) => this.renderItem(item)}
           />
         )}
       </View>
