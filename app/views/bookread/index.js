@@ -62,6 +62,8 @@ export default class BookRead extends React.Component {
       selectedChapter: ['#9e7758', '#175b46'],
       textColor: ['#1f1f1f', '#7f7f7f'],
       selectedColor: ['#1f1f1f', '#7f7f7f'],
+
+      logStr: '',
     };
 
     this.details = [null, null, null];
@@ -79,6 +81,8 @@ export default class BookRead extends React.Component {
     if (this.isShowLog) {
       console.log(bookInfo);
     }
+
+    this.aaa = 0;
   }
 
   // 初始加载
@@ -291,6 +295,8 @@ export default class BookRead extends React.Component {
                         isLoad: false,
                         title: title,
                         contents: thisDS,
+                        chapterId: thisDetail.chapterId,
+                        thisUrl: thisDetail.thisUrl,
                         prevUrl: thisDetail.prevUrl,
                         nextUrl: thisDetail.nextUrl,
                       },
@@ -517,41 +523,45 @@ export default class BookRead extends React.Component {
 
   _showControlStation_LR(evt) {
     // console.log('点击', evt.nativeEvent.pageX, evt.nativeEvent.pageY);
-    let isChange = true;
-    if (evt.nativeEvent.pageX <= width * 0.3) {
-      if (this.state.readCF.isLeft === 1) {
-        this.x += width;
-      } else {
-        this.x -= width;
-      }
-      // 向前翻页
-      this.scrollRef.scrollToOffset({
-        offset: this.x,
-        animated: true,
-      });
-    } else if (evt.nativeEvent.pageX >= width * 0.6) {
-      if (this.state.readCF.isLeft === 1) {
-        this.x -= width;
-      } else {
-        this.x += width;
-      }
-      // 向后翻页
-      this.scrollRef.scrollToOffset({
-        offset: this.x,
-        animated: true,
-      });
-    } else {
+    if (
+      evt.nativeEvent.pageX > width * 0.3 &&
+      evt.nativeEvent.pageX < width * 0.6
+    ) {
       // console.log('点击中间');
-      isChange = false;
       this.setState({isSetting: !this.state.isSetting});
-    }
+    } else if (!this.state.isLoad) {
+      if (evt.nativeEvent.pageX <= width * 0.3) {
+        if (this.state.readCF.isLeft === 1) {
+          this.x += width;
+        } else {
+          this.x -= width;
+        }
+        // 向前翻页
+        this.scrollRef.scrollToOffset({
+          offset: this.x,
+          animated: true,
+        });
+      } else if (evt.nativeEvent.pageX >= width * 0.6) {
+        if (this.state.readCF.isLeft === 1) {
+          this.x -= width;
+        } else {
+          this.x += width;
+        }
+        // 向后翻页
+        this.scrollRef.scrollToOffset({
+          offset: this.x,
+          animated: true,
+        });
+      }
 
-    if (isChange) {
       let p = parseInt(this.x / width);
       // console.log('点击：', p, this.state.contents.length, this.x);
+      this.setState({
+        logStr: p + ' ' + this.state.contents.length + ' ' + this.x.toFixed(2),
+      });
       if (p <= -1) {
         this._changeChapter(true, true);
-      } else if (p == this.state.contents.length - 2) {
+      } else if (p >= this.state.contents.length - 2) {
         this._changeChapter(false, true);
       } else {
         this._saveBook();
@@ -595,7 +605,74 @@ export default class BookRead extends React.Component {
     this.setState({isChapter: !this.state.isChapter});
   }
 
-  _content() {
+  _saveDetails() {
+    if (this.state.isSaveDetail === false) {
+      // 正序查询全部小说目录
+      let list = global.realm.queryChapterByBookId(
+        this.state.bookInfo.bookId,
+        false,
+      );
+      this._saveDetails2(this.state.bookInfo.bookId, list, 0, false);
+    }
+  }
+  _saveDetails2(bookId, list, index, isStart) {
+    let that = this;
+    // if (that.aaa >= 10) {
+    //   return;
+    // }
+    if (index >= list.length - 1) {
+      that.setState({isSaveDetail: true}, () => {
+        that._showChapter();
+      });
+      return;
+    }
+    let i = ++index;
+    let chapter = list[index];
+    // 从当前章节之后才开始缓存
+    if (!isStart) {
+      that._saveDetails2(
+        bookId,
+        list,
+        i,
+        chapter.chapterId === that.state.chapterId,
+      );
+    } else {
+      // 小说内容是否有缓存
+      let detail = global.realm.findDetail(chapter.chapterId);
+
+      global.appApi
+        .getChapter(
+          isNull(detail),
+          chapter.thisUrl,
+          bookId,
+          chapter.chapterId,
+          chapter.title,
+        )
+        .then(res => {
+          if (!isNull(res)) {
+            if (this.isShowLog) {
+              console.log(that.aaa + '下载成功：' + res.title);
+            }
+            that.aaa++;
+            that.setState({isSaveDetail: [i, list.length]}, () => {
+              setTimeout(() => {
+                that._saveDetails2(bookId, list, i, isStart);
+              }, 50);
+            });
+          } else {
+            if (this.isShowLog) {
+              console.log(i + '存在缓存：' + detail.title);
+            }
+            that._saveDetails2(bookId, list, i, isStart);
+          }
+        })
+        .catch(error => {
+          alert(JSON.stringify(error));
+        });
+    }
+  }
+
+  renderContentList() {
     return (
       <FlatList
         // initialScrollIndex={this.state.contents.length > 0 ? 1 : 0}
@@ -712,11 +789,7 @@ export default class BookRead extends React.Component {
               color: this.state.textColor[this.state.dayNight],
               fontSize: 12,
             }}>
-            {' 第 ' +
-              p +
-              '/' +
-              c +
-              ' 页 '}
+            {this.state.logStr + ' 第 ' + p + '/' + c + ' 页 '}
           </Text>
         </View>
       </View>
@@ -740,48 +813,6 @@ export default class BookRead extends React.Component {
           左
         </Text>
       );
-    }
-  }
-  _saveDetails2(bookId, list, index) {
-    let that = this;
-    if (index >= list.length - 1) {
-      that.setState({isSaveDetail: true}, () => {
-        this._showChapter();
-      });
-      return;
-    }
-    let chapter = list[index];
-    global.appApi
-      .getChapter(
-        true,
-        chapter.thisUrl,
-        bookId,
-        chapter.chapterId,
-        chapter.title,
-      )
-      .then(res => {
-        let i = ++index;
-        // console.log(i + '下载成功：' + res.title);
-        that.setState({isSaveDetail: [i, list.length]}, () => {
-          setTimeout(() => {
-            that._saveDetails2(bookId, list, i);
-          }, 100);
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }
-  _saveDetails() {
-    if (this.state.isSaveDetail === false) {
-      // 先删除全部小说缓存
-      global.realm.deleteDetailByBookId(this.state.bookInfo.bookId);
-      // 正序查询全部小说目录
-      let list = global.realm.queryChapterByBookId(
-        this.state.bookInfo.bookId,
-        false,
-      );
-      this._saveDetails2(this.state.bookInfo.bookId, list, 0);
     }
   }
   readerChapters() {
@@ -845,7 +876,7 @@ export default class BookRead extends React.Component {
               ref={c => (this.scrollRef_chapter = c)}
               data={this.state.chapterList}
               keyExtractor={item => item.chapterId}
-              renderItem={({item}) => this._getItem(item)}
+              renderItem={({item}) => this.readerChapterItem(item)}
               ItemSeparatorComponent={() => {
                 return (
                   <View
@@ -875,7 +906,7 @@ export default class BookRead extends React.Component {
                 size={StyleConfig.fontSize.icon}
               />
               {this.state.isSaveDetail === false
-                ? '  下载全部章节，没网也能看'
+                ? '  下载后面全部章节，没网也能看'
                 : this.state.isSaveDetail === true
                 ? '  下载完成'
                 : '  下载进度：' +
@@ -897,7 +928,7 @@ export default class BookRead extends React.Component {
       </Modal>
     );
   }
-  _getItem(data) {
+  readerChapterItem(data) {
     return (
       <TouchableOpacity
         style={{
@@ -916,6 +947,7 @@ export default class BookRead extends React.Component {
               isChapter: false,
             },
             () => {
+              that.x = 0;
               that._loadDetail(data.chapterId, data.thisUrl);
             },
           );
@@ -1204,7 +1236,7 @@ export default class BookRead extends React.Component {
           translucent={false}
           showHideTransition={'slide'}
         />
-        <View style={{width: width, height: height}}>{this._content()}</View>
+        <View style={{width: width, height: height}}>{this.renderContentList()}</View>
         {this.readerSetting()}
         {this.readerChapters()}
       </View>
