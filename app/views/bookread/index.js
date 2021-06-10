@@ -617,10 +617,7 @@ export default class BookRead extends React.Component {
   }
   _saveDetails2(bookId, list, index, isStart) {
     let that = this;
-    // if (that.aaa >= 10) {
-    //   return;
-    // }
-    if (index >= list.length - 1) {
+    if (that.aaa >= 100 || index >= list.length - 1) {
       that.setState({isSaveDetail: true}, () => {
         that._showChapter();
       });
@@ -657,7 +654,7 @@ export default class BookRead extends React.Component {
             that.setState({isSaveDetail: [i, list.length]}, () => {
               setTimeout(() => {
                 that._saveDetails2(bookId, list, i, isStart);
-              }, 50);
+              }, 20);
             });
           } else {
             if (this.isShowLog) {
@@ -906,7 +903,7 @@ export default class BookRead extends React.Component {
                 size={StyleConfig.fontSize.icon}
               />
               {this.state.isSaveDetail === false
-                ? '  下载后面全部章节，没网也能看'
+                ? '  下载后面100章，没网也能看'
                 : this.state.isSaveDetail === true
                 ? '  下载完成'
                 : '  下载进度：' +
@@ -1236,7 +1233,9 @@ export default class BookRead extends React.Component {
           translucent={false}
           showHideTransition={'slide'}
         />
-        <View style={{width: width, height: height}}>{this.renderContentList()}</View>
+        <View style={{width: width, height: height}}>
+          {this.renderContentList()}
+        </View>
         {this.readerSetting()}
         {this.readerChapters()}
       </View>
