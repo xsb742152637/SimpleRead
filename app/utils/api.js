@@ -36,33 +36,36 @@ export default AppApiBase = {
   getChapter(isRequestDetail, url, bookId, chapterId, title) {
     return new Promise((resolve, reject) => {
       if (isRequestDetail) {
-        console.log('请求小说：', url);
+        // console.log('请求小说：', url);
         AppApi.getChapter(url)
           .then(res => {
             // console.log(res);
             // 保存一章的明细
-            let title = res.title ? res.title : title;
-            let detail = {
-              chapterId: chapterId,
-              bookId: bookId,
-              title: title,
-              content: res.content,
-              thisUrl: url,
-              prevUrl: res.prevUrl,
-              nextUrl: res.nextUrl,
-            };
-            if (isNull(detail.chapterId)) {
-              console.log('主键缺失');
+            if (isNull(res)) {
+              resolve(res);
             } else {
-              console.log('保存本章内容');
-              global.realm.saveDetail(detail);
+              let title = res.title ? res.title : title;
+              let detail = {
+                chapterId: chapterId,
+                bookId: bookId,
+                title: title,
+                content: res.content,
+                thisUrl: url,
+                prevUrl: res.prevUrl,
+                nextUrl: res.nextUrl,
+              };
+              if (isNull(detail.chapterId)) {
+                console.log('主键缺失');
+              } else {
+                console.log('保存本章内容');
+                global.realm.saveDetail(detail);
+              }
+              resolve(detail);
             }
-
-            resolve(detail);
           })
           .catch(error => {
-            reject(error);
             console.error(error);
+            reject(error);
           });
       } else {
         resolve(null);

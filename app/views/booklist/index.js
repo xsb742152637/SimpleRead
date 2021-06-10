@@ -105,7 +105,12 @@ export default class BookList extends React.Component {
     // 传递全局回调的key
     if (this.state.isDelete) {
       let deleteIds = this.state.deleteIds;
-      deleteIds.push(item.bookId);
+      // 如果已经存在，则取消
+      if (this.state.deleteIds.indexOf(item.bookId) >= 0) {
+        deleteIds.splice(this.state.deleteIds.indexOf(item.bookId), 1);
+      } else {
+        deleteIds.push(item.bookId);
+      }
       this.setState({
         deleteIds: deleteIds,
       });
@@ -319,7 +324,7 @@ export default class BookList extends React.Component {
   }
   renderSel(item) {
     if (this.state.isDelete) {
-      let isSel = this.state.deleteIds.join(';').indexOf(item.bookId) >= 0;
+      let isSel = this.state.deleteIds.indexOf(item.bookId) >= 0;
       return (
         <MyIcon
           name={isSel ? 'xuanzhong' : 'weixuanzhong'}

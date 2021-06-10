@@ -30,30 +30,36 @@ export default AppApi = {
       request
         .fetchHtml(url)
         .then(html => {
-          let $ = cheerio.load(html, {decodeEntities: false});
-          let title = $('#box_con .bookname h1').text();
-          let content = textFormat($('#content').html());
+          if (isNull(html)) {
+            console.log('请求失败', html);
+            resolve(null);
+          } else {
+            let $ = cheerio.load(html, {decodeEntities: false});
+            let title = $('#box_con .bookname h1').text();
+            let content = textFormat($('#content').html());
 
-          let btn = $('.bottem>a');
-          let prevUrl = $($(btn)[1]).attr('href');
-          let listUrl = $($(btn)[2]).attr('href');
-          let nextUrl = $($(btn)[3]).attr('href');
+            let btn = $('.bottem>a');
+            let prevUrl = $($(btn)[1]).attr('href');
+            let listUrl = $($(btn)[2]).attr('href');
+            let nextUrl = $($(btn)[3]).attr('href');
 
-          if (prevUrl.indexOf('javascript') >= 0 || prevUrl === listUrl) {
-            prevUrl = '';
+            if (prevUrl.indexOf('javascript') >= 0 || prevUrl === listUrl) {
+              prevUrl = '';
+            }
+            if (nextUrl.indexOf('javascript') >= 0 || nextUrl === listUrl) {
+              nextUrl = '';
+            }
+            let data = {};
+            data.title = title;
+            data.content = content;
+            data.listUrl = listUrl;
+            data.prevUrl = prevUrl;
+            data.nextUrl = nextUrl;
+            resolve(data);
           }
-          if (nextUrl.indexOf('javascript') >= 0 || nextUrl === listUrl) {
-            nextUrl = '';
-          }
-          let data = {};
-          data.title = title;
-          data.content = content;
-          data.listUrl = listUrl;
-          data.prevUrl = prevUrl;
-          data.nextUrl = nextUrl;
-          resolve(data);
         })
         .catch(error => {
+          console.error(error);
           reject(error);
         });
     });

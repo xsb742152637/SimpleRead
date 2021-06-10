@@ -63,7 +63,7 @@ export default class BookRead extends React.Component {
       textColor: ['#1f1f1f', '#7f7f7f'],
       selectedColor: ['#1f1f1f', '#7f7f7f'],
 
-      logStr: '',
+      logStr: '', // 翻页日志
     };
 
     this.details = [null, null, null];
@@ -82,7 +82,10 @@ export default class BookRead extends React.Component {
       console.log(bookInfo);
     }
 
-    this.aaa = 0;
+    // 每次最多缓存多少章，-1表示全部
+    this.maxCache = 50;
+    // 当前缓存了多少章了
+    this.cacheProg = 0;
   }
 
   // 初始加载
@@ -133,7 +136,7 @@ export default class BookRead extends React.Component {
       //   type,
       //   isAuto,
       //   this.details[1].title,
-      //   parseInt(this.x2 / width),
+      //   Math.round(this.x2 / width),
       // );
     }
     this.setState(
@@ -164,7 +167,7 @@ export default class BookRead extends React.Component {
       saveTime: new Date(),
       historyChapterTitle: that.details[1].title,
       chapterId: that.details[1].chapterId,
-      historyChapterPage: parseInt(that.x / width) + 1,
+      historyChapterPage: Math.round(that.x / width) + 1,
       bookState: bookState,
     };
     console.log('记录进度', book, that.x, width);
@@ -306,7 +309,7 @@ export default class BookRead extends React.Component {
                         if (this.isShowLog) {
                           console.log(
                             '偏移：',
-                            parseInt(this.x2 / width),
+                            Math.round(this.x2 / width),
                             this.x,
                           );
                         }
@@ -385,15 +388,7 @@ export default class BookRead extends React.Component {
               chapter = res[0];
             } else {
               // 小说内容是否有缓存
-              detail = global.realm.findDetail(chapter.chapterId);
-              // console.log('根据ID找内容');
-              if (isNull(detail)) {
-                detail = global.realm.queryDetailByThisUrl(
-                  chapter.thisUrl,
-                  bookId,
-                );
-                // console.log('根据路径找内容');
-              }
+              detail = that._findDetail(bookId, chapter);
             }
 
             // 小说明细没有缓存
@@ -449,6 +444,7 @@ export default class BookRead extends React.Component {
     this.setState({
       isChapter: true,
       isSetting: false,
+      isSaveDetail: false,
       chapterOrder: chapterOrder,
       thisChapter: chapter,
       chapterList: global.realm.queryChapterByBookId(
@@ -554,10 +550,11 @@ export default class BookRead extends React.Component {
         });
       }
 
-      let p = parseInt(this.x / width);
+      let p = Math.round(this.x / width);
       // console.log('点击：', p, this.state.contents.length, this.x);
+      let logStr = p + ' ' + this.state.contents.length;
       this.setState({
-        logStr: p + ' ' + this.state.contents.length + ' ' + this.x.toFixed(2),
+        logStr: logStr,
       });
       if (p <= -1) {
         this._changeChapter(true, true);
@@ -605,6 +602,15 @@ export default class BookRead extends React.Component {
     this.setState({isChapter: !this.state.isChapter});
   }
 
+  _findDetail(bookId, chapter) {
+    let detail = global.realm.findDetail(chapter.chapterId);
+    // console.log('根据ID找内容');
+    if (isNull(detail)) {
+      detail = global.realm.queryDetailByThisUrl(chapter.thisUrl, bookId);
+      // console.log('根据路径找内容');
+    }
+    return detail;
+  }
   _saveDetails() {
     if (this.state.isSaveDetail === false) {
       // 正序查询全部小说目录
@@ -617,26 +623,37 @@ export default class BookRead extends React.Component {
   }
   _saveDetails2(bookId, list, index, isStart) {
     let that = this;
-    if (that.aaa >= 100 || index >= list.length - 1) {
+    if ((that.maxCache > 0 && that.cacheProg >= that.maxCache) || index >= list.length - 1) {
+      console.log(that.cacheProg, index, list.length);
       that.setState({isSaveDetail: true}, () => {
-        that._showChapter();
+        if (that.state.isChapter) {
+          that._showChapter();
+        }
       });
       return;
     }
     let i = ++index;
     let chapter = list[index];
     // 从当前章节之后才开始缓存
+    if (that.isShowLog) {
+      console.log(
+        'ID是否相等：',
+        chapter.chapterId === that.state.chapterId,
+        '路径是否相等：',
+        chapter.thisUrl === that.state.thisUrl,
+      );
+    }
     if (!isStart) {
       that._saveDetails2(
         bookId,
         list,
         i,
-        chapter.chapterId === that.state.chapterId,
+        chapter.chapterId === that.state.chapterId ||
+          chapter.thisUrl === that.state.thisUrl,
       );
     } else {
       // 小说内容是否有缓存
-      let detail = global.realm.findDetail(chapter.chapterId);
-
+      let detail = that._findDetail(bookId, chapter);
       global.appApi
         .getChapter(
           isNull(detail),
@@ -648,18 +665,32 @@ export default class BookRead extends React.Component {
         .then(res => {
           if (!isNull(res)) {
             if (this.isShowLog) {
-              console.log(that.aaa + '下载成功：' + res.title);
+              console.log(that.cacheProg + '下载成功：' + res.title);
             }
-            that.aaa++;
+            that.cacheProg++;
+            if (that.state.isChapter) {
+              that.scrollRef_chapter.scrollToOffset({
+                offset: chapter.orderNum * 41,
+                animated: true,
+              });
+            }
+
             that.setState({isSaveDetail: [i, list.length]}, () => {
               setTimeout(() => {
                 that._saveDetails2(bookId, list, i, isStart);
-              }, 20);
+              }, 1000);
             });
           } else {
             if (this.isShowLog) {
               console.log(i + '存在缓存：' + detail.title);
             }
+            if (that.state.isChapter) {
+              that.scrollRef_chapter.scrollToOffset({
+                offset: chapter.orderNum * 41,
+                animated: true,
+              });
+            }
+
             that._saveDetails2(bookId, list, i, isStart);
           }
         })
@@ -781,6 +812,7 @@ export default class BookRead extends React.Component {
             {t}
           </Text>
           {this.renderLeft()}
+          {this.renderCacheProg()}
           <Text
             style={{
               color: this.state.textColor[this.state.dayNight],
@@ -808,6 +840,19 @@ export default class BookRead extends React.Component {
             borderColor: this.state.selectedColor[this.state.dayNight],
           }}>
           左
+        </Text>
+      );
+    }
+  }
+  renderCacheProg() {
+    if (this.state.isSaveDetail != false && this.state.isSaveDetail != true) {
+      return (
+        <Text
+          style={{
+            color: this.state.textColor[this.state.dayNight],
+            fontSize: 12,
+          }}>
+          {'缓' + this.cacheProg + ' '}
         </Text>
       );
     }
@@ -903,10 +948,12 @@ export default class BookRead extends React.Component {
                 size={StyleConfig.fontSize.icon}
               />
               {this.state.isSaveDetail === false
-                ? '  下载后面100章，没网也能看'
+                ? '  下载后面'+ (this.maxCache == -1 ? '全部': this.maxCache) +'章，没网也能看'
                 : this.state.isSaveDetail === true
                 ? '  下载完成'
                 : '  下载进度：' +
+                  this.cacheProg +
+                  ' / ' +
                   this.state.isSaveDetail[0] +
                   ' / ' +
                   this.state.isSaveDetail[1]}

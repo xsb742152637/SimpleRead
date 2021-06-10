@@ -30,34 +30,40 @@ export default AppApi = {
       request
         .fetchHtml(url)
         .then(html => {
-          let $ = cheerio.load(html, {decodeEntities: false});
-          let main = $('.reader_box');
-          let title = $(main).find('.title_txtbox').text();
-          let content = '';
-          $(main)
-            .find('.content>p')
-            .each(function (i, o) {
-              content += $(o).text() + '\n\n';
-            });
+          if (isNull(html)) {
+            console.log('请求失败', html);
+            resolve(null);
+          } else {
+            let $ = cheerio.load(html, {decodeEntities: false});
+            let main = $('.reader_box');
+            let title = $(main).find('.title_txtbox').text();
+            let content = '';
+            $(main)
+              .find('.content>p')
+              .each(function (i, o) {
+                content += $(o).text() + '\n\n';
+              });
 
-          let btn = $(main).find('.chap_btnbox>a');
-          let listUrl = $($(btn)[0]).attr('href');
-          let prevUrl = $($(btn)[1]).attr('href');
-          let nextUrl = $($(btn)[2]).attr('href');
+            let btn = $(main).find('.chap_btnbox>a');
+            let listUrl = $($(btn)[0]).attr('href');
+            let prevUrl = $($(btn)[1]).attr('href');
+            let nextUrl = $($(btn)[2]).attr('href');
 
-          if (prevUrl.indexOf('javascript') >= 0) {
-            prevUrl = '';
+            if (prevUrl.indexOf('javascript') >= 0) {
+              prevUrl = '';
+            }
+            if (nextUrl.indexOf('javascript') >= 0) {
+              nextUrl = '';
+            }
+            let data = {};
+            data.title = title;
+            data.content = content;
+            data.listUrl = listUrl;
+            data.prevUrl = prevUrl;
+            data.nextUrl = nextUrl;
+            resolve(data);
           }
-          if (nextUrl.indexOf('javascript') >= 0) {
-            nextUrl = '';
-          }
-          let data = {};
-          data.title = title;
-          data.content = content;
-          data.listUrl = listUrl;
-          data.prevUrl = prevUrl;
-          data.nextUrl = nextUrl;
-          resolve(data);
+
         })
         .catch(error => {
           reject(error);
