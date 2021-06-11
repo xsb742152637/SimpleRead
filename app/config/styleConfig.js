@@ -4,15 +4,15 @@
 let StyleConfig;
 export default StyleConfig = {
   color: {
-    baseBackground: '#e4efee', // 页面底色
-    headerBackground: '#cbe8e6', // 页面头部
-    headerText: '#fff', // 顶部导航栏文字颜色
-    headerIcon: '#fff', // 顶部导航栏图标颜色
+    baseBackground: '#e7e7e7', // 页面底色
+    headerBackground: '#e7e7e7', // 页面头部
+    headerText: '#32353a', // 顶部导航栏文字颜色
+    headerIcon: '#32353a', // 顶部导航栏图标颜色
 
-    border: '#c7e8e6', // 边框
+    border: '#e0e0e0', // 边框
 
-    icon: '#c4e7e4', // 底部导航栏未选中颜色
-    iconActive: '#80ddd5', // 底部导航栏图标选中颜色
+    icon: '#afb0b2', // 底部导航栏未选中颜色
+    iconActive: '#32353a', // 底部导航栏图标选中颜色
 
     button: '#d2d7c2', // 主要按钮背景色
     detailButton: '', // 次要按钮

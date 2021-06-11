@@ -62,8 +62,6 @@ export default class BookRead extends React.Component {
       selectedChapter: ['#9e7758', '#175b46'],
       textColor: ['#1f1f1f', '#7f7f7f'],
       selectedColor: ['#1f1f1f', '#7f7f7f'],
-
-      logStr: '', // 翻页日志
     };
 
     this.details = [null, null, null];
@@ -119,7 +117,12 @@ export default class BookRead extends React.Component {
       this.details[2] = cloneObj(this.details[1]);
       this.details[1] = cloneObj(this.details[0]);
       this.details[0] = null;
-      this.x2 = this.details[1].pageNum * width;
+      if (isAuto) {
+        this.x2 = this.details[1].pageNum * width;
+      } else {
+        // 手动点“上一章”按钮
+        this.x2 = width;
+      }
     } else {
       if (isNull(this.details[2])) {
         global.toast.add('已经是最后一章了……');
@@ -167,7 +170,7 @@ export default class BookRead extends React.Component {
       saveTime: new Date(),
       historyChapterTitle: that.details[1].title,
       chapterId: that.details[1].chapterId,
-      historyChapterPage: Math.round(that.x / width) + 1,
+      historyChapterPage: Math.round(that.x / width),
       bookState: bookState,
     };
     console.log('记录进度', book, that.x, width);
@@ -552,13 +555,9 @@ export default class BookRead extends React.Component {
 
       let p = Math.round(this.x / width);
       // console.log('点击：', p, this.state.contents.length, this.x);
-      let logStr = p + ' ' + this.state.contents.length;
-      this.setState({
-        logStr: logStr,
-      });
       if (p <= -1) {
         this._changeChapter(true, true);
-      } else if (p >= this.state.contents.length - 2) {
+      } else if (p >= this.state.contents.length - 1) {
         this._changeChapter(false, true);
       } else {
         this._saveBook();
@@ -818,7 +817,7 @@ export default class BookRead extends React.Component {
               color: this.state.textColor[this.state.dayNight],
               fontSize: 12,
             }}>
-            {this.state.logStr + ' 第 ' + p + '/' + c + ' 页 '}
+            {' 第 ' + p + '/' + c + ' 页 '}
           </Text>
         </View>
       </View>

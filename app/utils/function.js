@@ -30,6 +30,7 @@ export let contentFormat = (content, font_size, line_height) => {
   // content = ' 了一下，\n嗅\n了卷';
   // content = '              槐诗愣了一下，\n嗅了嗅那一根手工卷';
   // console.log(height, line_height);
+  // 字母全部小写，因为大写字母占位不好计算
   content = trimBr(content).toLowerCase();
   // console.log(content);
 
@@ -78,8 +79,19 @@ export let contentFormat = (content, font_size, line_height) => {
     row.push(s);
   }
   // 最后一行
-  if (row.length > 0) {
-    rows.push(row.join(''));
+  if (rows.length == 0 && row.length > 0) {
+    let str = mergeSpace(row.join(''));
+    let ii = getByteLength(str);
+    // for (let i = 0; i < str.length; i++) {
+    //   let s = str.charAt(i);
+    //   // console.log(s, s.indexOf('\n'));
+    //   ii += getByteLength(s);
+    // }
+    while (ii <= fontCount - 6) {
+      str += ' ';
+      ii = getByteLength(str);
+    }
+    rows.push(str);
   }
   if (rows.length > 0) {
     pages.push(rows);
