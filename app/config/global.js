@@ -8,7 +8,7 @@ import Loading from '@/utils/load/loading';
 // 消息框
 import Toast from '@/utils/load/toast';
 // 对话框
-import Popup from '@/utils/load/popup';
+import MyAlert from '@/utils/load/alert';
 
 import AppApiBase from '@/utils/api';
 
@@ -17,7 +17,7 @@ global.realm = realm;
 global.appStyles = AppStyles;
 global.loading = Loading;
 global.toast = Toast;
-global.popup = Popup;
+global.alert = MyAlert;
 global.appApi = AppApiBase;
 // 全局回调
 global.callbacks = {};

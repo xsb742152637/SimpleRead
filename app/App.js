@@ -12,8 +12,6 @@ import StyleConfig from '@/config/styleConfig';
 import TabBar from './components/tabbar';
 // 各功能页面
 import BookRead from './views/bookread/index';
-import BookRead2 from './views/bookread/index2';
-import BookRead3 from './views/bookread/index3';
 import Search from './views/search/index';
 import SearchDetail from './views/search/detail';
 import ReadHistory from './views/readhistory/index';
@@ -38,8 +36,6 @@ export default () => {
       <Stack.Navigator headerMode="none" initialRouteName="TabBar">
         <Stack.Screen name="TabBar" component={TabBar} />
         <Stack.Screen name="BookRead" component={BookRead} />
-        <Stack.Screen name="BookRead2" component={BookRead2} />
-        <Stack.Screen name="BookRead3" component={BookRead3} />
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="SearchDetail" component={SearchDetail} />
         <Stack.Screen name="ReadHistory" component={ReadHistory} />

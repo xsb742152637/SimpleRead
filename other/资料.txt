@@ -51,3 +51,21 @@ gestureState
     vx - 当前的横向移动速度
     vy - 当前的纵向移动速度
     numberActiveTouches - 当前在屏幕上的有效触摸点的数量
+
+// 提示框
+global.alert.info(null, 'aaa');
+
+// 选择框
+global.alert.confirm(
+      {
+        okText: '确定按钮',
+        cancelText: '关闭按钮',
+        message: '内容',
+      },
+      () => {
+        console.log('确定事件');
+      },
+      () => {
+        console.log('关闭事件');
+      },
+      );

@@ -9,10 +9,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Alert,
+  ToastAndroid,
   Dimensions,
 } from 'react-native';
 const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 import StyleConfig from '@/config/styleConfig';
+import MyIcon from '@/config/myIcon';
 import {getId, textFormat, isNull, cloneObj} from '@/utils/function';
 
 export default class Me extends React.Component {
@@ -22,143 +25,78 @@ export default class Me extends React.Component {
   componentDidMount() {
     // this._bookRead();
   }
-
-  _back() {
-    // alert('You tapped the next button2');
-    // this.props.navigation.navigate('BookRead');
-    //返回
-    this.props.navigation.goBack();
-    // 返回到第一层
-    // this.props.navigation.popToTop()
+  _goReadHistory() {
+    this.props.navigation.navigate('ReadHistory');
+  }
+  _needHelp() {
+    global.alert.info(null, '抱歉，暂时没有问题案例……');
   }
 
-  _deleteAll() {
-    let bookId = '3419E117-41F0-48E6-977D-358D312720E3';
-    // global.realm.deleteBookAll();
-
-    global.realm.deleteBookAll();
-    // global.realm.deleteChapterByBookId(bookId);
-    // global.realm.deleteDetailByBookId(bookId);
-  }
-  _getMaxChapterOrderNum() {
-    let bookId = 'bbb';
-    let orderNum = global.realm.getMaxChapterOrderNum(bookId);
-    alert(orderNum);
-  }
-  _queryChapter() {
-    let bookId = '53548BB6-32C6-4EC0-9345-29DCB2BE43E7';
-    let orderNum = global.realm.queryChapterByBookId(bookId);
-    console.log(orderNum);
-  }
-  _getOneChapter() {
-    let chapterId = '7E4A2A21-57CD-4E43-A3D3-12B2D3CD0684';
-    let orderNum = global.realm.findChapter(chapterId);
-    console.log(orderNum);
-  }
-  _saveChapter() {
-    let that = this;
-    let bookId = 'aaaaa';
-
-    let orderNum = global.realm.getMaxChapterOrderNum(bookId);
-    // 保存阅读进度
-    let chapter = {
-      chapterId: getId(),
-      bookId: bookId,
-      chapterUrl: '啊发射点发射点',
-      title: '测试2',
-      num: 0,
-      orderNum: 1,
-    };
-    global.realm.saveChapter(chapter);
-  }
-  _bookRead() {
-    let bookId = '53548BB6-32C6-4EC0-9345-29DCB2BE43E7';
-    this.props.navigation.navigate(
-      'BookRead3',
-      cloneObj(global.realm.findBook(bookId)),
+  _callMe() {
+    global.alert.info(
+      '联系我们',
+      '\n感谢您对简阅小说长期以来的支持\n\nQQ：742152637\n\n微信号：XX201802011300',
     );
   }
-  _goDetail() {
-    let item = {
-      author: '姜梵',
-      bookId: '0CC61A7A-7E9C-479F-A3E6-BD811F9E5409',
-      bookName: '三国之大汉崛起',
-      bookUrl: 'https://www.23us.tw/23_23901/',
-      chapterUrl: '',
-      imgUrl: '',
-      isEnd: 1,
-      lastChapterTime: '19-0 6-06',
-      lastChapterTitle: ' 第831章身份转变',
-      len: '4936k',
-      state: '连载',
-      type: '',
-    };
-    this.props.navigation.navigate('SearchDetail', item);
+
+  renderHeader() {
+    return (
+      <View style={global.appStyles.header}>
+        <View>
+          <Text
+            style={[
+              global.appStyles.headerText,
+              {fontSize: StyleConfig.fontSize.base},
+            ]}>
+            欢 迎 使 用 简 阅 小 说
+          </Text>
+        </View>
+      </View>
+    );
   }
   render() {
     return (
       <View style={global.appStyles.content}>
-        <Text>11</Text>
-        <Text>22</Text>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._back()}>
-          <Text>返回</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._deleteAll()}>
-          <Text>清空全部数据</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._saveChapter()}>
-          <Text>保存章节</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._getOneChapter()}>
-          <Text>查询某一章节</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._queryChapter()}>
-          <Text>查询全部章节</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._getMaxChapterOrderNum()}>
-          <Text>查询最大章节序号</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._bookRead()}>
-          <Text>看小说</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={global.appStyles.padding}
-          onPress={() => this._goDetail()}>
-          <Text>明细页</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  render2() {
-    return (
-      <View
-        style={[
-          {
-            width: width,
-            height: height,
-            justifyContent: 'center',
-            display: 'flex',
-          },
-        ]}>
-        <Text style={{textAlign: 'center'}}>敬请期待</Text>
+        {this.renderHeader()}
+        <View style={global.appStyles.padding}>
+          <View style={[global.appStyles.card, {flexDirection: 'column'}]}>
+            <View style={{display: 'flex', flexDirection: 'row'}}>
+              <TouchableOpacity
+                style={styles.myButton}
+                onPress={() => this._goReadHistory()}>
+                <MyIcon name={'yuedujilu'} size={StyleConfig.fontSize.icon} />
+                <Text style={styles.myButtonText}>浏览历史</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.myButton}
+                onPress={() => this._needHelp()}>
+                <MyIcon name={'xiangqing'} size={StyleConfig.fontSize.icon} />
+                <Text style={styles.myButtonText}>常见问题</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.myButton}
+                onPress={() => this._callMe()}>
+                <MyIcon name={'fasong'} size={StyleConfig.fontSize.icon} />
+                <Text style={styles.myButtonText}>联系我们</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  myButton: {
+    flex: 1,
+    height: 60,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  myButtonText: {
+    marginTop: StyleConfig.padding.paddingTop,
+  },
+});

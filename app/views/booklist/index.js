@@ -98,9 +98,6 @@ export default class BookList extends React.Component {
       callbackKey: this.state.callbackKey,
     });
   }
-  _goReadHistory() {
-    this.props.navigation.navigate('ReadHistory');
-  }
   _clickItem(item) {
     // 传递全局回调的key
     if (this.state.isDelete) {
@@ -350,15 +347,6 @@ export default class BookList extends React.Component {
           <Text style={global.appStyles.headerText}>简 阅</Text>
         </View>
         <View style={styles.tools}>
-          {/*<TouchableOpacity*/}
-          {/*  style={styles.myButton}*/}
-          {/*  onPress={() => this._goReadHistory()}>*/}
-          {/*  <MyIcon*/}
-          {/*    name={'yuedujilu'}*/}
-          {/*    style={global.appStyles.headerIcon}*/}
-          {/*    size={StyleConfig.fontSize.icon}*/}
-          {/*  />*/}
-          {/*</TouchableOpacity>*/}
           <TouchableOpacity
             style={styles.myButton}
             onPress={() => this._showSetting()}>

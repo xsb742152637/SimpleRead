@@ -11,7 +11,6 @@ import {
   Modal,
   Dimensions,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   BackHandler,
   FlatList,
@@ -185,36 +184,18 @@ export default class BookRead extends React.Component {
     console.log('退回');
     let that = this;
     if (this.state.bookInfo.bookState === 0) {
-      global.popup.show(
+      global.alert.confirm(
         {
-          content: (
-            <Text
-              style={{
-                fontSize: StyleConfig.fontSize.base,
-                color: StyleConfig.color.text2,
-              }}>
-              是否加入书架？
-            </Text>
-          ),
+          okText: '立即加入',
           cancelText: '不了',
-          confirmText: '立即加入',
+          message: '是否加入书架？',
         },
-        res => {
-          // console.log(res);
+        () => {
           that._saveBook(1);
-          //关闭Popup
-          global.popup.hide();
+          that._closeAlter();
         },
-        res => {
-          // console.log('关闭弹窗');
-          setTimeout(function () {
-            // 如果有全局回调的key，执行回调
-            if (that.state.bookInfo.callbackKey) {
-              global.callbacks[that.state.bookInfo.callbackKey]();
-            }
-            // 关闭
-            that.props.navigation.goBack();
-          }, 300);
+        () => {
+          that._closeAlter();
         },
       );
       return true;
@@ -225,6 +206,18 @@ export default class BookRead extends React.Component {
       }
     }
     return false;
+  }
+
+  _closeAlter() {
+    let that = this;
+    setTimeout(function () {
+      // 如果有全局回调的key，执行回调
+      if (that.state.bookInfo.callbackKey) {
+        global.callbacks[that.state.bookInfo.callbackKey]();
+      }
+      // 关闭
+      that.props.navigation.goBack();
+    }, 300);
   }
 
   // 请求html内容，并缓存
