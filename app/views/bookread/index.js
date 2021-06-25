@@ -62,6 +62,8 @@ export default class BookRead extends React.Component {
       selectedChapter: ['#9e7758', '#175b46'],
       textColor: ['#1f1f1f', '#7f7f7f'],
       selectedColor: ['#1f1f1f', '#7f7f7f'],
+
+      logStr: '', // 翻页日志
     };
 
     this.details = [null, null, null];
@@ -76,6 +78,7 @@ export default class BookRead extends React.Component {
     this.x2 = this.x; // 当前的偏移量
     this.isShowLog = false; // 是否打印输出信息
 
+    // console.log(bookInfo.historyChapterPage, width, this.x);
     if (this.isShowLog) {
       console.log(bookInfo);
     }
@@ -188,7 +191,7 @@ export default class BookRead extends React.Component {
             <Text
               style={{
                 fontSize: StyleConfig.fontSize.base,
-                color: StyleConfig.color.text,
+                color: StyleConfig.color.text2,
               }}>
               是否加入书架？
             </Text>
@@ -316,6 +319,18 @@ export default class BookRead extends React.Component {
                             this.x,
                           );
                         }
+
+                        let p = Math.round(this.x2 / width);
+                        // console.log('点击：', p, this.state.contents.length, this.x);
+                        let logStr =
+                          p +
+                          ' ' +
+                          this.state.bookInfo.historyChapterPage +
+                          ' ' +
+                          this.state.contents.length;
+                        this.setState({
+                          logStr: logStr,
+                        });
 
                         if (that.scrollRef) {
                           setTimeout(() => {
@@ -555,6 +570,10 @@ export default class BookRead extends React.Component {
 
       let p = Math.round(this.x / width);
       // console.log('点击：', p, this.state.contents.length, this.x);
+      // let logStr = p + ' ' + this.state.contents.length;
+      // this.setState({
+      //   logStr: logStr,
+      // });
       if (p <= -1) {
         this._changeChapter(true, true);
       } else if (p >= this.state.contents.length - 1) {
@@ -622,7 +641,10 @@ export default class BookRead extends React.Component {
   }
   _saveDetails2(bookId, list, index, isStart) {
     let that = this;
-    if ((that.maxCache > 0 && that.cacheProg >= that.maxCache) || index >= list.length - 1) {
+    if (
+      (that.maxCache > 0 && that.cacheProg >= that.maxCache) ||
+      index >= list.length - 1
+    ) {
       console.log(that.cacheProg, index, list.length);
       that.setState({isSaveDetail: true}, () => {
         if (that.state.isChapter) {
@@ -817,7 +839,7 @@ export default class BookRead extends React.Component {
               color: this.state.textColor[this.state.dayNight],
               fontSize: 12,
             }}>
-            {' 第 ' + p + '/' + c + ' 页 '}
+            {this.state.logStr + ' 第 ' + p + '/' + c + ' 页 '}
           </Text>
         </View>
       </View>
@@ -947,7 +969,9 @@ export default class BookRead extends React.Component {
                 size={StyleConfig.fontSize.icon}
               />
               {this.state.isSaveDetail === false
-                ? '  下载后面'+ (this.maxCache == -1 ? '全部': this.maxCache) +'章，没网也能看'
+                ? '  下载后面' +
+                  (this.maxCache == -1 ? '全部' : this.maxCache) +
+                  '章，没网也能看'
                 : this.state.isSaveDetail === true
                 ? '  下载完成'
                 : '  下载进度：' +

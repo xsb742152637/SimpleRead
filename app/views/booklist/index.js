@@ -195,13 +195,13 @@ export default class BookList extends React.Component {
                 name={'shuaxin'}
                 style={{
                   width: 30,
-                  color: StyleConfig.color.text,
+                  color: StyleConfig.color.text2,
                 }}
                 size={StyleConfig.fontSize.icon}
               />
               <Text
                 style={{
-                  color: StyleConfig.color.text,
+                  color: StyleConfig.color.text2,
                 }}>
                 更新连载书
               </Text>
@@ -216,13 +216,13 @@ export default class BookList extends React.Component {
                 name={'shangchuan'}
                 style={{
                   width: 30,
-                  color: StyleConfig.color.text,
+                  color: StyleConfig.color.text2,
                 }}
                 size={StyleConfig.fontSize.icon}
               />
               <Text
                 style={{
-                  color: StyleConfig.color.text,
+                  color: StyleConfig.color.text2,
                 }}>
                 本地导入
               </Text>
@@ -237,13 +237,13 @@ export default class BookList extends React.Component {
                 name={'bianji'}
                 style={{
                   width: 30,
-                  color: StyleConfig.color.text,
+                  color: StyleConfig.color.text2,
                 }}
                 size={StyleConfig.fontSize.icon}
               />
               <Text
                 style={{
-                  color: StyleConfig.color.text,
+                  color: StyleConfig.color.text2,
                 }}>
                 书籍管理
               </Text>
@@ -283,7 +283,7 @@ export default class BookList extends React.Component {
               color:
                 this.state.deleteIds.length > 0
                   ? '#d00404'
-                  : StyleConfig.color.detailText,
+                  : StyleConfig.color.text3,
             }}
             onPress={() => {
               this._deleteBooks();
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     paddingTop: 250,
   },
   emptyText: {
-    color: StyleConfig.color.detailText,
+    color: StyleConfig.color.text3,
     paddingTop: StyleConfig.padding.baseTop,
   },
   settingOpacity: {

@@ -11,10 +11,11 @@ import {
   View,
   TextInput,
   FlatList,
-  Image,
+  Dimensions,
   Keyboard,
   BackHandler,
 } from 'react-native';
+const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 import {getId, textFormat, isNull} from '@/utils/function';
 import Back from '@/components/back';
 import MyIcon from '@/config/myIcon';
@@ -28,6 +29,7 @@ export default class Search extends React.Component {
     this.scrollRef = null;
     this.state = {
       callbackKey: this.props.route.params.callbackKey,
+      isLoad: false,
       isChange: false,
       searchText: '',
       bookList: [],
@@ -121,6 +123,26 @@ export default class Search extends React.Component {
       </TouchableOpacity>
     );
   }
+  _ListEmptyComponent() {
+    return (
+      <TouchableOpacity
+        style={{
+          width: width,
+          height: height,
+          justifyContent: 'center',
+          display: 'flex',
+        }}
+        activeOpacity={1}>
+        <Text
+          style={{
+            textAlign: 'center',
+            color: StyleConfig.color.text3,
+          }}>
+          {this.state.isLoad ? '正在搜索……' : '没有搜索结果'}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
   _clickItem(item) {
     // 传递全局回调的key
     this.props.navigation.navigate('SearchDetail', item);
@@ -155,6 +177,7 @@ export default class Search extends React.Component {
             data={this.state.bookList}
             keyExtractor={item => item.key}
             renderItem={({item}) => this._getItem(item)}
+            ListEmptyComponent={this._ListEmptyComponent()}
           />
         </View>
       </View>

@@ -78,7 +78,24 @@ export default class Me extends React.Component {
       cloneObj(global.realm.findBook(bookId)),
     );
   }
-  render2() {
+  _goDetail() {
+    let item = {
+      author: '姜梵',
+      bookId: '0CC61A7A-7E9C-479F-A3E6-BD811F9E5409',
+      bookName: '三国之大汉崛起',
+      bookUrl: 'https://www.23us.tw/23_23901/',
+      chapterUrl: '',
+      imgUrl: '',
+      isEnd: 1,
+      lastChapterTime: '19-0 6-06',
+      lastChapterTitle: ' 第831章身份转变',
+      len: '4936k',
+      state: '连载',
+      type: '',
+    };
+    this.props.navigation.navigate('SearchDetail', item);
+  }
+  render() {
     return (
       <View style={global.appStyles.content}>
         <Text>11</Text>
@@ -118,11 +135,16 @@ export default class Me extends React.Component {
           onPress={() => this._bookRead()}>
           <Text>看小说</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={global.appStyles.padding}
+          onPress={() => this._goDetail()}>
+          <Text>明细页</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
-  render() {
+  render2() {
     return (
       <View
         style={[

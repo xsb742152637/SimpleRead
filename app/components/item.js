@@ -66,15 +66,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   itemName: {
-    color: StyleConfig.color.titleText,
+    color: StyleConfig.color.text1,
     fontSize: StyleConfig.fontSize.titleText,
   },
   itemTitle: {
-    color: StyleConfig.color.text,
+    color: StyleConfig.color.text2,
     fontSize: StyleConfig.fontSize.detailText,
   },
   itemInfo: {
-    color: StyleConfig.color.detailText,
+    color: StyleConfig.color.text3,
     fontSize: StyleConfig.fontSize.detailText,
   },
 });

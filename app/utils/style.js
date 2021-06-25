@@ -39,7 +39,7 @@ module.exports = StyleSheet.create({
     paddingRight: StyleConfig.padding.baseLeft,
     paddingLeft: StyleConfig.padding.baseLeft,
     borderBottomWidth: 1,
-    borderBottomColor: StyleConfig.color.border,
+    borderBottomColor: StyleConfig.color.border1,
     borderStyle: 'solid',
     color: StyleConfig.color.headerText,
     // borderWidth: 1,
@@ -60,7 +60,7 @@ module.exports = StyleSheet.create({
   },
   border: {
     borderWidth: 1,
-    borderColor: StyleConfig.color.border,
+    borderColor: StyleConfig.color.border1,
     borderStyle: 'solid',
   },
 
@@ -72,8 +72,7 @@ module.exports = StyleSheet.create({
     paddingBottom: StyleConfig.padding.baseTop,
     paddingRight: StyleConfig.padding.baseLeft,
     paddingLeft: StyleConfig.padding.baseLeft,
-    backgroundColor:
-      'rgba(255,255,255,' + StyleConfig.opacity.cardBackground + ')',
+    backgroundColor: StyleConfig.color.cardBackground,
     borderRadius: StyleConfig.radius.base,
   },
 });

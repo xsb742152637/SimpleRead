@@ -1,24 +1,36 @@
 /**
  * 全局样式变量
  */
+import ColorConfig from '@/config/colorConfig';
 let StyleConfig;
 export default StyleConfig = {
   color: {
-    baseBackground: '#e7e7e7', // 页面底色
-    headerBackground: '#e7e7e7', // 页面头部
-    headerText: '#32353a', // 顶部导航栏文字颜色
-    headerIcon: '#32353a', // 顶部导航栏图标颜色
+    baseBackground: '#efefef', // 页面底色
 
-    border: '#e0e0e0', // 边框
+    headerBackground: ColorConfig.main3, // 页面头部
+    headerText: '#ffffff', // 顶部导航栏文字颜色
+    headerIcon: '#ffffff', // 顶部导航栏图标颜色
 
-    icon: '#afb0b2', // 底部导航栏未选中颜色
-    iconActive: '#32353a', // 底部导航栏图标选中颜色
 
-    button: '#d2d7c2', // 主要按钮背景色
-    detailButton: '', // 次要按钮
-    titleText: '#222222', // 标题
-    text: '#5f5f5f', // 一般文字颜色
-    detailText: '#a2a2a2', // 次要文字颜色
+    icon: ColorConfig.main5, // 底部导航栏未选中颜色
+    iconActive: ColorConfig.main3, // 底部导航栏图标选中颜色
+
+    // 按钮
+    button1: ColorConfig.main3,
+    button2: ColorConfig.det3,
+    button3: ColorConfig.sup3,
+
+    // 边框
+    border1: ColorConfig.main3,
+    border2: ColorConfig.det3,
+    border3: ColorConfig.sup3,
+
+    // 文字
+    text1: '#222222',
+    text2: '#5f5f5f',
+    text3: '#a2a2a2',
+
+    cardBackground: 'rgba(255,255,255,0.7)', //
   },
   fontSize: {
     base: 18,
@@ -40,7 +52,7 @@ export default StyleConfig = {
   },
   opacity: {
     active: 0.7, // 按下时，标签透明程度
-    cardBackground: 0.5, // 卡片背景
+    cardBackground: 0.7, // 卡片背景
     buttonBackground: 0.3, // 按钮背景
   },
   headerHeight: 50, // 页面头部高度

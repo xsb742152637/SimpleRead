@@ -163,7 +163,7 @@ export default class BookRead3 extends React.Component {
             <Text
               style={{
                 fontSize: StyleConfig.fontSize.base,
-                color: StyleConfig.color.text,
+                color: StyleConfig.color.text2,
               }}>
               是否加入书架？
             </Text>

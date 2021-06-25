@@ -26,6 +26,7 @@ export default class SearchDetail extends React.Component {
     global.appApi
       .getBookInfo(this.state.data)
       .then(res => {
+        console.log(res);
         that.setState(
           {
             bookInfo: res,
@@ -122,8 +123,8 @@ export default class SearchDetail extends React.Component {
                   <View
                     style={[
                       global.appStyles.padding,
-                      styles.myButton1,
                       styles.myButton,
+                      styles.myButton1,
                     ]}>
                     <MyIcon
                       name={'yuedu'}
@@ -139,9 +140,10 @@ export default class SearchDetail extends React.Component {
                   <View style={[global.appStyles.padding, styles.myButton]}>
                     <MyIcon
                       name={'jiarushujia'}
+                      style={styles.buttonText}
                       size={StyleConfig.fontSize.icon}
                     />
-                    <Text> 加入书架</Text>
+                    <Text style={styles.buttonText}> 加入书架</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -164,25 +166,25 @@ const styles = StyleSheet.create({
   },
   bookName: {
     fontSize: 25,
-    color: StyleConfig.color.text,
+    color: StyleConfig.color.text2,
   },
   other: {
-    color: StyleConfig.color.detailText,
+    color: StyleConfig.color.text3,
   },
   introP: {
     marginTop: StyleConfig.padding.baseTop,
     borderWidth: 1,
-    borderColor: StyleConfig.color.border,
+    borderColor: StyleConfig.color.border1,
     borderStyle: 'solid',
     minHeight: 200,
     borderRadius: StyleConfig.radius.base,
   },
   title: {
     fontSize: 20,
-    color: StyleConfig.color.text,
+    color: StyleConfig.color.text2,
   },
   intro: {
-    color: StyleConfig.color.detailText,
+    color: StyleConfig.color.text3,
   },
   buttonRow: {
     display: 'flex',
@@ -192,8 +194,9 @@ const styles = StyleSheet.create({
   myButton: {
     width: getWidth(0.4),
     alignItems: 'center',
+    backgroundColor: StyleConfig.color.button2,
     borderWidth: 1,
-    borderColor: StyleConfig.color.button,
+    borderColor: StyleConfig.color.button2,
     borderStyle: 'solid',
     borderRadius: StyleConfig.radius.button,
     display: 'flex',
@@ -201,7 +204,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   myButton1: {
-    backgroundColor: StyleConfig.color.button,
+    backgroundColor: StyleConfig.color.button1,
+    borderColor: StyleConfig.color.button1,
   },
   buttonText: {
     color: '#ffffff',
@@ -209,6 +213,6 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     paddingTop: 250,
-    color: StyleConfig.color.detailText,
+    color: StyleConfig.color.text3,
   },
 });

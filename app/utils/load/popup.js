@@ -176,7 +176,7 @@ class Popup extends Component {
             flexDirection: 'row',
             justifyContent: 'space-around',
             alignItems: 'center',
-            borderColor: StyleConfig.color.border,
+            borderColor: StyleConfig.color.border1,
             borderTopWidth: 1,
             height: StyleConfig.headerHeight,
           }}>
@@ -194,7 +194,7 @@ class Popup extends Component {
           </TouchableOpacity>
           <Text
             style={{
-              color: StyleConfig.color.titleText,
+              color: StyleConfig.color.text1,
               fontSize: StyleConfig.fontSize.titleText,
             }}>
             {this.state.title}
