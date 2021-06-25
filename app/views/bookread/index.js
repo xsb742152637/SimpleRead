@@ -1027,8 +1027,7 @@ export default class BookRead extends React.Component {
               this.state.thisChapter.chapterId == data.chapterId
                 ? this.state.selectedChapter[this.state.dayNight]
                 : this.state.textColor[this.state.dayNight],
-            fontSize: this.state.fontSize,
-            lineHeight: this.state.lineHeight,
+            fontSize: StyleConfig.fontSize.titleText,
             opacity: data.isSave == 1 ? 1 : 0.6,
           }}>
           {data.title}
