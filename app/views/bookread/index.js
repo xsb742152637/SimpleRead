@@ -494,7 +494,6 @@ export default class BookRead extends React.Component {
     global.realm.saveConfig(readCF);
     this.setState(
       {
-        isSetting: false,
         isLoad: true,
         readCF: readCF,
         fontSize: readCF.fontSize,
