@@ -18,9 +18,48 @@ export default AppApiBase = {
           .then(res => {
             console.log('章节总数：' + res.length);
             if (res.length > 0) {
-              global.realm.saveChapter(res);
-            } else {
-              alert('获取章节信息失败');
+              // 查询该小说现有目录，只保存不存在的目录
+
+              let newMap = {};
+              res.map((chapter, index) => {
+                newMap[chapter.thisUrl] = chapter;
+              });
+              let oldChapterList = global.realm.queryChapterByBookId(bookId);
+              if (oldChapterList != null) {
+                oldChapterList.map((chapter, index) => {
+                  if (newMap[chapter.thisUrl] != null) {
+                    delete newMap[chapter.thisUrl];
+                  }
+                });
+              }
+
+              let updateChapterList = [];
+              for (let key in newMap) {
+                if (newMap[key] == null) {
+                  continue;
+                }
+                console.log('更新：', newMap[key].title);
+                updateChapterList.push(newMap[key]);
+              }
+              let book = cloneObj(global.realm.findBook(bookId));
+
+              if (updateChapterList.length > 0) {
+                AppApi.getBookInfo(book)
+                  .then(res2 => {
+                    console.log('更新成功2：', book.bookName);
+                    global.realm.saveBook({
+                      bookId: bookId,
+                      lastChapterTitle: res2.lastChapterTitle,
+                      lastChapterTime: res2.lastChapterTime,
+                      hasNewChapter: 1,
+                    });
+                  })
+                  .catch(error => {
+                    console.log('更新失败1：', book.bookName);
+                  });
+                global.realm.saveChapter(updateChapterList);
+              }
+              console.log('成功更新目录数量：', updateChapterList.length);
             }
             resolve(res);
           })

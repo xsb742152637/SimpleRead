@@ -102,6 +102,23 @@ export default AppApi = {
           let imgUrl = $(main).find('#fmimg img').attr('src');
           let intro = that._getContent($(main).find('#intro').text());
 
+          try{
+            let lastChapterTime = $($(main).find('#info>p')[2]).text();
+            lastChapterTime = lastChapterTime
+              .replace('更新时间：', '')
+              .substring(0, 16);
+            data.lastChapterTime = lastChapterTime;
+          } catch (e) {
+            console.log(e);
+          }
+
+          try{
+            let lastChapterTitle = $($(main).find('#info>p')[3]).find('a').text();
+            data.lastChapterTitle = lastChapterTitle;
+          } catch (e) {
+            console.log(e);
+          }
+
           data.imgUrl = imgUrl;
           data.intro = textFormat(intro);
           data.chapterUrl = data.bookUrl;

@@ -88,6 +88,7 @@ export default class BookList extends React.Component {
     global.toast.add('再按一次退出应用……');
     return true;
   }
+
   _loadBookList() {
     this.setState({bookList: cloneObj(global.realm.queryBookList(1))});
   }
@@ -124,7 +125,33 @@ export default class BookList extends React.Component {
     this.setState({isSetting: false});
   }
   _updateBooks() {
-    console.log('更新');
+    let that = this;
+    let maxLen = that.state.bookList.length;
+    this.setState({isSetting: false}, function() {
+      that.state.bookList.map((book, index) => {
+        // 已完结的跳过
+        if (book.isEnd === 2 || index == 1) {
+          return;
+        }
+        // console.log('开始更新，', book.bookName, book.chapterUrl);
+        global.appApi
+          .getChapterList(true, book.chapterUrl, book.bookId)
+          .then(res => {
+            // console.log('更新成功aa：', book.bookName);
+            if (index + 1 >= maxLen) {
+              that._loadBookList();
+              global.toast.add('更新完成');
+            }
+          })
+          .catch(error => {
+            // console.log('更新失败bb：', book.bookName);
+            if (index + 1 >= maxLen) {
+              that._loadBookList();
+              global.toast.add('更新完成');
+            }
+          });
+      });
+    });
   }
   _localImport() {
     console.log('导入');
@@ -304,9 +331,10 @@ export default class BookList extends React.Component {
         ? '还未读过'
         : item.historyChapterTitle,
       itemInfo1: '最新章节：' + item.lastChapterTitle,
-      itemInfo2: '更新情况：' + mergeSpace(textFormat(item.lastChapterTime)),
+      itemInfo2: '更新时间：' + mergeSpace(textFormat(item.lastChapterTime)),
       item: item,
     };
+
     return (
       <TouchableOpacity
         style={{position: 'relative'}}
@@ -315,9 +343,27 @@ export default class BookList extends React.Component {
           this._clickItem(item);
         }}>
         <Item data={item2} navigation={this.props.navigation} />
+        {this.renderState(item)}
         {this.renderSel(item)}
       </TouchableOpacity>
     );
+  }
+  renderState(item) {
+    if (item.isEnd === 2) {
+      return (
+        <View
+          style={styles.itemState}>
+          <Text style={styles.itemStateText}>完</Text>
+        </View>
+      );
+    } else if (item.hasNewChapter === 1) {
+      return (
+        <View
+          style={styles.itemState}>
+          <Text style={styles.itemStateText}>新</Text>
+        </View>
+      );
+    }
   }
   renderSel(item) {
     if (this.state.isDelete) {
@@ -435,5 +481,25 @@ const styles = StyleSheet.create({
     // borderColor: 'red',
     // borderStyle: 'solid',
     // borderWidth: 1,
+  },
+  itemState: {
+    position: 'absolute',
+    left: 70,
+    top: 16,
+    borderWidth: 1,
+    borderColor: StyleConfig.color.border3,
+    backgroundColor: StyleConfig.color.border3,
+    borderStyle: 'solid',
+    width: 18,
+    height: 18,
+    borderRadius: 18,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+  },
+  itemStateText: {
+    fontSize: StyleConfig.fontSize.detailText,
+    color: '#fff',
   },
 });

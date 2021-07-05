@@ -174,6 +174,7 @@ export default class BookRead extends React.Component {
       chapterId: that.details[1].chapterId,
       historyChapterPage: Math.round(that.x / width),
       bookState: bookState,
+      hasNewChapter: 0,
     };
     console.log('记录进度', book, that.x, width);
     global.realm.saveBook(book);
