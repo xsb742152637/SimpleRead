@@ -22,7 +22,7 @@ import ReadHistory from './views/readhistory/index';
 const Stack = createStackNavigator();
 
 export default () => {
-  console.log('状态栏高度：', StatusBar.currentHeight);
+  // console.log('状态栏高度：', StatusBar.currentHeight);
   return (
     <NavigationContainer>
       <StatusBar

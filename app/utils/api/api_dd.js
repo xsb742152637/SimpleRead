@@ -36,6 +36,7 @@ export default AppApi = {
           } else {
             let $ = cheerio.load(html, {decodeEntities: false});
             let title = $('#box_con .bookname h1').text();
+            $('#content #center_tip').remove();
             let content = textFormat($('#content').html());
 
             let btn = $('.bottem>a');

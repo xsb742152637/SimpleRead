@@ -13,6 +13,7 @@ import {
   Modal,
   Dimensions,
   BackHandler,
+  Image,
 } from 'react-native';
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
@@ -127,7 +128,7 @@ export default class BookList extends React.Component {
   _updateBooks() {
     let that = this;
     let maxLen = that.state.bookList.length;
-    this.setState({isSetting: false}, function() {
+    this.setState({isSetting: false}, function () {
       that.state.bookList.map((book, index) => {
         // 已完结的跳过
         if (book.isEnd === 2 || index == 1) {
@@ -351,15 +352,13 @@ export default class BookList extends React.Component {
   renderState(item) {
     if (item.isEnd === 2) {
       return (
-        <View
-          style={styles.itemState}>
+        <View style={styles.itemState}>
           <Text style={styles.itemStateText}>完</Text>
         </View>
       );
     } else if (item.hasNewChapter === 1) {
       return (
-        <View
-          style={styles.itemState}>
+        <View style={styles.itemState}>
           <Text style={styles.itemStateText}>新</Text>
         </View>
       );
@@ -389,8 +388,12 @@ export default class BookList extends React.Component {
   renderHeader() {
     return (
       <View style={global.appStyles.header}>
-        <View>
-          <Text style={global.appStyles.headerText}>简 阅</Text>
+        <View style={styles.headerTitle}>
+          <Image
+            style={styles.logoImg}
+            source={require('@/assets/img/logo.png')}
+          />
+          <Text style={global.appStyles.headerText}>简阅小说</Text>
         </View>
         <View style={styles.tools}>
           <TouchableOpacity
@@ -496,10 +499,20 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-
   },
   itemStateText: {
     fontSize: StyleConfig.fontSize.detailText,
     color: '#fff',
+  },
+  headerTitle: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoImg: {
+    width: 30,
+    height: 30,
+    marginRight: StyleConfig.padding.text,
   },
 });
