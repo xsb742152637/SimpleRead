@@ -174,4 +174,23 @@ export default AppApi = {
         });
     });
   },
+  checkUrl() {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      request
+        .fetchHtml(that.base)
+        .then(html => {
+          let $ = cheerio.load(html, {decodeEntities: false});
+          let url = $('.menu_nav ul>li:first-child>a').attr('href');
+          if (url !== that.base) {
+            that.base = url;
+            global.toast.add(that.base + ' 更新为 ' + url);
+          }
+          resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
 };

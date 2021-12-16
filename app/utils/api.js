@@ -117,4 +117,7 @@ export default AppApiBase = {
   getSearchList(searchkey) {
     return AppApi.getSearchList(searchkey);
   },
+  checkUrl() {
+    return AppApi.checkUrl();
+  },
 };

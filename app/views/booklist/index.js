@@ -18,13 +18,7 @@ import {
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
 import MyIcon from '@/config/myIcon';
-import {
-  getId,
-  textFormat,
-  mergeSpace,
-  isNull,
-  cloneObj,
-} from '@/utils/function';
+import {textFormat, mergeSpace, isNull, cloneObj} from '@/utils/function';
 import Item from '@/components/item';
 const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
@@ -51,6 +45,10 @@ export default class BookList extends React.Component {
   // 初始加载
   componentDidMount() {
     let that = this;
+
+    // 检查小说网址是否变更
+    global.appApi.checkUrl();
+
     // 添加返回监听
     BackHandler.addEventListener(
       'hardwareBackPress',
@@ -131,13 +129,13 @@ export default class BookList extends React.Component {
     this.setState({isSetting: false}, function () {
       that.state.bookList.map((book, index) => {
         // 已完结的跳过
-        if (book.isEnd === 2 || index == 1) {
+        if (book.isEnd === 2 || index === 1) {
           return;
         }
         // console.log('开始更新，', book.bookName, book.chapterUrl);
         global.appApi
           .getChapterList(true, book.chapterUrl, book.bookId)
-          .then(res => {
+          .then(() => {
             // console.log('更新成功aa：', book.bookName);
             if (index + 1 >= maxLen) {
               that._loadBookList();
@@ -145,7 +143,7 @@ export default class BookList extends React.Component {
             }
           })
           .catch(error => {
-            // console.log('更新失败bb：', book.bookName);
+            console.log('更新失败：', error);
             if (index + 1 >= maxLen) {
               that._loadBookList();
               global.toast.add('更新完成');
@@ -164,7 +162,7 @@ export default class BookList extends React.Component {
   _setSelected(type) {
     let deleteIds = [];
     if (type) {
-      this.state.bookList.map((value, index) => {
+      this.state.bookList.map(value => {
         deleteIds.push(value.bookId);
       });
     }
@@ -172,12 +170,12 @@ export default class BookList extends React.Component {
   }
   _deleteBooks() {
     let rows = [];
-    this.state.deleteIds.map((value, index) => {
+    this.state.deleteIds.map(value => {
       rows.push({bookId: value, bookState: 0});
     });
     if (rows.length > 0) {
       global.realm.saveBook(rows);
-      this.state.deleteIds.map((value, index) => {
+      this.state.deleteIds.map(value => {
         global.realm.deleteDetailByBookId(value);
       });
       this.setState({isDelete: false});
@@ -294,9 +292,7 @@ export default class BookList extends React.Component {
           <Text
             onPress={() => {
               this._setSelected(
-                this.state.deleteIds.length === this.state.bookList.length
-                  ? false
-                  : true,
+                this.state.deleteIds.length !== this.state.bookList.length,
               );
             }}>
             {this.state.deleteIds.length === this.state.bookList.length
@@ -417,7 +413,7 @@ export default class BookList extends React.Component {
     );
   }
   render() {
-    let isEmpty = this.state.bookList.length == 0;
+    let isEmpty = this.state.bookList.length === 0;
     return (
       <View style={global.appStyles.content}>
         {this.renderHeader()}

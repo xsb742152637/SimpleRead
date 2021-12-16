@@ -7,7 +7,7 @@ import {getId, textFormat, mergeSpace, isNull} from '@/utils/function';
 
 let AppApi;
 export default AppApi = {
-  base: 'https://www.23us.tw',
+  base: 'https://www.x23us.us',
   search: '/modules/article/search.php',
   _getUrl(url) {
     return this.base + url;
@@ -103,7 +103,7 @@ export default AppApi = {
           let imgUrl = $(main).find('#fmimg img').attr('src');
           let intro = that._getContent($(main).find('#intro').text());
 
-          try{
+          try {
             let lastChapterTime = $($(main).find('#info>p')[2]).text();
             lastChapterTime = lastChapterTime
               .replace('更新时间：', '')
@@ -113,8 +113,10 @@ export default AppApi = {
             console.log(e);
           }
 
-          try{
-            let lastChapterTitle = $($(main).find('#info>p')[3]).find('a').text();
+          try {
+            let lastChapterTitle = $($(main).find('#info>p')[3])
+              .find('a')
+              .text();
             data.lastChapterTitle = lastChapterTitle;
           } catch (e) {
             console.log(e);
@@ -189,6 +191,34 @@ export default AppApi = {
         .catch(error => {
           reject(error);
           console.error(error);
+        });
+    });
+  },
+  checkUrl() {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      request
+        .fetchHtml(that.base)
+        .then(html => {
+          let $ = cheerio.load(html, {decodeEntities: false});
+          try {
+            let url = $($('#wrapper .nav>ul>li')[1])
+              .find('a')
+              .attr('href')
+              .replace('/xuanhuanxiaoshuo/', '');
+            if (url.indexOf(that.base) !== 0) {
+              that.base = url;
+              global.toast.add(that.base + ' 以变为 ' + url);
+            } else {
+              console.log('没变');
+            }
+            resolve();
+          } catch (e) {
+            global.toast.add('检查失败：dd');
+          }
+        })
+        .catch(error => {
+          reject(error);
         });
     });
   },
