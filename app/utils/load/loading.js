@@ -14,10 +14,11 @@ class Loading extends Component {
     _this = this;
     this.state = {
       show: false,
+      title: '正在加载……',
     };
   }
-  static show = () => {
-    _this.setState({show: true});
+  static show = (title = '正在加载……') => {
+    _this.setState({show: true, title: title});
   };
   static hide = () => {
     _this.setState({show: false});
@@ -38,7 +39,7 @@ class Loading extends Component {
             }}>
             <ActivityIndicator size="large" color="#FFF" />
             <Text style={{marginLeft: 10, color: '#FFF', marginTop: 10}}>
-              正在加载...
+              {this.state.title}
             </Text>
           </View>
         </View>

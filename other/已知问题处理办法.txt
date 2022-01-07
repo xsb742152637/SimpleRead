@@ -1,0 +1,5 @@
+
+android 编译特别慢
+    到node_modules / react-native-file-selector / android / build.gradle 文件下面
+        把 google() 替换成 maven { url 'https://maven.aliyun.com/repository/google' }
+        把 jcenter()  替换成  maven { url 'https://maven.aliyun.com/repository/jcenter' }

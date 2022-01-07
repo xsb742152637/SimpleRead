@@ -31,7 +31,12 @@ export default class Item extends React.Component {
     return (
       <View style={global.appStyles.card}>
         {isNull(data.imgUrl) ? (
-          <Text />
+          <View>
+            <Image
+              source={require('@/assets/img/defImg.jpg')}
+              style={{width: data.imgWidth, height: data.imgHeight}}
+            />
+          </View>
         ) : (
           <View>
             <Image

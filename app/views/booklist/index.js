@@ -18,8 +18,16 @@ import {
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
 import MyIcon from '@/config/myIcon';
-import {textFormat, mergeSpace, isNull, cloneObj} from '@/utils/function';
+import {
+  textFormat,
+  mergeSpace,
+  isNull,
+  cloneObj,
+  saveLocalTxt,
+} from '@/utils/function';
 import Item from '@/components/item';
+import RNFetchBlob from 'react-native-fetch-blob';
+import RNFileSelector from 'react-native-file-selector';
 const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
 export default class BookList extends React.Component {
@@ -153,10 +161,72 @@ export default class BookList extends React.Component {
     });
   }
   _localImport() {
-    console.log('导入');
+    let filterFile = '.+(.txt|.TXT)$';
+    // if (Platform.OS === 'ios') {
+    //   filterFile = ['txt','TXT'];
+    // } else if (Platform.OS === 'android') {
+    //   filterFile = ".+(.txt|.TXT)$";
+    // }
+
+    RNFileSelector.Show({
+      title: '选择小说',
+      closeMenu: true,
+      filter: filterFile,
+      onDone: path => {
+        // console.log('file selected: ' + path);
+        if (path.substring(path.lastIndexOf('.') + 1) !== 'txt') {
+          global.toast.add('导入失败，请选择TXT文件');
+          return;
+        }
+        let bookName = path.substring(
+          path.lastIndexOf('/') + 1,
+          path.lastIndexOf('.'),
+        );
+        let txtStr = [];
+        // android上通过'react-native-file-selector获取的path是不包含file://'协议的，
+        // android上需要拼接协议为'file://'+ path，
+        // 而IOS则不需要,type可以是文件的MIME类型或者'multipart/form-data'
+        this.setState({isSetting: false});
+        global.loading.show('解析中……');
+        let st = new Date().getTime();
+        let bufferSize = 1024 * 1024; // 单位: b，设置缓冲区大小为1M
+        RNFetchBlob.fs
+          .readStream('file://' + path, 'utf8', bufferSize)
+          .then(ifstream => {
+            ifstream.open();
+            ifstream.onData(chunk => {
+              // when encoding is `ascii`, chunk will be an array contains numbers
+              // otherwise it will be a string
+              txtStr.push(chunk);
+            });
+            ifstream.onError(err => {
+              // console.log('oops', err);
+              global.loading.hide();
+              global.toast.add('导入失败：' + JSON.stringify(err));
+            });
+            ifstream.onEnd(() => {
+              saveLocalTxt(bookName, txtStr.join('')).then(datas => {
+                // console.log(datas);
+                global.loading.hide();
+                global.toast.add('导入成功');
+                // console.log(
+                //   '导入成功，耗时：',
+                //   (new Date().getTime() - st) / 1000,
+                // );
+                this._loadBookList();
+              });
+            });
+          });
+      },
+      onCancel: () => {
+        // console.log('cancelled');
+        global.loading.hide();
+      },
+    });
   }
+
   _showDelete(isDelete) {
-    console.log('删除', isDelete);
+    // console.log('删除', isDelete);
     this.setState({isSetting: false, isDelete: isDelete, deleteIds: []});
   }
   _setSelected(type) {

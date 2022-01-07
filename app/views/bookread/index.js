@@ -298,12 +298,12 @@ export default class BookRead extends React.Component {
 
                     if (this.isShowLog) {
                       console.log(
-                          that.details[0].title,
-                          that.details[0].pageNum,
-                          that.details[1].title,
-                          that.details[1].pageNum,
-                          that.details[2].title,
-                          that.details[2].pageNum,
+                        that.details[0] ? that.details[0].title : '',
+                        that.details[0] ? that.details[0].pageNum : '',
+                        that.details[1].title,
+                        that.details[1].pageNum,
+                        that.details[2] ? that.details[2].title : '',
+                        that.details[2] ? that.details[2].pageNum : '',
                       );
                     }
                     that.setState(

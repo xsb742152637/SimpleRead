@@ -60,7 +60,7 @@ export let contentFormat = (content, font_size, line_height) => {
         s = '';
         // console.log(content.charAt(i - 1));
         // 第一行不允许有换行
-        if (row.join('') == '' && (p == 0 || p >= fontLines - 1)) {
+        if (row.join('') === '' && (p === 0 || p >= fontLines - 1)) {
           continue;
         }
       }
@@ -71,7 +71,9 @@ export let contentFormat = (content, font_size, line_height) => {
       // console.log('满了');
       // 满一页
       if (p >= fontLines) {
-        pages.push(cloneObj(rows));
+        if (isNullPage(rows)) {
+          pages.push(cloneObj(rows));
+        }
         rows = [];
         p = 0;
       }
@@ -88,11 +90,132 @@ export let contentFormat = (content, font_size, line_height) => {
     }
     rows.push(str);
   }
-  if (rows.length > 0) {
+  if (isNullPage(rows)) {
     pages.push(rows);
   }
 
   return pages;
+};
+// 判断一页是否有文字
+let isNullPage = rows => {
+  return (
+    !isNull(rows) && rows.length > 0 && /^[\u4e00-\u9fa5]+$/.test(rows.join(''))
+  );
+};
+
+// 解析并保存本地导入的txt内容
+export let saveLocalTxt = (bookName, str) => {
+  let book = null;
+  let chapters = [];
+  let chapterDetails = [];
+
+  let s = str.split('\n');
+  let isStart = false;
+
+  let chapterList = [];
+  let title = '';
+  let contents = [];
+  s.forEach((o, i) => {
+    // 排除掉 最开始的无用内容
+    if (!isStart && _isChapterStart(o)) {
+      isStart = true;
+    }
+    // 例外情况，排除
+    if (!isStart) {
+      return;
+    } else if (o.indexOf('本书') >= 0 && o.indexOf('转载') > 0) {
+      return;
+    }
+
+    // 如果开头有空格，说明是不新一章的标题
+    if (_isChapterStart(o)) {
+      // 是第一章，先保存一章
+      if (contents.length > 0) {
+        chapterList.push({
+          chapterId: getId(),
+          title: title,
+          content: contents.join('\n'),
+        });
+      }
+      title = o;
+      contents = [];
+    } else {
+      contents.push(o);
+    }
+  });
+
+  if (contents.length > 0) {
+    chapterList.push({
+      chapterId: getId(),
+      title: title,
+      content: contents.join('\n'),
+    });
+  }
+
+  if (chapterList.length > 0) {
+    book = {
+      bookId: getId(),
+      bookName: bookName,
+      author: '',
+      bookUrl: 'localhost',
+      chapterId: '', // 这里先随便填一个ID
+      chapterUrl: 'localhost',
+      imgUrl: '',
+      lastChapterTitle: '',
+      lastChapterTime: '已完结',
+      hasNewChapter: 0,
+      isEnd: 2,
+      bookState: 1, // 直接阅读的小说状态为不显示
+      sourceKey: 'localhost',
+      saveTime: new Date(),
+    };
+
+    for (let i = 0; i < chapterList.length; i++) {
+      let prevUrl =
+        i > 0 && chapterList[i - 1] ? chapterList[i - 1].chapterId : '';
+      let nextUrl =
+        i < chapterList.length - 1 && chapterList[i + 1]
+          ? chapterList[i + 1].chapterId
+          : '';
+      let t = chapterList[i];
+      chapters.push({
+        chapterId: t.chapterId,
+        bookId: book.bookId,
+        thisUrl: t.chapterId,
+        title: t.title,
+        isSave: 1,
+        num: i,
+        orderNum: i,
+      });
+
+      chapterDetails.push({
+        chapterId: t.chapterId,
+        bookId: book.bookId,
+        title: t.title,
+        content: t.content,
+        thisUrl: t.chapterId,
+        prevUrl: prevUrl,
+        nextUrl: nextUrl,
+      });
+    }
+
+    book.chapterId = chapters[0].chapterId;
+    book.historyChapterTitle = chapters[0].title;
+    book.lastChapterTitle = chapters[chapters.length - 1].title;
+  }
+
+  return Promise.all([
+    global.realm.saveChapter(chapters),
+    global.realm.saveDetail(chapterDetails, false),
+    global.realm.saveBook(book),
+  ]);
+};
+
+// 判断这一行是不是标题
+let _isChapterStart = o => {
+  return (
+    (o.indexOf('第') === 0 && o.indexOf('章') > 0) || o.indexOf('番外') === 0
+  );
 };
 
 // 对象克隆

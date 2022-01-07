@@ -51,7 +51,7 @@ export default StyleConfig = {
     button: 12,
   },
   opacity: {
-    active: 0.7, // 按下时，标签透明程度
+    active: 0.5, // 按下时，标签透明程度
     cardBackground: 0.7, // 卡片背景
     buttonBackground: 0.3, // 按钮背景
   },

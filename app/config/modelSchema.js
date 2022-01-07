@@ -298,9 +298,11 @@ const findDetail = primaryKey => {
   return cloneObj(_findOne('BookChapterDetail', primaryKey));
 };
 
-const saveDetail = rows => {
-  let chapter = findChapter(rows.chapterId);
-  saveChapter({chapterId: chapter.chapterId, isSave: 1});
+const saveDetail = (rows, isUpdate) => {
+  if (isUpdate) {
+    let chapter = findChapter(rows.chapterId);
+    saveChapter({chapterId: chapter.chapterId, isSave: 1});
+  }
   return _saveRow('BookChapterDetail', rows);
 };
 

@@ -97,7 +97,7 @@ export default AppApiBase = {
                 console.log('主键缺失');
               } else {
                 console.log('保存本章内容');
-                global.realm.saveDetail(detail);
+                global.realm.saveDetail(detail, true);
               }
               resolve(detail);
             }
