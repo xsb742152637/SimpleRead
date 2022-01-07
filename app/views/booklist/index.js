@@ -189,7 +189,7 @@ export default class BookList extends React.Component {
         this.setState({isSetting: false});
         global.loading.show('解析中……');
         let st = new Date().getTime();
-        let bufferSize = 1024 * 1024; // 单位: b，设置缓冲区大小为1M
+        let bufferSize = 1024 * 1024 * 10; // 单位: b，设置缓冲区大小为10M
         RNFetchBlob.fs
           .readStream('file://' + path, 'utf8', bufferSize)
           .then(ifstream => {

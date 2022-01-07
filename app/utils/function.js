@@ -71,9 +71,7 @@ export let contentFormat = (content, font_size, line_height) => {
       // console.log('满了');
       // 满一页
       if (p >= fontLines) {
-        if (isNullPage(rows)) {
-          pages.push(cloneObj(rows));
-        }
+        pages.push(cloneObj(rows));
         rows = [];
         p = 0;
       }
@@ -81,7 +79,8 @@ export let contentFormat = (content, font_size, line_height) => {
     row.push(s);
   }
   // 最后一行
-  if (row.length > 0) {
+  if (isNotNullRow(row)) {
+    // console.log('aaaaaaaaaaa' + row.join('') + row.length + isNotNullRow(row));
     let str = mergeSpace(row.join(''));
     let ii = getByteLength(str);
     while (ii <= fontCount - 6) {
@@ -90,17 +89,27 @@ export let contentFormat = (content, font_size, line_height) => {
     }
     rows.push(str);
   }
-  if (isNullPage(rows)) {
+  if (rows.length > 0) {
     pages.push(rows);
   }
 
   return pages;
 };
 // 判断一页是否有文字
-let isNullPage = rows => {
-  return (
-    !isNull(rows) && rows.length > 0 && /^[\u4e00-\u9fa5]+$/.test(rows.join(''))
-  );
+let isNotNullRow = rows => {
+  // console.log('isNotNullRow', /^[\u4e00-\u9fa5]+$/.test(rows.join('')), rows.join(''));
+  if (!isNull(rows) && rows.length > 0 && typeof rows === 'object') {
+    if (typeof rows[0] === 'object') {
+      let rs = [];
+      for (let i = 0; i < rows.length; i++) {
+        rs.push(rows[i].join(''));
+      }
+      return /^[\u4e00-\u9fa5]+$/.test(rs.join(''));
+    } else {
+      return /^[\u4e00-\u9fa5]+$/.test(rows.join(''));
+    }
+  }
+  return false;
 };
 
 // 解析并保存本地导入的txt内容

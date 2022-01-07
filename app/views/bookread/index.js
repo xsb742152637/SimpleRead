@@ -552,13 +552,13 @@ export default class BookRead extends React.Component {
   _showControlStation_LR(evt) {
     // console.log('点击', evt.nativeEvent.pageX, evt.nativeEvent.pageY);
     if (
-      evt.nativeEvent.pageX > width * 0.3 &&
-      evt.nativeEvent.pageX < width * 0.6
+      evt.nativeEvent.pageX > width * 0.25 &&
+      evt.nativeEvent.pageX < width * 0.8
     ) {
       // console.log('点击中间');
       this.setState({isSetting: !this.state.isSetting});
     } else if (!this.state.isLoad) {
-      if (evt.nativeEvent.pageX <= width * 0.3) {
+      if (evt.nativeEvent.pageX <= width * 0.25) {
         if (this.state.readCF.isLeft === 1) {
           this.x += width;
         } else {
@@ -569,7 +569,7 @@ export default class BookRead extends React.Component {
           offset: this.x,
           animated: true,
         });
-      } else if (evt.nativeEvent.pageX >= width * 0.6) {
+      } else if (evt.nativeEvent.pageX >= width * 0.8) {
         if (this.state.readCF.isLeft === 1) {
           this.x -= width;
         } else {
@@ -588,7 +588,7 @@ export default class BookRead extends React.Component {
       // this.setState({
       //   logStr: logStr,
       // });
-      if (p <= -1) {
+      if (p <= 0) {
         this._changeChapter(true, true);
       } else if (p >= this.state.contents.length - 1) {
         this._changeChapter(false, true);
