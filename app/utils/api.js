@@ -44,6 +44,13 @@ export default AppApiBase = {
               let book = cloneObj(global.realm.findBook(bookId));
 
               if (updateChapterList.length > 0) {
+                // 删除更新前最后一章缓存下来的小说内容，因为这一章的下一章地址变了
+                if (oldChapterList.length > 0) {
+                  let lastCid =
+                    oldChapterList[oldChapterList.length - 1].chapterId;
+                  global.realm.deleteDetail(lastCid);
+                }
+
                 AppApi.getBookInfo(book)
                   .then(res2 => {
                     console.log('更新成功2：', book.bookName);

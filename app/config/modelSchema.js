@@ -311,6 +311,11 @@ const deleteDetailByBookId = bookId => {
   deleteRow(rows);
 };
 
+const deleteDetail = chapterId => {
+  let rows = findDetail(chapterId);
+  deleteRow(rows);
+};
+
 const findConfig = () => {
   let config;
   try {
@@ -361,6 +366,7 @@ module.exports = {
   findDetail,
   saveDetail,
   deleteDetailByBookId,
+  deleteDetail,
 
   findConfig: findConfig,
   saveConfig: saveConfig,
