@@ -14,6 +14,7 @@ import {
   Dimensions,
   BackHandler,
   Image,
+  Platform,
 } from 'react-native';
 // 公共样式参数
 import StyleConfig from '@/config/styleConfig';
@@ -26,7 +27,7 @@ import {
   saveLocalTxt,
 } from '@/utils/function';
 import Item from '@/components/item';
-import RNFetchBlob from 'react-native-fetch-blob';
+import RNFetchBlob from 'rn-fetch-blob';
 import RNFileSelector from 'react-native-file-selector';
 const {width, height} = Dimensions.get('screen'); // 整个显示屏幕的宽高，包括顶部的状态信息栏
 
@@ -161,16 +162,18 @@ export default class BookList extends React.Component {
     });
   }
   _localImport() {
-    let filterFile = '.+(.txt|.TXT)$';
-    // if (Platform.OS === 'ios') {
-    //   filterFile = ['txt','TXT'];
-    // } else if (Platform.OS === 'android') {
-    //   filterFile = ".+(.txt|.TXT)$";
-    // }
+    let filterFile = null;
+    if (Platform.OS === 'ios') {
+      filterFile = ['java', 'class'];
+    } else if (Platform.OS === 'android') {
+      console.log('安卓');
+      filterFile = '.+(.mp4|.jpg|.txt|.TXT)$';
+    }
 
     RNFileSelector.Show({
-      title: '选择小说',
-      closeMenu: true,
+      title: '选择小说', // 标题
+      hiddenFiles: true, // 显示隐藏的文件
+      path: '/storage/emulated/0/小说/', // 选择器初始路径
       filter: filterFile,
       onDone: path => {
         // console.log('file selected: ' + path);
@@ -191,7 +194,7 @@ export default class BookList extends React.Component {
         let st = new Date().getTime();
         let bufferSize = 1024 * 1024 * 10; // 单位: b，设置缓冲区大小为10M
         RNFetchBlob.fs
-          .readStream('file://' + path, 'utf8', bufferSize)
+          .readStream('content://' + path, 'utf8', bufferSize)
           .then(ifstream => {
             ifstream.open();
             ifstream.onData(chunk => {

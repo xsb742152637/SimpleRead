@@ -138,8 +138,8 @@ android {
         applicationId "com.simpleread"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2 // 对用户不可见，仅用于应用市场、程序内部识别版本，判断新旧等用途
-        versionName "2.0.0" // 展示给用户，用户会通过它认知自己安装的版本
+        versionCode 3 // 对用户不可见，仅用于应用市场、程序内部识别版本，判断新旧等用途
+        versionName "2.0.1" // 展示给用户，用户会通过它认知自己安装的版本
     }
     splits {
         abi {
